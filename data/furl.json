@@ -1,0 +1,19 @@
+{
+	"topLevel": "gc",
+	"pages": {
+	    "collab_category": {
+		    "friendly": "cat/{#category}-{?}",
+		    "real": "app=collab&module=collab&controller=categories",
+		    "verify": "\\IPS\\collab\\Category"
+	    },
+	    "collab_collab": {
+		    "friendly": "{#id}-{?}",
+		    "real": "app=collab&module=collab&controller=collabs",
+		    "verify": "\\IPS\\collab\\Collab"
+	    },
+	    "collab_index": {
+	        "friendly": "",
+	        "real": "app=collab&module=collab&controller=categories"
+	    }
+	}
+}

@@ -1,0 +1,62 @@
+{
+    "ipsNodeController": {
+        "type": "C",
+        "class": "\\IPS\\Node\\Controller"
+    },
+    "ipsMember": {
+        "type": "C",
+        "class": "\\IPS\\Member"
+    },
+    "ipsDispatcherFront": {
+        "type": "C",
+        "class": "\\IPS\\Dispatcher\\Front"
+    },
+    "ipsTheme": {
+        "type": "C",
+        "class": "\\IPS\\Theme"
+    },
+    "ipsThemeDevTheme": {
+        "type": "C",
+        "class": "\\IPS\\Theme\\Dev\\Theme"
+    },
+    "ipsSessionFront": {
+        "type": "C",
+        "class": "\\IPS\\Session\\Front"
+    },
+    "ipsNodeModel": {
+        "type": "C",
+        "class": "\\IPS\\Node\\Model"
+    },
+    "ipsContent": {
+        "type": "C",
+        "class": "\\IPS\\Content"
+    },
+    "theme_coreFrontProfile": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_core_front_profile"
+    },
+    "theme_coreFrontGlobal": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_core_front_global"
+    },
+    "ipsContentItem": {
+        "type": "C",
+        "class": "\\IPS\\Content\\Item"
+    },
+    "ipsApplication": {
+        "type": "C",
+        "class": "\\IPS\\Application"
+    },
+    "modForumsForum": {
+        "type": "C",
+        "class": "\\IPS\\forums\\Forum"
+    },
+    "ipsDispatcherController": {
+        "type": "C",
+        "class": "\\IPS\\Dispatcher\\Controller"
+    },
+    "ipsHttpUrl": {
+        "type": "C",
+        "class": "\\IPS\\Http\\Url"
+    }
+}

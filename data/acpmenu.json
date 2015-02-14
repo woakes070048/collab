@@ -1,0 +1,16 @@
+{
+    "collab": {
+        "categories": {
+            "tab": "community",
+            "controller": "categories",
+            "do": "",
+            "restriction": "collab_categories_manage"
+        },
+        "settings": {
+            "tab": "community",
+            "controller": "settings",
+            "do": "",
+            "restriction": "collab_settings_manage"
+        }
+    }
+}

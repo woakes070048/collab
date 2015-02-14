@@ -1,0 +1,32 @@
+[
+    {
+        "method": "addColumn",
+        "params": [
+            "core_groups",
+            {
+                "name": "g_collabs_owned_limit",
+                "type": "INT",
+                "length": 10,
+                "null": false,
+                "default": 0,
+                "comment": "Limit to amount of collabs group user can lead.",
+                "unsigned": true
+            }
+        ]
+    },
+    {
+        "method": "addColumn",
+        "params": [
+            "core_groups",
+            {
+                "name": "g_collabs_joined_limit",
+                "type": "INT",
+                "length": 10,
+                "null": false,
+                "default": 0,
+                "comment": "Limit to amount of collabs group user can join.",
+                "unsigned": true
+            }
+        ]
+    }
+]

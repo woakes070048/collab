@@ -1,0 +1,14 @@
+{
+    "admin": {
+        "collab": {
+            "default_controller": "categories",
+            "protected": 0
+        }
+    },
+    "front": {
+        "collab": {
+            "default_controller": "categories",
+            "protected": 0
+        }
+    }
+}

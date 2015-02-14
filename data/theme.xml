@@ -1,0 +1,1965 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="Default" author_name="Invision Power Services, Inc" author_url="http://www.invisionpower.com">
+ <template template_group="components" template_name="categoryCoverOverlay" template_data="$category, $layout" template_location="front" template_app="collab"><![CDATA[
+<div class='ipsColumns ipsColumns_collapsePhone collabCategoryCoverLayout collabCategoryCoverLayout_{$layout}' data-hideOnCoverEdit>
+	<div class='ipsColumn ipsColumn_fluid ipsClearfix'>
+		<div class='ipsPos_left ipsPad coverContent'>
+			<h1 class='ipsType_reset'>
+				{{if $layout != 'standard'}}<a href='{$category->url()}'>{{endif}}
+				{$category->_title}
+				{{if $layout != 'standard'}}</a>{{endif}}
+			</h1>
+			{{if $layout == 'subview'}}
+				<a href='{$category->url()}' class='ipsButton ipsButton_verySmall ipsButton_light'>{lang="browse"}</a>
+			{{else}}
+				<div class='collabCategoryDescription'>
+					{$category->description|raw}
+				</div>
+			{{endif}}
+			{{if $layout == 'index'}}
+				<div class="categoryCoverBrowseButton">
+					<a href='{$category->url()}' class='ipsButton ipsButton_veryLarge ipsButton_alternate'>{lang="browse"}</a>
+				</div>
+			{{endif}}
+			{{if $layout == 'standard' and $category->can('add')}}
+				<div class="categoryCoverAddButton ipsResponsive_hidePhone">
+					<a href='{$category->url()->setQueryString( 'do', 'add' )}' class='ipsButton ipsButton_positive'><i class="fa fa-plus-circle"></i> &nbsp;{lang="collab_start_new" sprintf="$category->collab_singular"}</a>
+				</div>
+			{{endif}}
+		</div>
+	</div>
+</div>
+]]></template>
+ <template template_group="components" template_name="categoryTable" template_data="$table, $headers, $rows" template_location="front" template_app="collab"><![CDATA[<div data-baseurl='{$table->baseUrl}' data-resort='{$table->resortKey}' data-tableID='topics' data-controller='core.global.core.table{{if $table->canModerate()}},core.front.core.moderation{{endif}}'>
+
+	<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+		{{if $table->container()->can('add')}}
+		<ul class="ipsButtonRow ipsPos_left ipsClearfix">
+			<li class="ipsResponsive_hideDesktop ipsResponsive_hideTablet">
+				<a href="{$table->container()->url()->setQueryString( 'do', 'add' )}"><i class="fa fa-plus-circle"></i> &nbsp;{lang="collab_start_new" sprintf="$table->container()->collab_singular"}</a>
+			</li>
+		</ul>
+		{{endif}}
+		{{if $table->canModerate()}}
+		<ul class="ipsButtonRow ipsPos_right ipsClearfix">
+			<li>
+				<a class="ipsJS_show" href="#elCheck_menu" id="elCheck_{$table->uniqueId}" title='{lang="{$table->langPrefix}select_rows_tooltip"}' data-ipsTooltip data-ipsAutoCheck data-ipsAutoCheck-context="#elTable_{$table->uniqueId}" data-ipsMenu data-ipsMenu-activeClass="ipsButtonRow_active">
+					<span class="cAutoCheckIcon ipsType_medium"><i class="fa fa-square-o"></i></span> <i class="fa fa-caret-down"></i>
+					<span class='ipsNotificationCount' data-role='autoCheckCount'>0</span>
+				</a>
+				<ul class="ipsMenu ipsMenu_auto ipsMenu_withStem ipsHide" id="elCheck_{$table->uniqueId}_menu">
+					<li class="ipsMenu_title">{lang="{$table->langPrefix}select_rows"}</li>
+					<li class="ipsMenu_item" data-ipsMenuValue="all"><a href="#">{lang="all"}</a></li>
+					<li class="ipsMenu_item" data-ipsMenuValue="none"><a href="#">{lang="none"}</a></li>
+					{{if count($table->getFilters())}}
+						<li class="ipsMenu_sep"><hr></li>
+						{{foreach $table->getFilters() as $filter}}
+							<li class="ipsMenu_item" data-ipsMenuValue="{$filter}"><a href="#">{lang="$filter"}</a></li>
+						{{endforeach}}
+					{{endif}}
+				</ul>
+			</li>
+		</ul>
+		{{endif}}
+
+		<ul class="ipsButtonRow ipsPos_right ipsClearfix">
+			{{if isset( $table->sortOptions ) and !empty( $table->sortOptions )}}
+				<li>
+					<a href="#elSortByMenu_menu" id="elSortByMenu_{$table->uniqueId}" data-role='sortButton' data-ipsMenu data-ipsMenu-activeClass="ipsButtonRow_active" data-ipsMenu-selectable="radio">{lang="sort_by"} <i class="fa fa-caret-down"></i></a>
+					<ul class="ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide" id="elSortByMenu_{$table->uniqueId}_menu">
+						{{$custom = TRUE;}}
+						{{foreach $table->sortOptions as $k => $col}}
+							<li class="ipsMenu_item {{if $col === $table->sortBy}}{{$custom = FALSE;}}ipsMenu_itemChecked{{endif}}" data-ipsMenuValue="{$col}" data-sortDirection='{{if $col == 'title'}}asc{{else}}desc{{endif}}'><a href="{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $col, 'sortdirection' => ( $col == 'title' ) ? 'asc' : 'desc', 'page' => '1' ) )}">{lang="{$table->langPrefix}sort_{$k}"}</a></li>
+						{{endforeach}}
+						{{if $table->advancedSearch}}
+							<li class="ipsMenu_item {{if $custom}}ipsMenu_itemChecked{{endif}}" data-noSelect="true">
+								<a href='{$table->baseUrl->setQueryString( array( 'advancedSearchForm' => '1', 'filter' => $table->filter, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection ) )}' data-ipsDialog data-ipsDialog-title='{lang="custom_sort"}'>{lang="custom"}</a>
+							</li>
+						{{endif}}
+					</ul>
+				</li>
+			{{endif}}
+			{{if !empty( $table->filters )}}
+				<li>
+					<a href="#elFilterByMenu_menu" id="elFilterByMenu_{$table->uniqueId}" data-role='tableFilterMenu' data-ipsMenu data-ipsMenu-activeClass="ipsButtonRow_active" data-ipsMenu-selectable="radio">{lang="filter_by"} <i class="fa fa-caret-down"></i></a>
+					<ul class='ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide' data-role="tableFilterMenu" id='elFilterByMenu_{$table->uniqueId}_menu'>
+						<li data-action="tableFilter" data-ipsMenuValue='' class='ipsMenu_item {{if !$table->filter}}ipsMenu_itemChecked{{endif}}'>
+							<a href='{$table->baseUrl->setQueryString( array( 'filter' => '', 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}'>{lang="{$table->langPrefix}all"}</a>
+						</li>
+						{{foreach $table->filters as $k => $q}}
+							<li data-action="tableFilter" data-ipsMenuValue='{$k}' class='ipsMenu_item {{if $k === $table->filter}}ipsMenu_itemChecked{{endif}}'>
+								<a href='{$table->baseUrl->setQueryString( array( 'filter' => $k, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}'>{lang="{$table->langPrefix}{$k}"}</a>
+							</li>
+						{{endforeach}}
+					</ul>
+				</li>
+			{{endif}}
+		</ul>
+
+		{{if $table->pages > 1}}
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit, TRUE, $table->getPaginationKey()"}
+			</div>
+		{{endif}}
+	</div>
+
+	{{if $table->canModerate()}}
+		<form action="{$table->baseUrl}" method="post" data-role='moderationTools' data-ipsPageAction>
+	{{endif}}
+		{{if count( $rows )}}
+			<ol class='ipsDataList ipsDataList_zebra ipsClear collabListTable {{foreach $table->classes as $class}}{$class} {{endforeach}}' id='elTable_{$table->uniqueId}' data-role="tableRows" itemscope itemtype="http://schema.org/ItemList">
+				{template="$table->rowsTemplate[1]" params="$table, $headers, $rows" object="$table->rowsTemplate[0]"}
+			</ol>
+		{{endif}}
+		{{if $table->container()->collabs_enable and count( $rows ) == 0}}
+			<div class='ipsType_center ipsPad'>
+				<p class='ipsType_large'>{lang="no_collabs_in_category" sprintf="$table->container()->collab_plural"}</p>
+				{{if $table->container()->can('add')}}
+					<a href='{$table->container()->url()->setQueryString( 'do', 'add' )}' class='ipsButton ipsButton_primary ipsButton_medium'>
+						<i class="fa fa-plus-circle"></i> &nbsp;{lang="collab_start_new" sprintf="$table->container()->collab_singular"}
+					</a>
+				{{endif}}
+			</div>
+		{{endif}}
+		{{if $table->canModerate()}}
+			<div class="ipsAreaBackground ipsPad ipsClearfix" data-role="pageActionOptions">
+				<div class="ipsPos_right">
+					<select name="modaction" data-role="moderationAction">
+						{{if $table->canModerate('unhide')}}
+							<option value='approve' data-icon='check-circle'>{lang="approve"}</option>
+						{{endif}}
+						{{if $table->canModerate('feature') or $table->canModerate('unfeature')}}
+							<optgroup label="{lang="feature"}" data-icon='star' data-action='feature'>
+								{{if $table->canModerate('feature')}}
+									<option value='feature'>{lang="feature"}</option>
+								{{endif}}
+								{{if $table->canModerate('unhide')}}
+									<option value='unfeature'>{lang="unfeature"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('pin') or $table->canModerate('unpin')}}
+							<optgroup label="{lang="pin"}" data-icon='thumb-tack' data-action='pin'>
+								{{if $table->canModerate('pin')}}
+									<option value='pin'>{lang="pin"}</option>
+								{{endif}}
+								{{if $table->canModerate('unpin')}}
+									<option value='unpin'>{lang="unpin"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('hide') or $table->canModerate('unhide')}}
+							<optgroup label="{lang="hide"}" data-icon='eye' data-action='hide'>
+								{{if $table->canModerate('hide')}}
+									<option value='hide'>{lang="hide"}</option>
+								{{endif}}
+								{{if $table->canModerate('unhide')}}
+									<option value='unhide'>{lang="unhide"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('lock') or $table->canModerate('unlock')}}
+							<optgroup label="{lang="lock"}" data-icon='lock' data-action='lock'>
+								{{if $table->canModerate('lock')}}
+									<option value='lock'>{lang="lock"}</option>
+								{{endif}}
+								{{if $table->canModerate('unlock')}}
+									<option value='unlock'>{lang="unlock"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('move')}}
+							<option value='move' data-icon='arrow-right'>{lang="move"}</option>
+						{{endif}}
+						{{if $table->canModerate('split_merge')}}
+							<option value='merge' data-icon='level-up'>{lang="merge"}</option>
+						{{endif}}
+						{{if $table->canModerate('delete')}}
+							<option value='delete' data-icon='times-circle'>{lang="delete"}</option>
+						{{endif}}
+						{{if $table->savedActions}}
+							<optgroup label="{lang="saved_actions"}" data-icon='tasks' data-action='saved_actions'>
+								{{foreach $table->savedActions as $k => $v}}
+									<option value='savedAction-{$k}'>{$v}</option>
+								{{endforeach}}
+							</optgroup>
+						{{endif}}
+					</select>
+					<button type="submit" class="ipsButton ipsButton_alternate ipsButton_verySmall">{lang="submit"}</button>
+				</div>
+			</div>
+		</form>
+		{{endif}}
+
+	{{if $table->pages > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit, TRUE, $table->getPaginationKey()"}
+			</div>
+		</div>
+	{{endif}}
+</div>]]></template>
+ <template template_group="components" template_name="collabAdminHeader" template_data="$collab, $page_title" template_location="front" template_app="collab"><![CDATA[
+<header class="collabHeader">
+	<div class='ipsPageHead_special' id='elCollabHeader' data-controller='core.front.core.coverPhoto' data-url="{$collab->url()->csrf()}" data-coverOffset='{$coverPhoto->offset}'>
+			<ul class='ipsList_inline' id='elEditCollab' style="right: 10px; top:10px;">
+				{template="menuCollab" app="collab" group="components" params="$collab"}
+			</ul>
+		<div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
+			<div class='ipsColumn ipsColumn_fluid'>
+				<div class='ipsPos_left ipsPad cProfileHeader_name'>
+					<h1 class='ipsType_reset'>
+						{$page_title}	
+					</h1>
+					<p>{$collab->title}</p>
+				</div>
+			</div>
+		</div>
+		<div id="collabModOptions">
+			{template="menuModerators" app="collab" group="components" params="$collab"}
+		</div>
+	</div>
+</header>]]></template>
+ <template template_group="components" template_name="collabComment" template_data="$item, $comment, $otherClasses=''" template_location="front" template_app="collab"><![CDATA[{{$idField = $comment::$databaseColumnId;}}
+{{$itemClassSafe = str_replace( '\\', '_', mb_substr( $comment::$itemClass, 4 ) );}}
+{{if $comment->isIgnored()}}
+	<div class='ipsComment ipsComment_ignored ipsType_light' id='elIgnoreComment_{$comment->$idField}' data-ignoreCommentID='elComment_{$comment->$idField}' data-ignoreUserID='{$comment->author()->member_id}'>
+		{lang="ignoring_content" sprintf="$comment->author()->name"} <a href='#elIgnoreComment_{$comment->$idField}_menu' data-ipsMenu data-ipsMenu-menuID='elIgnoreComment_{$comment->$idField}_menu' data-ipsMenu-appendTo='#elIgnoreComment_{$comment->$idField}' data-action="ignoreOptions" title='{lang="see_post_ignore_options"}' class='ipsType_blendLinks'>{lang="options"} <i class='fa fa-caret-down'></i></a>
+		<ul class='ipsMenu ipsHide' id='elIgnoreComment_{$comment->$idField}_menu'>
+			<li class='ipsMenu_item ipsJS_show' data-ipsMenuValue='showPost'><a href='#'>{lang="show_this_post"}</a></li>
+			<li class='ipsMenu_sep ipsJS_show'><hr></li>
+			<li class='ipsMenu_item' data-ipsMenuValue='stopIgnoring'><a href='{url="app=core&module=system&controller=ignore&do=remove&id={$comment->author()->member_id}" seoTemplate="ignore"}'>{lang="stop_ignoring_posts_by" sprintf="$comment->author()->name"}</a></li>
+			<li class='ipsMenu_item'><a href='{url="app=core&module=members&controller=ignore" seoTemplate="ignore"}'>{lang="change_ignore_preferences"}</a></li>
+		</ul>
+	</div>
+{{endif}}
+
+<a id='comment-{$comment->$idField}'></a>
+<article itemscope itemtype="http://schema.org/Comment" id='elComment_{$comment->$idField}' class='cPost ipsBox {{if $otherClasses}}{$otherClasses}{{endif}} ipsComment {{if settings.reputation_highlight and $comment->reputation() >= settings.reputation_highlight}}ipsComment_popular{{endif}} ipsComment_parent ipsClearfix ipsClear ipsColumns ipsColumns_noSpacing ipsColumns_collapsePhone {{if $comment->isIgnored()}}ipsHide{{endif}} {{if $comment->hidden()}}ipsModerated{{endif}}'>
+	<aside class='ipsComment_author cAuthorPane ipsAreaBackground_light ipsColumn ipsColumn_medium'>
+		<h3 class='ipsType_sectionHead cAuthorPane_author ipsType_blendLinks ipsType_break' itemprop="creator" itemscope="" itemtype="http://schema.org/Person"><strong>{$comment->author()->link( $comment->warningRef() )|raw}</strong> <span class='ipsResponsive_showPhone ipsResponsive_inline'>{template="reputationBadge" group="global" app="core" params="$comment->author()"}</span></h3>
+		<ul class='cAuthorPane_info ipsList_reset'>
+			{{if $comment->author()->member_title && $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone'>{$comment->author()->member_title}</li>
+			{{elseif $comment->author()->rank['title'] && $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone'>{$comment->author()->rank['title']}</li>
+			{{endif}}
+			<li class='cAuthorPane_photo'>
+				{template="userPhoto" app="core" group="global" params="$comment->author(), 'large', $comment->warningRef()"}
+			</li>
+			<li>{expression="\IPS\Member\Group::load( $comment->author()->member_group_id )->formattedName" raw="true"}</li>
+			{{if $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone'>{template="reputationBadge" group="global" app="core" params="$comment->author()"}</li>
+				<li class='ipsType_light'>{lang="member_post_count" pluralize="$comment->author()->member_posts"}</li>
+				{{if $comment->author()->reputationImage()}}
+					<li class='ipsPad_half ipsResponsive_hidePhone'>
+						<img src='{$comment->author()->reputationImage()}' title='{{if $comment->author()->reputation()}}{$comment->author()->reputation()}{{endif}}' alt=''>
+					</li>
+				{{endif}}
+			{{endif}}
+			{{if \IPS\Member\Group::load( $comment->author()->member_group_id )->g_icon }}
+				<li><img src='{$comment->author()->group['g_icon']}' alt=''></li>
+			{{endif}}
+		</ul>
+	</aside>
+	<div class='ipsColumn ipsColumn_fluid'>
+		{template="post" group="topics" app="forums" params="$item, $comment, $item::$formLangPrefix . 'comment', $item::$application, $item::$module, $itemClassSafe"}
+	</div>
+</article>]]></template>
+ <template template_group="components" template_name="collabComments" template_data="$collab, $comments" template_location="front" template_app="collab"><![CDATA[
+<div data-controller='core.front.core.commentFeed,forums.front.topic.view' data-baseURL='{$collab->url()}' {{if $collab->isLastPage()}}data-lastPage{{endif}} data-feedID='collab-{$collab->collab}' class='cTopic ipsClear'>
+
+	<h2 class='ipsType_sectionTitle ipsType_reset ipsType_medium' data-role="comment_count" data-commentCountString="js_num_topic_posts" style="text-transform: lowercase">{lang="collab_comment_count" pluralize="$collab->posts" sprintf="$collab->collab_singular"}</h2>
+	{{if $collab->commentPageCount() > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			{$collab->commentPagination( array( 'sortby' ) )|raw}
+		</div>
+	{{endif}}
+
+	<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+		<form action="{$collab->url()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+			{{$postCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
+			{{if count( $comments )}}
+				{{foreach $comments as $comment}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}
+						{{if $lined = TRUE and $postCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$postCount++;}}
+					
+					{template="collabComment" group="components" app="collab" params="$collab, $comment"}
+				{{endforeach}}
+			{{endif}}
+			{template="commentMultimod" app="core" group="global" params="$collab"}
+		</form>
+	</div>
+
+	{{if $collab->commentPageCount() > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			{$collab->commentPagination( array( 'sortby' ) )|raw}
+		</div>
+	{{endif}}
+
+	{{if $collab->commentForm() || $collab->locked() || \IPS\Member::loggedIn()->restrict_post || \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+		<a id='replyForm'></a>
+		<div data-role='replyArea' class='cTopicPostArea ipsBox ipsBox_transparent ipsAreaBackground ipsPad {{if !$collab->canComment()}}cTopicPostArea_noSize{{endif}} ipsSpacer_top'>
+			{{if $collab->commentForm()}}
+				{{if $collab->locked()}}
+					<strong class='ipsType_warning ipsComposeArea_warning'><i class='fa fa-info-circle'></i> {lang="topic_locked_can_comment"}</strong>
+				{{endif}}
+				{$collab->commentForm()|raw}
+			{{else}}
+				{{if $collab->locked()}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'topic_locked_cannot_comment'"}
+				{{elseif \IPS\Member::loggedIn()->restrict_post}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+				{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+
+	<div class='ipsResponsive_noFloat ipsResponsive_showPhone ipsResponsive_block ipsSpacer_top'>
+		{template="follow" app="core" group="global" params="'collab', 'collab', $collab->collab_id, $collab->followers()->count( TRUE )"}
+	</div>
+
+</div>]]></template>
+ <template template_group="components" template_name="collabCoverOverlay" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
+{{$parents = array();}}
+{{foreach $collab->container()->parents() as $parent}}
+  {{$parents[] = $parent->_title;}}
+{{endforeach}}
+{{$parents[] = $collab->container()->_title;}}
+
+<ul class='ipsList_inline {{if \IPS\collab\Application::urlMatch( $collab ) and $collab->canEdit()}}editable{{endif}}' id='elEditCollab'>
+	{template="menuCollab" app="collab" group="components" params="$collab"}
+	{{if $collab->canJoin() and $collab->join_mode !== \IPS\collab\COLLAB_JOIN_INVITE}}
+	<li>
+		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_positive ipsButton_verySmall' title="{lang="collab_join" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join" sprintf="$collab->collab_singular"}</a>
+	</li>
+	{{endif}}
+</ul>
+<div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
+	<div class='ipsColumn ipsColumn_fluid'>
+		<div class='ipsPos_left ipsPad headerContent' style='padding-top:0'>
+			<h1 class='ipsType_reset'>
+				{$collab->title}
+				<span class='ipsResponsive_hidePhone'>
+					{{if $collab->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{$collab->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $collab->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}
+					{{if $collab->locked()}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="locked"}'><i class='fa fa-lock'></i></span>
+					{{endif}}
+					{{if $collab->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $collab->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+					{{if $membership = $collab->getMembership()}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$collab->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_negative" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$collab->collab_singular"}'><i class='fa fa-times-circle'></i></span>
+						{{endif}}
+					{{endif}}
+					{{if $collab->is_template and ( $collab->canMakeModel() or $collab->canUnmakeModel() )}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_marked_model"}'><i class='fa fa-flag'></i></span>
+					{{endif}}
+				</span>
+			</h1>
+			<p>{$collab->collab_singular} &nbsp;( {expression="implode(' / ', $parents)"} )</p>
+			{{if count( $collab->tags() )}}
+				<div style="padding-bottom:10px" class="ipsResponsive_hidePhone">
+					{template="tags" group="global" app="core" params="$collab->tags()"}
+				</div>
+			{{endif}}
+			{{if $collab->container()->bitoptions[ 'allow_ratings' ]}}
+			<div class='ipsType_light ipsResponsive_hidePhone'>
+				{$collab->rating()|raw}
+			</div>
+			{{endif}}
+		</div>
+	</div>
+</div>
+<div id="collabModOptions">
+	{template="menuModerators" app="collab" group="components" params="$collab"}
+</div>
+]]></template>
+ <template template_group="components" template_name="collabHeader" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<header class="collabHeader">
+	{$collab->coverPhoto()|raw}
+	<div id='elCollabStats' class='ipsClearfix'>
+		<div data-role='switchView' class='ipsResponsive_hidePhone ipsResponsive_block'>
+			<div class='ipsPos_right'>
+				{template="follow" app="core" group="global" params="'collab', 'collab', $collab->collab_id, $collab->followersCount()"}
+			</div>
+		</div>
+		<ul class='ipsList_inline ipsPos_left statsList'>
+			<li>
+				<a href="{$collab->url()->setQueryString( array( 'do' => 'members' ) )}" data-ipsDialog data-ipsdialog-title="{lang="collab_active_members"}" data-ipsDialog-size="narrow" data-ipstooltip _title="{lang="collab_see_active_members" sprintf="\strtolower($collab->collab_singular)"}">
+					<h4 class='ipsType_minorHeading'>{lang="collab_members_count"}</h4>
+					{$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )}
+				</a>
+			</li>
+			<li class='ipsResponsive_hidePhone'>
+				<h4 class='ipsType_minorHeading'>{lang="collab_created_date" sprintf="$collab->collab_singular"}</h4>
+				{datetime="$collab->created_date"}
+			</li>
+			<li>
+				<h4 class='ipsType_minorHeading'>{lang="collab_owned_by" sprintf="$collab->collab_singular"}</h4>
+				{$collab->author()->link()|raw}
+			</li>
+		</ul>
+	</div>
+</header>]]></template>
+ <template template_group="components" template_name="collabRow" template_data="$table, $headers, $rows" template_location="front" template_app="collab"><![CDATA[{{$rowIds = array();}}
+{{foreach $rows as $row}}
+	{{$idField = $row::$databaseColumnId;}}
+	{{$rowIds[] = $row->$idField;}}
+{{endforeach}}
+{{$iposted = ( method_exists( $table, 'container' ) AND $table->container() !== NULL ) ? $table->container()->contentPostedIn( null, $rowIds ) : array();}}
+{{if count( $rows )}}
+	{{$rowCount=0;}}
+	{{foreach $rows as $row}}
+		{{$rowCount++;}}
+		{{$idField = $row::$databaseColumnId;}}
+		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
+			<div class='ipsDataItem_icon ipsPos_top'>
+				{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
+				<span class='ipsItemStatus ipsItemStatus_large collabStatusIcon'>
+					{{if $row->isFull()}}
+						<i class="fa fa-circle"></i>
+					{{else}}
+					  	<i class="fa fa-circle-o"></i>
+					{{endif}}
+					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style1 membershipCount" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
+						{$member_count}
+					</span>
+					{{if $membership = $row->getMembership()}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive membershipStatus" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$collab->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_negative membershipStatus" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$collab->collab_singular"}'><i class='fa fa-times-circle'></i></span>
+						{{endif}}
+					{{endif}}
+				</span>
+			</div>
+			<div class='ipsDataItem_main'>
+				<h4 class='ipsDataItem_title marg0 ipsType_break'>
+					{{if $row->locked()}}
+						<i class='fa fa-lock' data-ipsTooltip title='{lang="topic_locked"}'></i>
+					{{endif}}
+										
+					{{if $row->prefix()}}
+						{template="prefix" group="global" app="core" params="$row->prefix( TRUE ), $row->prefix()"}
+					{{endif}}
+					
+					<a href='{$row->url()}' {{if $row->tableHoverUrl and $row->canView()}}data-ipsHover data-ipsHover-target='{$row->url()->setQueryString('preview', 1)}' data-ipsHover-timeout='1.5'{{endif}}>
+						{{if $row->mapped('title')}}{lang="$row->mapped('title')" wordbreak="true"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+					</a>
+				</h4>
+				<span>
+					{{if $row->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$row->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $row->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}							
+					{{if $row->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $row->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+					{{if $row->is_template and ( $row->canMakeModel() or $row->canUnmakeModel() )}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_marked_model"}'><i class='fa fa-flag'></i></span>
+					{{endif}}
+					{{if count( $row->tags() )}}
+						&nbsp;&nbsp;
+						{template="tags" group="global" app="core" params="$row->tags(), true, true"}
+					{{endif}}
+				</span>
+				<div class='ipsDataItem_meta ipsType_reset ipsType_light ipsType_blendLinks'>
+					{truncate="$row->short_description" length="256"}
+				</div>
+			</div>
+			<ul class='ipsDataItem_stats'>
+				{{foreach $row->stats(TRUE) as $k => $v}}
+					<li {{if $k == 'num_views'}}class='ipsType_light'{{elseif in_array( $k, $row->hotStats )}}class="ipsDataItem_stats_hot" data-text='{lang="hot_item"}' data-ipsTooltip title='{lang="hot_item_desc"}'{{endif}}>
+						<span class='ipsDataItem_stats_number'>{$v}</span>
+						<span class='ipsDataItem_stats_type'>{lang="forums_{$k}" pluralize="$v"}</span>
+						{{if $k == 'comments' && \IPS\collab\Collab::modPermission( 'unhide', NULL, $row->container() ) AND $row->queuedposts}}
+							&nbsp;<a href='{$row->url()->setQueryString( 'queued_posts', 1 )}' class='ipsType_warning ipsType_small ipsPos_right ipsResponsive_noFloat' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$row->topic_queuedposts"}'><i class='fa fa-warning'></i> <strong>{$row->topic_queuedposts}</strong></a>
+						{{endif}}
+					</li>
+				{{endforeach}}
+			</ul>
+			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+				<li>
+					{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
+				</li>
+				<li>
+					{$row->author()->link()|raw}
+				</li>
+				<li class="ipsType_light ipsResponsive_hidePhone">
+					{$row->getMembership( $row->author() )->title()}
+				</li>
+			</ul>
+			{{if $table->canModerate()}}
+				<div class='ipsDataItem_modCheck'>
+					<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->tableStates()}}{$row->tableStates()}{{endif}}'>
+				</div>
+			{{endif}}
+		</li>
+	{{endforeach}}
+{{endif}}]]></template>
+ <template template_group="components" template_name="membersList" template_data="$url, $pagination, $memberships" template_location="front" template_app="collab"><![CDATA[<div data-ipsInfScroll data-ipsInfScroll-scrollScope="#elMembersList" data-ipsInfScroll-container="#elMembersList" data-ipsInfScroll-url="{$url}" data-ipsInfScroll-pageParam="membersPage" data-ipsInfScroll-pageBreakTpl="">
+	<div class="ipsJS_hide">{$pagination|raw}</div>
+	<div class='ipsFollowerList ipsPad ipsScrollbar'>
+		<ul class="ipsDataList ipsList_reset" id="elMembersList">
+			{template="membersRows" app="collab" group="components" params="$memberships"}
+		</ul>
+	</div>
+</div>]]></template>
+ <template template_group="components" template_name="membersRows" template_data="$memberships" template_location="front" template_app="collab"><![CDATA[{{foreach $memberships as $membership}}
+	<li class='ipsDataItem ipsClearfix'>
+		<div class='ipsDataItem_icon ipsPos_top'>
+			{template="userPhoto" app="core" group="global" params="$membership->member(), 'tiny'"}
+		</div>
+		<div class='ipsDataItem_main'>
+			<strong class='ipsDataItem_membername'>{member="name" id="$membership->member()->member_id"}</strong><br>
+			{{if $membership->title()}}
+			<span class='ipsDataItem_title'>{$membership->title()}</span>
+			{{endif}}
+			<span class='ipsType_light'>{datetime="$membership->joined"}</span>
+		</div>
+	</li>
+{{endforeach}}]]></template>
+ <template template_group="components" template_name="menuCollab" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<li>
+	<a class='ipsButton ipsButton_important ipsButton_verySmall' data-ipsMenu data-ipsMenu-appendTo='#elEventHeader' id='elCollabMenu' href='#elCollabMenu_menu'>
+		<i class='fa fa-bars'></i>&nbsp;<span class='ipsResponsive_hidePhone ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_menu" sprintf="$collab->collab_singular"} <i class='fa fa-caret-down'></i></span>
+	</a>
+	<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCollabMenu_menu'>
+		<li class='ipsMenu_item'>
+			<a href='{$collab->url()}'>
+				<i class='fa fa-home'></i>&nbsp;<span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_homepage" sprintf="$collab->collab_singular"}</span>
+			</a>
+		</li>
+	</ul>
+</li>
+]]></template>
+ <template template_group="components" template_name="menuModerators" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
+{{if $collab->hidden() === 1 and $collab->canUnhide()}}
+	<div class="ipsMessage ipsMessage_warning ipsSpacer_top">
+		<p class="ipsType_reset">{lang="topic_pending_approval"}</p>
+		<ul class='ipsList_inline ipsSpacer_top'>
+			<li><a href="{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}" class="ipsButton ipsButton_positive ipsButton_verySmall" title='{lang="approve_title"}'><i class="fa fa-check"></i> {lang="approve"}</a></li>
+			{{if $collab->canDelete()}}
+				<li><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  title='{lang="topic_delete_title"}' class='ipsButton ipsButton_negative ipsButton_verySmall'><i class='fa fa-times'></i> {lang="delete"}</a></li>
+			{{endif}}
+		</ul>
+	</div>
+{{endif}}
+
+<ul class="ipsToolList ipsClearfix {{if !( $collab->canPin() or $collab->canUnpin() or $collab->canFeature() or $collab->canUnfeature() or $collab->canHide() or $collab->canUnhide() or $collab->canMove() or $collab->canLock() or $collab->canUnlock() or $collab->canDelete() or $collab->availableSavedActions() )}}ipsResponsive_hidePhone{{endif}}">
+	{{if $collab->isMod() or $collab->collabCan( 'manageCollab' )}}
+		<li>
+			<a href='#elCollabActions_menu' id='elCollabActions' class='ipsButton ipsButton_link ipsButton_medium ipsButton_fullWidth' data-ipsMenu>{lang="collab_moderation_actions" sprintf="$collab->collab_singular"} <i class='fa fa-caret-down'></i></a>
+			<ul id='elCollabActions_menu' class='ipsMenu ipsMenu_auto ipsHide'>
+				{{if $collab->canEdit()}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=collabs&id={$collab->collab_id}&do=edit"}'>
+						<i class='fa fa-cogs'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_settings" sprintf="$collab->collab_singular"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{if $collab->collabCan( 'manageMembers' )}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=admin&collab={$collab->collab_id}&do=manageMembers"}'>
+						<i class='fa fa-users'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_manageMembers"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{if $collab->collabCan( 'manageRoles' )}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=roles&collab={$collab->collab_id}"}'>
+						<i class='fa fa-shield'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_manageRoles"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{foreach $collab->enabledNodes() as $app => $config}}
+					{{if $collab->collabCan( 'appManage-' . $app )}}
+						{{$appNodeCount = count( $config['nodes'] );}}
+						{{foreach $config['nodes'] as $node}}
+							<li class='ipsMenu_item'>
+								<a href='{url="app=collab&module=collab&controller=nodes&collab={$collab->collab_id}&nid={$node['nid']}"}'>
+									<i class='fa fa-{$config['icon']}'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{{if $appNodeCount > 1}}{lang="collab_manage_nodes" sprintf="$node['content_container_name']"}{{else}}{lang="collab_manage_nodes" sprintf="$config['app']->_title"}{{endif}}</span>
+								</a>
+							</li>
+						{{endforeach}}
+					{{endif}}
+				{{endforeach}}
+				{{if $collab->isMod()}}
+					<li class='ipsMenu_sep'><hr></li>
+				{{endif}}
+				{{if $collab->canFeature()}}
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'feature' ) )}'><i class="fa fa-star"></i> &nbsp;{lang="feature"}</a></li>
+				{{endif}}
+				{{if $collab->canUnfeature()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unfeature' ) )}' ><i class="fa fa-minus-circle"></i> &nbsp;{lang="unfeature"}</a></li>
+				{{endif}}
+				{{if $collab->canPin()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'pin' ) )}' ><i class="fa fa-thumb-tack"></i> &nbsp;{lang="pin"}</a></li>
+				{{endif}}
+				{{if $collab->canUnpin()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unpin' ) )}' ><i class="fa fa-minus-circle"></i> &nbsp;{lang="unpin"}</a></li>
+				{{endif}}
+				{{if $collab->canHide()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'hide' ) )}' data-ipsDialog data-ipsDialog-title="{lang="hide"}"><i class="fa fa-eye-slash"></i> &nbsp;{lang="hide"}</a></li>
+				{{endif}}
+				{{if $collab->canUnhide()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}' >{{if $collab->hidden() === 1}}<i class="fa fa-thumbs-up"></i> &nbsp;{lang="approve"}{{else}}<i class="fa fa-minus-circle"></i> &nbsp;{lang="unhide"}{{endif}}</a></li>
+				{{endif}}
+				{{if $collab->canLock()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'lock' ) )}' ><i class="fa fa-lock"></i> &nbsp;{lang="lock"}</a></li>
+				{{endif}}
+				{{if $collab->canUnlock()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unlock' ) )}' ><i class="fa fa-unlock"></i> &nbsp;{lang="unlock"}</a></li>
+				{{endif}}
+				{{if $collab->canMove()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'move' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="move"}"  ><i class="fa fa-sign-out"></i> &nbsp;{lang="move"}</a></li>
+				{{endif}}
+				{{if $collab->canMakeModel()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'makeModel' ) )}' ><i class="fa fa-flag"></i> &nbsp;{lang="collab_make_model" sprintf="$collab->collab_singular"}</a></li>
+				{{endif}}
+				{{if $collab->canUnmakeModel()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'unmakeModel' ) )}' ><i class="fa fa-flag-o"></i> &nbsp;{lang="collab_unmake_model" sprintf="$collab->collab_singular"}</a></li>
+				{{endif}}
+				{{if $collab->canMerge()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'merge' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="merge"}" ><i class="fa fa-level-up"></i> &nbsp;{lang="merge"}</a></li>
+				{{endif}}
+				{{if $collab->canDelete()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  ><i class="fa fa-trash"></i> &nbsp;{lang="delete"}</a></li>
+				{{endif}}
+				{{if $collab->availableSavedActions()}}
+					<li class='ipsMenu_sep'><hr></li>
+					{{foreach $collab->availableSavedActions() as $action}}
+						<li class="ipsMenu_item"><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'savedAction', 'action' => $action->_id ) )}' data-confirm>{$action->_title}</a></li>
+					{{endforeach}}
+				{{endif}}
+				{{if \IPS\Member::loggedIn()->modPermission('can_view_moderation_log')}}	
+					<li class='ipsMenu_sep'><hr></li>
+					<li class="ipsMenu_item"><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'modLog' ) )}' data-ipsDialog data-ipsDialog-title='{lang="moderation_history"}'><i class="fa fa-history"></i> &nbsp;{lang="moderation_history"}</a></li>
+				{{endif}}
+			</ul>
+		</li>
+	{{endif}}
+</ul>]]></template>
+ <template template_group="components" template_name="nodeGridItem" template_data="$node" template_location="front" template_app="collab"><![CDATA[{{if $node->can('view')}}
+	<div data-role='patchworkItem' class="ipsAreaBackground_reset ipsPad cForumGrid ipsClearfix" data-nodeID="{$node->_id}">
+
+		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix'>
+			<span class='ipsPos_left'>
+					{{if $node->icon}}
+						<img src="{$node->icon}" class='ipsImage cForumGrid_icon'>
+					{{else}}
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal'>
+							<i class="fa fa-comments"></i>
+						</span>
+					{{endif}}
+			</span>
+			<div>
+				<h3 class='ipsType_reset ipsType_large'>
+					{{if $node->password && !$node->loggedInMemberHasPasswordAccess()}}
+						<a href="{$node->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$node->_title}</a>
+					{{else}}
+						<a href="{$node->url()}">{$node->_title}</a>
+					{{endif}}
+				</h3>
+			</div>
+		</div>
+		
+		{{if $node->hasChildren()}}
+			<br>
+			<ul class="ipsList_inline">
+				<li><strong>{lang="collab_cat_sub"}</strong></li>
+				{{foreach $node->children() as $subnode}}
+					<li class="">
+						<a href="{$subnode->url()}">{$subnode->_title}</a>
+					</li>
+				{{endforeach}}
+			</ul>
+		{{endif}}
+
+		{{if $node->description}}
+			<br>
+			<div class='ipsType_richText ipsType_medium'>{$node->description|raw}</div>
+		{{endif}}
+		
+		<hr class='ipsHr'>
+
+		{{if !$node->redirect_on}}
+			{{if method_exists( $node, 'lastPost' ) and $lastPost = $node->lastPost()}}
+				<div class='ipsPhotoPanel ipsPhotoPanel_tiny'>
+					{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}
+					<div>
+						<ul class='ipsList_reset'>
+							<li><a href="{$lastPost['topic_url']}" class='ipsType_break' title='{$lastPost['topic_title']}'>{truncate="$lastPost['topic_title']" length="30"}</a></li>
+							<li>{lang="byline_nodate" htmlsprintf="$lastPost['author']->link()"}, <span class='ipsType_light'>{datetime="$lastPost['date']"}<span></li>
+						</ul>
+					</div>
+				</div>
+			{{else}}
+				<p class='ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
+			{{endif}}
+		{{endif}}
+		
+	</div>
+{{endif}}]]></template>
+ <template template_group="components" template_name="nodeList" template_data="$app, $nodeClass, $title_lang, $grid=3" template_location="front" template_app="collab"><![CDATA[
+{{$roots_as_categories = TRUE;}}
+{{$not_empty = FALSE;}}
+
+{{if $nodeClass::$databaseColumnParent == NULL}}
+  {{$roots_as_categories = FALSE;}}
+  {{foreach $nodeClass::roots() as $root}}
+    {{if $root->can('view')}}
+      {{$not_empty = TRUE;}}
+    {{endif}}
+  {{endforeach}}
+{{else}}
+  {{foreach $nodeClass::roots() as $root}}
+    {{if !$root->hasChildren()}}
+      {{$roots_as_categories = FALSE;}}
+    {{endif}}
+    {{if $root->can('view')}}
+      {{$not_empty = TRUE;}}
+    {{endif}}
+ {{endforeach}}
+{{endif}}
+
+<section>
+	<ol class='ipsList_reset' data-controller='core.global.core.table' data-baseURL=''>
+	{{if $roots_as_categories == TRUE}}
+		{{foreach $nodeClass::roots() as $category}}
+			{{if $category->can('view')}}
+				{{if $category->hasChildren()}}
+				<li data-categoryID='{expression="md5($nodeClass)"}_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
+					<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
+						<a href='{$category->url()}'>{$category->_title}</a>
+					</h2>
+					{{if $category->childrenCount() >= $grid}}
+						<div class='ipsAreaBackground ipsPad' data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+							<div data-role='patchworkList'>
+								{{foreach $category->children() as $subnode}}
+									{template="nodeGridItem" group="components" app="collab" params="$subnode"}
+								{{endforeach}}
+							</div>
+						</div>
+					{{else}}
+						<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset">
+							{{foreach $category->children() as $subnode}}
+								{template="nodeRow" group="components" app="collab" params="$subnode"}
+							{{endforeach}}
+						</ol>
+					{{endif}}
+				</li>		
+				{{endif}}
+			{{endif}}
+		{{endforeach}}
+	{{else}}
+		{{if $not_empty}}
+		<li class='ipsBox ipsSpacer_bottom'>
+			<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
+				{lang="$title_lang"}
+			</h2>
+			{{if $layout === 'grid'}}
+				<div class='ipsAreaBackground ipsPad' data-role="forums" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+					<div data-role='patchworkList'>
+						{{foreach $nodeClass::roots() as $node}}
+							{{if $node->can('view')}}
+								{template="nodeGridItem" group="components" app="collab" params="$node"}
+							{{endif}}
+						{{endforeach}}
+					</div>
+				</div>
+			{{else}}
+				<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset" data-role="forums">
+					{{foreach $nodeClass::roots() as $node}}
+						{{if $node->can('view')}}
+							{template="nodeRow" group="components" app="collab" params="$node"}
+						{{endif}}
+					{{endforeach}}
+				</ol>
+			{{endif}}
+		</li>
+		{{endif}}
+	{{endif}}
+	</ol>
+</section>]]></template>
+ <template template_group="components" template_name="nodeRow" template_data="$node" template_location="front" template_app="collab"><![CDATA[
+{{$content_read_class = "";}}
+{{$nodeClass = get_class( $node );}}
+{{$contentClass = $nodeClass::$contentItemClass;}}
+{{if !$contentClass::containerUnread( $node ) && !$node->redirect_on}}
+  {{$content_read_class = "ipsItemStatus_read";}}
+{{endif}}
+
+{{if $node->can('view')}}
+	<li class="ipsDataItem ipsDataItem_responsivePhoto ipsClearfix" data-forumID="{$node->_id}">
+		<div class="ipsDataItem_icon ipsDataItem_category">
+			{{if $node->icon}}
+				<img src="{$node->icon}" class='ipsItemStatus ipsItemStatus_custom {$content_read_class}'>
+			{{elseif method_exists( $node, 'tableIcon' )}}
+				<div class='ipsDataItem_icon ipsType_center ipsType_noBreak {$content_read_class}'>
+					{$node->tableIcon()|raw}
+				</div>
+			{{else}}
+				<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {$content_read_class}'>
+					<i class="fa fa-comments"></i>
+				</span>
+			{{endif}}
+		</div>
+		<div class="ipsDataItem_main">
+			<h4 class="ipsDataItem_title ipsType_large">
+				<a href="{$node->url()}">{$node->_title}</a>
+				{{if $node->_locked}}
+					<i class="fa fa-lock"></i>
+				{{endif}}
+			</h4>
+			{{if $node->hasChildren()}}
+				<ul class="ipsDataItem_subList ipsList_inline">
+					{{foreach $node->children() as $subnode}}
+						<li class="">
+							<a href="{$subnode->url()}">{$subnode->_title}</a>
+						</li>
+					{{endforeach}}
+				</ul>
+			{{endif}}
+			{{if $node->_description}}
+				<div class='ipsDataItem_meta ipsType_light' data-ipsTruncate data-ipsTruncate-size='2 lines' data-ipsTruncate-type='remove'>
+					{$node->_description}
+				</div>
+			{{elseif $node->description}}
+				<div class="ipsDataItem_meta ipsType_richText">{$node->description|raw}</div>
+			{{elseif $node->metaDescription()}}
+				<div class='ipsDataItem_meta ipsType_light' data-ipsTruncate data-ipsTruncate-size='2 lines' data-ipsTruncate-type='remove'>
+					{$node->metaDescription()|raw}
+				</div>
+			{{endif}}
+		</div>
+		{{if !$node->redirect_on}}
+		<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+			{{if $contentClass and method_exists( $contentClass, 'contentCount' ) and $count = $contentClass::contentCount( $node, TRUE )}}
+				<dl>
+					<dt class="ipsDataItem_stats_number">{number="$count"}</dt>
+					<dd class="ipsDataItem_stats_type ipsType_light">{lang="posts_no_number" pluralize="$count"}</dd>
+				</dl>
+			{{else}}
+				{{if $node->_items}}
+				<dl>
+					<dd class='ipsDataItem_stats_type ipsType_light'>{lang="node_content_items" pluralize="$node->_items"}</dd>
+				</dl>
+				{{endif}}
+				{{if $node->_comments}}
+				<dl>
+					<dd class='ipsDataItem_stats_type ipsType_light'>{lang="node_content_comments" pluralize="$node->_comments"}</dd>
+				</dl>
+				{{endif}}
+				{{if $node->_reviews}}
+				<dl>
+					<dd class='ipsDataItem_stats_type ipsType_light'>{lang="node_content_reviews" pluralize="$node->_reviews"}</dd>
+				</dl>
+				{{endif}}
+			{{endif}}
+			{{if get_class( $node ) == 'IPS\forums\Forum' and \IPS\forums\Topic::modPermission( 'unhide', NULL, $node ) AND ( $node->queued_topics OR $node->queued_posts )}}
+				<strong class='ipsType_warning ipsType_medium'>
+					<i class='fa fa-warning'></i>
+					{{if $node->queued_topics}}
+						<a href='{$node->url()->setQueryString( array( 'advanced_search_submitted' => 1, 'topic_type' => 'queued_topics' ) )->csrf()}' data-ipsTooltip title='{lang="queued_topics_badge" pluralize="$node->queued_topics"}' class='ipsType_blendLinks'>{$node->queued_topics}</a>
+					{{else}}
+						<span class='ipsType_light'>0</span>
+					{{endif}}
+					/
+					{{if $node->queued_posts}}
+						<a href='{$node->url()->setQueryString( array( 'advanced_search_submitted' => 1, 'topic_type' => 'queued_posts' ) )->csrf()}' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$node->queued_posts"}' class='ipsType_blendLinks'>{$node->queued_posts}</a>
+					{{else}}
+						<span class='ipsType_light'>0</span>
+					{{endif}}
+				</strong>					
+			{{endif}}
+		</div>
+		{{if get_class( $node ) == 'IPS\forums\Forum'}}
+		<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
+			{{if $lastPost = $node->lastPost()}}
+				<li>{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}</li>
+				<li><a href="{$lastPost['topic_url']->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break ipsContained' title='{$lastPost['topic_title']}'>{truncate="$lastPost['topic_title']" length="30"}</a></li>
+				<li>{lang="byline_nodate" htmlsprintf="$lastPost['author']->link()"}</li>
+				<li class="ipsType_light"><a href='{$lastPost['topic_url']->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost['date']"}</a></li>
+			{{else}}
+				<li class='ipsType_light ipsResponsive_showDesktop'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</li>
+			{{endif}}
+		</ul>
+		{{elseif method_exists( $node, 'getLatestContentItem' )}}
+		<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
+			{{if $lastPost = $node->getLatestContentItem()}}
+				<li>{template="userPhoto" app="core" group="global" params="\IPS\Member::load( $lastPost->mapped('author') ), 'tiny'"}</li>
+				<li><a href="{$lastPost->url()}" class='ipsType_break ipsContained' title='{$lastPost->mapped('title')}'>{truncate="$lastPost->mapped('title')" length="30"}</a></li>
+				<li>{lang="byline_nodate" htmlsprintf="\IPS\Member::load( $lastPost->mapped('author') )->link()"}</li>
+				<li class="ipsType_light"><a href='{$lastPost->url()}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped('date')"}</a></li>
+			{{else}}
+				<li class='ipsType_light ipsResponsive_showDesktop'>{lang="collab_no_content"}</li>
+			{{endif}}
+		</ul>		
+		{{endif}}
+		{{endif}}
+	</li>
+{{endif}}]]></template>
+ <template template_group="components" template_name="tableRows" template_data="$table, $headers, $rows" template_location="front" template_app="collab"><![CDATA[{{if empty( $rows )}}
+	<tr>
+		<td colspan="{expression="count( $headers )"}">
+			<div class='ipsPad_double ipsType_light'>
+				{lang="no_results"}
+				{{if ( isset( $table->rootButtons['add'] ) )}}
+					&nbsp;&nbsp;
+					<a 
+						{{if isset( $table->rootButtons['add']['link'] )}}href='{$table->rootButtons['add']['link']}'{{endif}}
+						title='{lang="$table->rootButtons['add']['title']"}'
+						class='ipsButton ipsButton_alternate ipsButton_small {{if isset( $table->rootButtons['add']['class'] )}}{$table->rootButtons['add']['class']}{{endif}}'
+						role="button"
+						{{if isset( $table->rootButtons['add']['data'] )}}
+							{{foreach $table->rootButtons['add']['data'] as $k => $v}}
+								data-{$k}="{$v}"
+							{{endforeach}}
+						{{endif}}
+						{{if isset( $table->rootButtons['add']['hotkey'] )}}
+							data-keyAction='{$table->rootButtons['add']['hotkey']}'
+						{{endif}}
+					>{lang="$table->rootButtons['add']['title']"}</a>
+				{{endif}}
+			</div>
+		</td>
+	</tr>
+{{else}}
+	{{foreach $rows as $r}}
+		<tr class='ipsClearfix' data-keyNavBlock>
+			{{foreach $r as $k => $v}}
+				<td class='{{if $k === 'photo'}}ipsTable_icon{{endif}} {{if $k === $table->mainColumn}}ipsTable_primary ipsType_break{{endif}} {{if $k === '_buttons'}}ipsTable_controls{{endif}}' {{if $k !== $table->mainColumn && $k !== '_buttons' && $k !== 'photo'}}data-title="{lang="{$table->langPrefix}{$k}"}"{{endif}}>
+					{{if $k === '_buttons'}}
+						{template="controlStrip" params="$v" group="global" app="core"}
+					{{else}}
+						{$v|raw}
+					{{endif}}
+				</td>
+			{{endforeach}}
+		</tr>
+	{{endforeach}}
+{{endif}}]]></template>
+ <template template_group="components" template_name="tableWrapper" template_data="$table, $headers, $rows, $quickSearch" template_location="front" template_app="collab"><![CDATA[<div data-baseurl="{$table->baseUrl}" data-resort='{$table->resortKey}' data-controller="core.global.core.genericTable">
+	<div class='ipsClearfix'>
+		{{if $table->pages > 1}}
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit"}
+			</div>
+			<br>
+		{{endif}}
+		{template="buttons" params="$table->rootButtons, ''" group="global" app="core" if="isset( $headers['_buttons'] )"}
+	</div>
+	<div class="acpBlock ipsClear">
+		{{if $quickSearch !== NULL or $table->advancedSearch or !empty( $table->filters )}}
+			<div class='ipsClearfix ipsClear ipsPad acpWidgetToolbar ipsAreaBackground_dark' data-role="tableSortBar">
+				{{if $quickSearch !== NULL or $table->advancedSearch}}
+					{{if $table->advancedSearch}}
+						<a class='ipsPos_right acpWidgetSearch' data-ipsTooltip aria-label='{lang="search"}' href='{$table->baseUrl->setQueryString( array( 'advancedSearchForm' => '1', 'filter' => $table->filter, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection ) )}' data-ipsDialog data-ipsDialog-title='{lang="search"}'><i class='fa fa-cog'></i></a>
+					{{endif}}
+					{{if $quickSearch !== NULL}}
+						<input type='text' class='ipsField_short ipsPos_right acpTable_search ipsJS_show' data-role='tableSearch' results placeholder="{{if is_string( $quickSearch )}}{lang="search_prefix" sprintf="\IPS\Member::loggedIn()->language()->addToStack( $table->langPrefix . $quickSearch )"}{{else}}{lang="search"}{{endif}}" value="{expression="\IPS\Request::i()->quicksearch"}">
+					{{endif}}
+				{{endif}}
+					
+				{{if !empty( $table->filters )}}
+					<div class='ipsButtonBar ipsClearfix ipsResponsive_showDesktop'>
+						<ul class='ipsButtonRow ipsPos_left ipsClearfix'>
+							<li data-action="tableFilter" data-filter="">
+								<a href='{$table->baseUrl->setQueryString( array( 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1', 'filter' => '' ) )}' class='{{if !array_key_exists( $table->filter, $table->filters )}}ipsButtonRow_active{{endif}}'>{lang="all"}</a>
+							</li>
+							{{foreach $table->filters as $k => $q}}
+								<li data-action="tableFilter" data-filter="{$k}">
+									<a href='{$table->baseUrl->setQueryString( array( 'filter' => $k, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}' class='{{if $k === $table->filter}}ipsButtonRow_active{{endif}}'>{lang="$k"}</a>
+								</li>
+							{{endforeach}}
+						</ul>
+					</div>
+				{{endif}}
+				<div class='ipsButtonBar ipsClearfix ipsResponsive_hideDesktop ipsResponsive_block'>
+					{{if !empty( $table->filters )}}
+						<ul class='ipsButtonRow ipsPos_left ipsClearfix'>
+							<li>
+								<a href='#elFilterMenu_menu' data-role="tableFilterMenu" id='elFilterMenu' data-ipsMenu data-ipsMenu-activeClass='ipsButtonRow_active' data-ipsMenu-selectable="radio">{lang="filter"} <i class='fa fa-caret-down'></i></a>
+								<ul class='ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide' id='elFilterMenu_menu'>
+									<li data-ipsMenuValue='' class='ipsMenu_item {{if !array_key_exists( $table->filter, $table->filters )}}ipsMenu_itemChecked{{endif}}'><a href={$table->baseUrl->setQueryString( array( 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}'>{lang="all"}</a></li>
+									{{foreach $table->filters as $k => $q}}
+										<li class='ipsMenu_item {{if $k === $table->filter}}ipsMenu_itemChecked{{endif}}' data-action="tableFilter" data-ipsMenuValue='{$k}'><a href={$table->baseUrl->setQueryString( array( 'filter' => $k, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}'>{lang="$k"}</a></li>
+									{{endforeach}}
+								</ul>
+							</li>
+						</ul>
+					{{endif}}
+					<ul class='ipsButtonRow ipsPos_left ipsClearfix'>
+						<li>
+							<a href='#elSortMenu_menu' id='elSortMenu' data-ipsMenu data-ipsMenu-activeClass='ipsButtonRow_active' data-ipsMenu-selectable="radio">{lang="sort_by"} <i class='fa fa-caret-down'></i></a>
+							<ul class='ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide' id='elSortMenu_menu'>
+								{{foreach $headers as $k => $header}}
+									{{if $k !== '_buttons' && !in_array( $k, $table->noSort )}}
+										<li class='ipsMenu_item {{if $k == $table->sortBy}}ipsMenu_itemChecked{{endif}}' data-ipsMenuValue=$k>
+											{{if $k == $table->sortBy and $table->sortDirection == 'desc'}}
+												<a href='{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $k, 'sortdirection' => 'desc' ) )}'>
+											{{else}}
+												<a href='{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $k, 'sortdirection' => 'asc' ) )}'>
+											{{endif}}
+													{lang="{$table->langPrefix}{$header}"}
+												</a>
+										</li>
+									{{endif}}
+								{{endforeach}}
+							</ul>
+						</li>
+						<li>
+							<a href='#elOrderMenu_menu' id='elOrderMenu' data-ipsMenu data-ipsMenu-activeClass='ipsButtonRow_active' data-ipsMenu-selectable="radio">{lang="order_by"} <i class='fa fa-caret-down'></i></a>
+							<ul class='ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide' id='elOrderMenu_menu'>
+								<li class='ipsMenu_item {{if $table->sortDirection == 'asc'}}ipsMenu_itemChecked{{endif}}' data-ipsMenuValue='asc'>
+									<a href='{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $table->sortBy, 'sortdirection' => 'asc' ) )}'>{lang="ascending"}</a>
+								</li>
+								<li class='ipsMenu_item {{if $table->sortDirection == 'desc'}}ipsMenu_itemChecked{{endif}}' data-ipsMenuValue='desc'>
+									<a href='{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $table->sortBy, 'sortdirection' => 'desc' ) )}'>{lang="descending"}</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		{{endif}}
+		
+		<div data-role="extraHtml">{$table->extraHtml|raw}</div>
+		
+		<table class='ipsTable ipsTable_responsive ipsTable_zebra {{foreach $table->classes as $class}}{$class} {{endforeach}}' data-role="table" data-ipsKeyNav data-ipsKeyNav-observe='e d return'>
+			<thead>
+				<tr class='ipsAreaBackground'>
+					{{foreach $headers as $k => $header}}
+						{{if $k !== '_buttons'}}
+							<th class='{{if !in_array( $k, $table->noSort )}}ipsTable_sortable {{if $k == ( mb_strrpos( $table->sortBy, ',' ) !== FALSE ? trim( mb_substr( $table->sortBy, mb_strrpos( $table->sortBy, ',' ) + 1 ) ) : $table->sortBy )}}ipsTable_sortableActive ipsTable_sortable{{if $table->sortDirection == 'asc'}}Asc{{else}}Desc{{endif}} {{else}}ipsTable_sortableAsc{{endif}}{{endif}} {{if array_key_exists( $header, $table->classes )}}{$table->classes[ $header ]}{{endif}}' data-key="{$header}" {{if !in_array( $k, $table->noSort )}}data-action="tableSort" {{if $k == ( mb_strrpos( $table->sortBy, ',' ) !== FALSE ? trim( mb_substr( $table->sortBy, mb_strrpos( $table->sortBy, ',' ) + 1 ) ) : $table->sortBy )}}aria-sort="{{if $table->sortDirection == 'asc'}}ascending{{else}}descending{{endif}}"{{endif}}{{endif}} {{if isset( $table->widths[ $header ] )}}style="width: {$table->widths[ $header ]}%"{{endif}}>
+								{{if !in_array( $k, $table->noSort )}}
+									{{if $k == $table->sortBy and $table->sortDirection == 'desc'}}
+										<a href='{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $header, 'sortdirection' => 'asc' ) )}'>
+									{{else}}
+										<a href='{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $header, 'sortdirection' => 'desc' ) )}'>
+									{{endif}}
+											{lang="{$table->langPrefix}{$header}"}
+											<span class='ipsTable_sortIcon'></span>
+										</a>
+								{{else}}
+									{lang="{$table->langPrefix}{$header}"}
+								{{endif}}
+							</th>
+						{{elseif $k === '_buttons'}}
+							<th>&nbsp;</th>
+						{{endif}}
+					{{endforeach}}
+				</tr>
+			</thead>
+			<tbody data-role="tableRows">
+				{template="$table->rowsTemplate[1]" params="$table, $headers, $rows" object="$table->rowsTemplate[0]"}
+			</tbody>
+		</table>
+		<br>
+		{{if $table->pages > 1}}
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit"}
+			</div>
+		{{endif}}
+	</div>
+</div>]]></template>
+ <template template_group="forms" template_name="collabJoinRequest" template_data="$collab, $form, $membership" template_location="front" template_app="collab"><![CDATA[
+<div id="collabRules" class="collabDescription">
+	{$collab->rules|raw}
+</div>
+
+<div id="collabJoinForm">
+	{$form|raw}
+</div>
+]]></template>
+ <template template_group="global" template_name="snippet" template_data="$activity, $type='activity'" template_location="front" template_app="collab"><![CDATA[{{if $activity instanceof \IPS\collab\Collab}}
+	<div class='cSearchActivity_info ipsContained'>
+		{{if $type != 'search'}}<a href='{$activity->url()}' class='ipsType_normal ipsType_break'>{$activity->mapped('title')}</a>{{endif}}
+		{{if mb_strlen( trim( $activity->truncated() ) ) }}
+			<div class='ipsType_medium ipsType_richText ipsContained {{if $type != 'search'}}ipsSpacer_both{{else}}ipsSpacer_bottom{{endif}} ipsSpacer_half' data-ipsTruncate data-ipsTruncate-size='3 lines' data-ipsTruncate-type='remove'>
+				{$activity->truncated()|raw}
+			</div>
+		{{endif}}
+		<ul class='ipsList_inline ipsType_light'>
+			<li>{lang="replies_number" pluralize="$activity->comments"}</li>
+			<li>{lang="num_views_with_number" pluralize="$activity->views"}</li>
+		</ul>
+	</div>
+{{else}}
+	{{if mb_strlen( trim( strip_tags( $activity->truncated() ) ) ) }}
+		<div class='cSearchActivity_info ipsContained'>
+			<div class='ipsType_medium ipsType_richText ipsContained ipsSpacer_bottom ipsSpacer_half' data-ipsTruncate data-ipsTruncate-size='3 lines' data-ipsTruncate-type='remove'>
+				{$activity->truncated()|raw}
+			</div>
+			{{if $type != 'search' and $activity instanceof \IPS\Content\Reputation and settings.reputation_enabled}}
+				<ul class='ipsList_inline ipsType_light'>
+					<li>{template="reputationMini" group="global" app="core" params="$activity, '', NULL, TRUE"}</li>
+				</ul>
+			{{endif}}
+		</div>
+	{{endif}}
+{{endif}}]]></template>
+ <template template_group="layouts" template_name="category" template_data="$category, $table" template_location="front" template_app="collab"><![CDATA[
+<div class="collabLayout">
+	<header class="collabCategoryHeader">
+		{$category->coverPhoto()|raw}
+		{{if $category->hasChildren()}}
+		<div id='elCollabStats' class='ipsClearfix'>
+			<div class="ipsGrid ipsGrid_collapsePhone collabCategoryChildren">
+			{{foreach $category->children() as $subcat}}
+				<div class="ipsGrid_span_custom pad10_phone">
+					{$subcat->coverPhoto( 'subview' )|raw}
+				</div>
+			{{endforeach}}
+			</div>
+		</div>
+		{{endif}}
+	</header>
+
+	{{if $category->collabs_enable}}
+		{$table|raw}
+	{{endif}}
+</div>]]></template>
+ <template template_group="layouts" template_name="categoryIndex" template_data="" template_location="front" template_app="collab"><![CDATA[<div class="collabLayout">
+	{template="pageHeader" group="global" app="core" params="\IPS\Member::loggedIn()->language()->addToStack('__app_collab')"}
+
+	{{foreach \IPS\collab\Category::roots() as $category}}
+	<section class="collabCategoryIndex">
+		<a href='{$category->url()}'>
+		{$category->coverPhoto( 'index' )|raw}
+		</a>
+	</section>
+	{{endforeach}}
+</div>]]></template>
+ <template template_group="layouts" template_name="collab" template_data="$collab, $activity" template_location="front" template_app="collab"><![CDATA[
+<div class="collabLayout">
+	<div id="collabDescription" class="collabDescription">
+		{$collab->description|raw}
+	</div>
+
+	{{foreach $collab->enabledNodes() as $app => $config}}
+		{{$nodeCount = count( $config['nodes'] );}}
+		{{foreach $config['nodes'] as $node}}
+			{{if $nodeCount > 1}}
+			  {{$title_lang = $node['content_container_name'];}}
+			{{else}}
+			  {{$title_lang = "__app_" . $app;}}
+			{{endif}}
+			{{if count( $node['node']::roots() )}}
+				{template="nodeList" app="collab" group="components" params="$app, $node['node'], $title_lang"}
+			{{endif}}
+		{{endforeach}}
+	{{endforeach}}
+
+	{{if $activity}}
+	<div id="collabFeedback">
+		<h2 class="ipsType_sectionTitle ipsType_reset">{lang="collab_activity_feed"}</h2>
+		{$activity|raw}
+	</div>
+	{{endif}}
+
+	{{if !$collab->container()->disable_sharelinks}}
+		<hr class='ipsHr'>
+		{template="sharelinks" app="core" group="global" params="$collab"}
+	{{endif}}
+</div>]]></template>
+ <template template_group="layouts" template_name="collabAdminWrapper" template_data="$collab, $output, $title" template_location="front" template_app="collab"><![CDATA[
+<div class="collabLayout">
+	{template="collabAdminHeader" app="collab" group="components" params="$collab, $title"}
+	{$output|raw}
+</div>]]></template>
+ <template template_group="layouts" template_name="collabPublicWrapper" template_data="$collab, $output" template_location="front" template_app="collab"><![CDATA[
+<div class="collabLayout">
+	{template="collabHeader" app="collab" group="components" params="$collab"}
+	{$output|raw}
+</div>]]></template>
+ <template template_group="tabs" template_name="comments" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
+<div data-controller='core.front.core.commentFeed' data-commentsType='comments' data-baseURL='{$collab->url()}' {{if $collab->isLastPage()}}data-lastPage{{endif}} data-feedID='file-{$collab->id}'>
+	<br>
+	{{if $collab->commentPageCount() > 1}}
+		{$collab->commentPagination( array( 'tab' ) )|raw}
+		<br><br>
+	{{endif}}
+	<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+		{{if count( $collab->comments() )}}
+			<form action="{$collab->url()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+				{{$commentCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
+				{{foreach $collab->comments() as $comment}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}
+						{{if $lined = TRUE and $commentCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$commentCount++;}}
+					{$comment->html()|raw}
+				{{endforeach}}
+				{template="commentMultimod" app="core" group="global" params="$collab"}
+			</form>
+		{{else}}
+			<p class='ipsType_normal ipsType_light ipsType_reset' data-role='noComments'>{lang="no_comments"}</p>
+		{{endif}}
+	</div>
+	{{if $collab->commentPageCount() > 1}}
+		<hr class='ipsHr'>
+		{$collab->commentPagination( array( 'tab' ) )|raw}
+	{{endif}}
+	{{if $collab->commentForm() || $collab->locked() || \IPS\Member::loggedin()->restrict_post || \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+		<br><br>
+		<div class='ipsAreaBackground ipsPad' data-role='replyArea'>
+			{{if $collab->commentForm()}}
+				{{if $collab->locked()}}
+					<strong class='ipsType_warning ipsComposeArea_warning'><i class='fa fa-info-circle'></i> {lang="collab_locked_can_comment"}</strong>
+				{{endif}}
+				{$collab->commentForm()|raw}
+			{{else}}
+				{{if $collab->locked()}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'collab_locked_cannot_comment'"}
+				{{elseif \IPS\Member::loggedin()->restrict_post}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+				{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+</div>]]></template>
+ <template template_group="tabs" template_name="reviews" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<div data-controller='core.front.core.commentFeed' data-commentsType='reviews' data-baseURL='{$collab->url()}' {{if $collab->isLastPage('reviews')}}data-lastPage{{endif}} data-feedID='file-{$collab->id}-reviews'>
+	{{if $collab->canReview()}}
+		{{if $collab->locked()}}
+			<strong class='ipsType_warning'><i class='fa fa-info-circle'></i> {lang="item_locked_can_review"}</strong>
+		{{endif}}
+		<div id='elFileReviewForm'>
+			{$collab->reviewForm()|raw}
+		</div>
+	{{else}}
+		{{if $collab->locked()}}
+			{template="commentUnavailable" group="forms" location="front" app="core" params="'item_locked_cannot_comment'"}
+		{{elseif \IPS\Member::loggedin()->restrict_post}}
+			{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+		{{elseif $collab->hasReviewed()}}
+			<!-- Already reviewed -->
+		{{elseif \IPS\Member::loggedIn()->restrict_post}}
+			{template="reviewUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment'"}
+		{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+			{template="reviewUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+		{{else}}
+			{template="reviewUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment'"}
+		{{endif}}
+	{{endif}}
+	{{if count( $collab->reviews() )}}
+		<div class="ipsClearfix ipsSpacer_both">
+			{{if $collab->reviewPageCount() > 1}}
+				<div class="ipsPos_left ipsResponsive_noFloat">
+					{$collab->reviewPagination( array( 'tab', 'sort' ) )|raw}
+				</div>
+			{{endif}}
+			<div class="ipsClearfix ipsPos_right ipsResponsive_hidePhone">
+				<ul class="ipsButtonRow ipsClearfix">
+					<li data-action="tableFilter">
+						<a href="{$collab->url()->setQueryString( array( 'tab' => 'reviews', 'page' => 1, 'sort' => 'helpful' ) )}" class="{{if !isset( request.sort ) or request.sort != 'newest'}}ipsButtonRow_active{{endif}}" data-action="filterClick">{lang="most_helpful"}</a>
+					</li>
+					<li data-action="tableFilter">
+						<a href="{$collab->url()->setQueryString( array( 'tab' => 'reviews', 'page' => 1, 'sort' => 'newest' ) )}" class="{{if isset( request.sort ) and request.sort == 'newest'}}ipsButtonRow_active{{endif}}" data-action="filterClick">{lang="newest"}</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		
+		<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+			<form action="{$collab->url()->setQueryString( 'do', 'multimodReview' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+				{{$reviewCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
+				{{foreach $collab->reviews() as $review}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $review->mapped('date')}}
+						{{if $lined = TRUE and $reviewCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$reviewCount++;}}
+					{$review->html()|raw}
+				{{endforeach}}
+				{template="commentMultimod" app="core" group="global" params="$collab, 'review'"}
+			</form>
+		</div>
+		{{if $collab->reviewPageCount() > 1}}
+			<div>
+				{$collab->reviewPagination( array( 'tab', 'sort' ) )|raw}
+			</div>
+		{{endif}}
+	{{endif}}
+</div>]]></template>
+ <css css_location="front" css_app="collab" css_attributes="" css_path="." css_name="collab.css"><![CDATA[/* Formatting Styles */
+
+.marg0 {
+	margin:0;
+}
+
+/* Admin CSS Transplants */
+
+.ipsToolList_horizontal {
+	margin-bottom: 15px;
+}
+
+.ipsDrag .ipsDrag_dragHandle {
+	cursor: move;
+	transition: all 0.2s linear 0s;
+}
+
+/* Collab Styles */
+
+ul.role-permissions {
+	list-style: none;
+	margin-bottom: 15px;
+}
+
+.role-permission-sets .ipsFieldRow_label {
+	text-align:left !important;
+}
+
+.collabDescription {
+	font-size: 1.2em;
+	line-height: 1.4em;
+	padding: 0 20px 20px;
+}
+
+.acpWidgetSearch {
+	padding: 8px 5px 5px 15px;
+}
+
+.ipsItemStatus.collabStatusIcon {
+	position: relative;
+}
+
+.ipsItemStatus.collabStatusIcon .ipsBadge {
+	position: absolute;
+}
+
+.ipsItemStatus.collabStatusIcon .membershipStatus {
+	left: -5px;
+	bottom: -5px;
+}
+
+.ipsItemStatus.collabStatusIcon .membershipCount {
+	right: -5px;
+	top: -5px;
+	width: auto;
+	min-width:19px;
+	padding:0 4px;
+}
+
+.collabCategoryHeader .headerContent h1 {
+	font-size: 2em;
+	line-height: 2.2em;
+}
+
+.collabLayout .ipsCoverPhoto_button {
+	z-index: 2000;
+}
+
+.collabLayout .coverContent {
+	width: 100%;
+}
+
+.collabListTable {
+	padding:20px;
+}
+
+/* Collab Category Header Layouts */
+
+section.collabCategoryIndex {
+	margin: 20px 0;
+	overflow: hidden;
+	{prefix="border-radius" value="5px"}
+}
+
+.collabCategoryCoverLayout h1 a {
+	color:inherit;
+	text-decoration:none;
+}
+
+.collabCategoryCoverLayout h1 a:hover {
+	color:inherit;
+	text-decoration:none;
+}
+
+.collabCategoryCoverLayout_index .collabCategoryDescription {
+	max-width: 75%;
+}
+
+.collabCategoryCoverLayout_index .coverContent {
+	min-height: 250px;
+}
+
+.collabCategoryCoverLayout_standard .coverContent {
+	min-height: 150px;
+}
+
+.collabCategoryCoverLayout_subview .coverContent {
+	min-height: 100px;
+	padding-top: 0;
+}
+
+.collabCategoryCoverLayout_subview .coverContent h1 {
+	font-size: 1.5em;
+	line-height: 2em;
+	margin-bottom: 25px;
+}
+
+.collabCategoryCoverLayout_index .categoryCoverBrowseButton {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	width: 25%;
+	text-align: center;
+}
+
+.collabCategoryCoverLayout_standard .categoryCoverAddButton {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+}
+
+.collabCategoryCoverLayout_index .categoryCoverBrowseButton .ipsButton {
+	width: 150px;
+	height: 50px;
+	margin-top: -25px;
+}
+
+.collabCategoryCoverLayout_standard .collabCategoryDescription {
+	max-width: 500px;
+}
+
+/* DESKTOP */
+@media screen and (min-width: 980px) {
+
+  .ipsApp .ipsGrid.collabCategoryChildren > .ipsGrid_span_custom { width: 31.914893617021278%; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom { margin-top:2.127659574468085%; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 1 ) { margin-top:0; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 2 ) { margin-top:0; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 3 ) { margin-top:0; }
+  html[dir="ltr"] .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 3n+1 ) { margin-left:0; }
+  html[dir="rtl"] .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 3n+1 ) { margin-right:0; }
+  
+}
+
+/* TABLETS */
+@media screen and (min-width: 768px) and (max-width: 979px) {
+
+  .ipsApp .ipsGrid.collabCategoryChildren > .ipsGrid_span_custom { width: 48.93617021276595%; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom { margin-top:2.127659574468085%; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 1 ) { margin-top:0; }
+  .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( 2 ) { margin-top:0; }  
+  html[dir="ltr"] .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( odd ) { margin-left:0; }
+  html[dir="rtl"] .ipsGrid.collabCategoryChildren .ipsGrid_span_custom:nth-child( odd ) { margin-right:0; }  
+  
+}
+
+/* BOTH */
+@media screen and (max-width: 979px) {
+
+}
+
+/* PHONES */
+@media screen and (max-width: 767px) {
+
+  .pad10_phone {
+	padding: 10px;
+  }
+  
+  .collabCategoryHeader .coverContent {
+	text-align: center;
+	width: 100%;
+  }
+  
+  .collabCategoryHeader .coverContent p {
+	margin:0;
+  }
+  
+  .collabCategoryCoverLayout .coverContent {
+	min-height: auto;
+	height: auto;
+	text-align: center;
+  }
+  
+  .collabCategoryCoverLayout .coverContent .collabCategoryDescription {
+	display: none;
+  }
+  
+  .collabCategoryCoverLayout .categoryCoverBrowseButton {
+	position: relative;
+	top: 0;
+	width: 100%;
+  }
+  
+  .collabCategoryCoverLayout .categoryCoverBrowseButton .ipsButton {
+	width: auto;
+	height: auto;
+	margin-top: 20px;
+  }
+  
+  .collabCategoryCoverLayout_subview .coverContent h1 {
+	margin-bottom: 5px;
+  }
+  
+}
+
+
+
+
+
+]]></css>
+ <css css_location="front" css_app="collab" css_attributes="" css_path="." css_name="global.css"><![CDATA[/** 
+ * Global CSS Styles
+ */
+
+i.fa {
+	line-height: inherit;
+}
+ 
+ header.collabHeader {
+	margin-bottom:20px;
+}
+
+html[dir="ltr"] #elEditCollab {
+	right: -5px;
+}
+html[dir="rtl"] #elEditCollab {
+	left: -5px;
+}
+
+html[dir="ltr"] #elEditCollab.editable {
+	right: 70px;
+}
+html[dir="rtl"] #elEditCollab.editable {
+	left: 70px;
+}
+
+@media ( max-width: 759px ) {
+  .collabHeader .headerContent {
+	text-align: center;
+	width: 100%;
+  }
+  .collabHeader .headerContent p {
+	margin:0;
+  }
+}
+
+.collabHeader .headerContent h1 {
+	font-size: 2em;
+	line-height: 2.2em;
+}
+
+.collabHeader .ipsCoverPhoto_button {
+	z-index: 2000;
+}
+
+@media ( min-width: 760px ) {
+
+  #elEditCollab {
+	position: absolute;
+	top: -5px;
+	z-index: 2000;
+  }
+  
+  #collabModOptions {
+	position: absolute;
+	right: 5px;
+	bottom: 5px;
+	z-index: 1;
+	width: 190px;
+  }
+}
+
+#collabModOptions {
+	clear: both;
+}
+
+#elCollabStats {
+	background: #222;
+	color: #fff;
+	min-height: 65px;
+	padding: 12px 12px 12px 12px;
+	font-size: 15px;
+	font-weight: 500;
+	z-index: 2000;
+	position: relative;
+}
+
+#elCollabStats .statsList a {
+	display: block;
+	color: lightblue;
+}
+
+html[dir="rtl"] #elCollabStats {
+	padding: 12px 155px 12px 12px;
+}
+	
+
+html[dir="ltr"] #elCollabStats > ul:last-child > li {
+	margin-right: 20px;
+	padding-right: 20px;
+	border-right: 1px solid rgba(0,0,0,0.1);
+}
+html[dir="rtl"] #elCollabStats > ul:last-child > li {
+	margin-left: 20px;
+	padding-left: 20px;
+	border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+#elCollabStats > [data-role="switchView"] .ipsList_inline,
+#elCollabStats > [data-role="switchView"] .ipsButton {
+	position: relative;
+	z-index: 1000;
+}
+
+#elCollabStats li:last-child {
+	border: 0;
+}
+
+#elCollabActions_menu .ipsMenu_item i {
+	width: 20px;
+}
+
+.collabHeader .ipsPageHead_special {
+	min-height: 150px;
+}
+
+.ipsBadge.ipsBadge_collab {
+	color: #888;
+	height: auto;
+}]]></css>
+ <css css_location="front" css_app="collab" css_attributes="" css_path="nodes" css_name="controlstrip.css">.ipsControlStrip {
+	border: 1px solid rgba(0,0,0,0.1);
+	display: inline-block;
+	border-radius: 4px;
+	opacity: 0.8;
+	float: right;
+	{prefix=&quot;transition&quot; value=&quot;0.2s all linear&quot;}
+}
+html[dir=&quot;rtl&quot;] .ipsControlStrip {
+	float: left;
+}
+
+.ipsControlStrip li {
+	display: inline-block;
+	float: left;
+}
+html[dir=&quot;rtl&quot;] .ipsControlStrip li {
+	float: right;
+}
+
+.ipsControlStrip a {
+	display: block;
+	background: rgb(252,252,252);
+	background: -moz-linear-gradient(top, rgba(252,252,252,1) 0%, rgba(244,244,244,1) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(244,244,244,1)));
+	background: -webkit-linear-gradient(top, rgba(252,252,252,1) 0%,rgba(244,244,244,1) 100%);
+	background: -o-linear-gradient(top, rgba(252,252,252,1) 0%,rgba(244,244,244,1) 100%);
+	background: -ms-linear-gradient(top, rgba(252,252,252,1) 0%,rgba(244,244,244,1) 100%);
+	background: linear-gradient(to bottom, rgba(252,252,252,1) 0%,rgba(244,244,244,1) 100%);
+	color: #000;
+	width: 30px;
+	height: 24px;
+	text-align: center;
+}
+html[dir=&quot;ltr&quot;] .ipsControlStrip a {
+	border-left: 1px solid rgba(0,0,0,0.1);
+}
+html[dir=&quot;rtl&quot;] .ipsControlStrip a {
+	border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+	.ipsControlStrip a:active {
+		background: rgb(244,244,244);
+		background: -moz-linear-gradient(top, rgba(244,244,244,1) 0%, rgba(252,252,252,1) 100%);
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(244,244,244,1)), color-stop(100%,rgba(252,252,252,1)));
+		background: -webkit-linear-gradient(top, rgba(244,244,244,1) 0%,rgba(252,252,252,1) 100%);
+		background: -o-linear-gradient(top, rgba(244,244,244,1) 0%,rgba(252,252,252,1) 100%);
+		background: -ms-linear-gradient(top, rgba(244,244,244,1) 0%,rgba(252,252,252,1) 100%);
+		background: linear-gradient(to bottom, rgba(244,244,244,1) 0%,rgba(252,252,252,1) 100%);
+		box-shadow: 0px 1px 2px rgba(0,0,0,0.4) inset;
+	}
+
+.ipsControlStrip .ipsControlStrip_icon {
+	font-size: 18px;
+	line-height: 24px;
+	display: inline-block;
+}
+
+.ipsControlStrip .ipsControlStrip_item {
+	display: none;
+}
+
+html[dir=&quot;ltr&quot;] .ipsControlStrip li:first-child a {
+	border-radius: 3px 0 0 3px;
+	border-left: 0;
+}
+html[dir=&quot;rtl&quot;] .ipsControlStrip li:first-child a {
+	border-radius: 0 3px 3px 0;
+	border-right: 0;
+}
+
+html[dir=&quot;ltr&quot;] .ipsControlStrip li:last-child a {
+	border-radius: 0 3px 3px 0;
+}
+html[dir=&quot;rtl&quot;] .ipsControlStrip li:last-child a {
+	border-radius: 3px 0 0 3px;
+}
+
+/* Relationships with other css modules */
+.ipsTable tr .ipsControlStrip a, .ipsTree_row .ipsControlStrip a {
+	opacity: 0.7;
+}
+
+.ipsTable tr:hover .ipsControlStrip a, .ipsTree_row:hover .ipsControlStrip a {
+	opacity: 1;
+}
+
+/* Show text option */
+.ipsControlStrip.ipsControlStrip_showText a {
+	width: auto;
+	padding: 0 7px;
+}
+
+.ipsControlStrip.ipsControlStrip_showText .ipsControlStrip_icon {
+	vertical-align: middle;
+}
+
+.ipsControlStrip.ipsControlStrip_showText .ipsControlStrip_item {
+	display: inline-block;
+	font-size: 12px;
+}
+
+html[dir=&quot;ltr&quot;] .ipsControlStrip.ipsControlStrip_showText .ipsControlStrip_item {
+	margin-left: 3px;
+}
+html[dir=&quot;rtl&quot;] .ipsControlStrip.ipsControlStrip_showText .ipsControlStrip_item {
+	margin-right: 3px;
+}</css>
+ <css css_location="front" css_app="collab" css_attributes="" css_path="nodes" css_name="trees.css"><![CDATA[.ipsTree, .ipsTree ol {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.ipsTree_row {
+	display: table;
+	width: 100%;
+}
+
+	.ipsTree_row + form > .ipsTree_rows {
+		padding-left: 15px;
+	}
+
+.ipsTree_row > div {
+	display: table-cell;
+}
+
+.ipsTree_row:hover .ipsControlStrip {
+	opacity: 1;
+}
+
+html[dir="ltr"] .ipsTree_loadingRow {
+	background: #fff url( {resource="tiny_loading.gif" location="admin" app="core"} ) no-repeat 5px 10px;
+	padding: 10px 10px 10px 30px;
+}
+html[dir="rtl"] .ipsTree_loadingRow {
+	background: #fff url( {resource="tiny_loading.gif" location="admin" app="core"} ) no-repeat right 5px top 10px;
+	padding: 10px 30px 10px 10px;
+}
+
+/* Cell types */
+.ipsTree_drag {
+	min-width: 30px;
+	text-align: center;
+}
+
+	.ipsTree_drag .ipsTree_dragHandle {
+		opacity: 0.2;
+	}
+
+.ipsTree_controls {
+	width: 110px;
+	min-width: 110px;
+	vertical-align: top;
+	padding-top: 12px;
+}
+html[dir="ltr"] .ipsTree_controls {
+	padding-right: 10px;
+}
+html[dir="rtl"] .ipsTree_controls {
+	padding-left: 10px;
+}
+	
+	.ipsTree_controls .ipsControlStrip {
+		float: right;
+	}
+	html[dir="rtl"] .ipsTree_controls .ipsControlStrip {
+		float: left;
+	}
+
+.ipsTree_rowData {
+	width: 100%;
+	padding: 15px 10px;
+	position: relative;
+}
+
+/* Stack styles */
+.ipsTree_rowData h4 {
+	margin: 0;
+}
+
+.ipsTree_parent.ipsTree_row:not( .ipsTree_noToggle ):hover > div {
+	background: rgba(0,0,0,0.03);
+	cursor: pointer;
+}
+
+html[dir="ltr"] .ipsTree_parent.ipsTree_row > .ipsTree_rowData {
+	padding-left: 25px;
+}
+html[dir="rtl"] .ipsTree_parent.ipsTree_row > .ipsTree_rowData {
+	padding-right: 25px;
+}
+
+	.ipsTree_parent.ipsTree_row > .ipsTree_rowData h4 {
+		font-weight: bold;
+		font-size: 14px;
+		position: relative;
+		/*display: inline-block;*/
+	}
+
+		.ipsJS_has .ipsTree_parent.ipsTree_row > .ipsTree_rowData h4 a {
+			color: inherit;
+		}
+
+	.ipsTree_parent.ipsTree_row > .ipsTree_rowData h4:before {
+		position: absolute;
+		top: 0;
+		content: '\\f04b';
+		font-family: 'FontAwesome';
+		font-size: 11px;
+		text-align: center;
+		display: block;
+		opacity: 0.8;
+		{prefix="transition" value="0.2s all linear"}
+	}
+	html[dir="ltr"] .ipsTree_parent.ipsTree_row > .ipsTree_rowData h4:before {
+		left: -20px;
+	}
+	html[dir="rtl"] .ipsTree_parent.ipsTree_row > .ipsTree_rowData h4:before {
+		right: -20px;
+	}
+
+		.ipsTree_parent.ipsTree_row > .ipsTree_rowData h4:before {
+			{prefix="transform" value="rotate(0deg)"}
+		}
+		html[dir="rtl"] .ipsTree_parent.ipsTree_row > .ipsTree_rowData h4:before {
+			{prefix="transform" value="rotate(180deg)"}
+		}
+
+		.ipsTree_parent.ipsTree_open.ipsTree_row > .ipsTree_rowData h4:before {
+			{prefix="transform" value="rotate(90deg)"}
+			opacity: 1;
+		}
+		html[dir="rtl"] .ipsTree_parent.ipsTree_open.ipsTree_row > .ipsTree_rowData h4:before {
+			{prefix="transform" value="rotate(90deg)"}
+			opacity: 1;
+		}
+
+.ipsTree_row {
+	border-bottom: 1px solid #f5f5f5;
+}
+
+.ipsTree_row.ipsTree_parent {
+	background: #f3f3f3;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+	.ipsTree_row.ipsTree_draggingInto {
+		background: #cfcfcf;
+	}
+
+.ipsTree_row + ol .ipsTree_row {
+	background: #fafafa;
+	border-bottom: 1px solid #ececec;
+}
+
+.ipsTree_row + ol .ipsTree_row + ol .ipsTree_row {
+	background: #fff;
+	border-bottom: 1px solid #f4f4f4;
+}
+
+html[dir="ltr"] ol ol {
+	margin-left: 15px;
+}
+html[dir="rtl"] ol ol {
+	margin-right: 15px;
+}
+
+/* Nested sortable classes */
+.mjs-nestedSortable-error {
+	border: 1px solid #e85959 !important;
+	background: #f3d9d9 !important;
+	min-height: 48px !important;
+	position: relative;
+}
+
+	.mjs-nestedSortable-error:before,
+	.mjs-nestedSortable-error:after {
+		display: block;
+		position: absolute;
+		line-height: 48px;
+		font-size: 11px;
+		color: #e85959;
+	}
+
+	.mjs-nestedSortable-error:before {
+		content: attr(data-error);
+		left: 30px;
+	}
+
+	.mjs-nestedSortable-error:after {
+		content: '\\f071';
+		font-family: 'FontAwesome';
+		left: 10px;
+	}
+
+.sortable-placeholder {
+	border: 1px solid #59aee8;
+	background: #d9e8f3;
+	min-height: 48px;
+}]]></css>
+</theme>

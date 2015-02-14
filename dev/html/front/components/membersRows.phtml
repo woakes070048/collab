@@ -1,0 +1,15 @@
+<ips:template parameters="$memberships" />
+{{foreach $memberships as $membership}}
+	<li class='ipsDataItem ipsClearfix'>
+		<div class='ipsDataItem_icon ipsPos_top'>
+			{template="userPhoto" app="core" group="global" params="$membership->member(), 'tiny'"}
+		</div>
+		<div class='ipsDataItem_main'>
+			<strong class='ipsDataItem_membername'>{member="name" id="$membership->member()->member_id"}</strong><br>
+			{{if $membership->title()}}
+			<span class='ipsDataItem_title'>{$membership->title()}</span>
+			{{endif}}
+			<span class='ipsType_light'>{datetime="$membership->joined"}</span>
+		</div>
+	</li>
+{{endforeach}}

@@ -1,0 +1,82 @@
+<ips:template parameters="$app, $nodeClass, $title_lang, $grid=3" />
+
+{{$roots_as_categories = TRUE;}}
+{{$not_empty = FALSE;}}
+
+{{if $nodeClass::$databaseColumnParent == NULL}}
+  {{$roots_as_categories = FALSE;}}
+  {{foreach $nodeClass::roots() as $root}}
+    {{if $root->can('view')}}
+      {{$not_empty = TRUE;}}
+    {{endif}}
+  {{endforeach}}
+{{else}}
+  {{foreach $nodeClass::roots() as $root}}
+    {{if !$root->hasChildren()}}
+      {{$roots_as_categories = FALSE;}}
+    {{endif}}
+    {{if $root->can('view')}}
+      {{$not_empty = TRUE;}}
+    {{endif}}
+ {{endforeach}}
+{{endif}}
+
+<section>
+	<ol class='ipsList_reset' data-controller='core.global.core.table' data-baseURL=''>
+	{{if $roots_as_categories == TRUE}}
+		{{foreach $nodeClass::roots() as $category}}
+			{{if $category->can('view')}}
+				{{if $category->hasChildren()}}
+				<li data-categoryID='{expression="md5($nodeClass)"}_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
+					<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
+						<a href='{$category->url()}'>{$category->_title}</a>
+					</h2>
+					{{if $category->childrenCount() >= $grid}}
+						<div class='ipsAreaBackground ipsPad' data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+							<div data-role='patchworkList'>
+								{{foreach $category->children() as $subnode}}
+									{template="nodeGridItem" group="components" app="collab" params="$subnode"}
+								{{endforeach}}
+							</div>
+						</div>
+					{{else}}
+						<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset">
+							{{foreach $category->children() as $subnode}}
+								{template="nodeRow" group="components" app="collab" params="$subnode"}
+							{{endforeach}}
+						</ol>
+					{{endif}}
+				</li>		
+				{{endif}}
+			{{endif}}
+		{{endforeach}}
+	{{else}}
+		{{if $not_empty}}
+		<li class='ipsBox ipsSpacer_bottom'>
+			<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
+				{lang="$title_lang"}
+			</h2>
+			{{if $layout === 'grid'}}
+				<div class='ipsAreaBackground ipsPad' data-role="forums" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+					<div data-role='patchworkList'>
+						{{foreach $nodeClass::roots() as $node}}
+							{{if $node->can('view')}}
+								{template="nodeGridItem" group="components" app="collab" params="$node"}
+							{{endif}}
+						{{endforeach}}
+					</div>
+				</div>
+			{{else}}
+				<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset" data-role="forums">
+					{{foreach $nodeClass::roots() as $node}}
+						{{if $node->can('view')}}
+							{template="nodeRow" group="components" app="collab" params="$node"}
+						{{endif}}
+					{{endforeach}}
+				</ol>
+			{{endif}}
+		</li>
+		{{endif}}
+	{{endif}}
+	</ol>
+</section>

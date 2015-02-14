@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<emails><template><template_app>collab</template_app><template_name>notification_collab_join_accepted</template_name><template_content_html><![CDATA[
+Congratulations! {$sponsor->name} has accepted your request to join "{$collab->title}".]]></template_content_html><template_data>$sponsor, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+Congratulations! {$sponsor->name} has accepted your request to join "{$collab->title}".]]></template_content_plaintext></template><template><template_app>collab</template_app><template_name>notification_collab_invitation_accepted</template_name><template_content_html><![CDATA[
+{$member->name} has accepted your invitation to "{$collab->title}".]]></template_content_html><template_data>$member, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+{$member->name} has accepted your invitation to "{$collab->title}".]]></template_content_plaintext></template><template><template_app>collab</template_app><template_name>notification_collab_join_requested</template_name><template_content_html><![CDATA[
+{$member->name} has requested to join "{$collab->title}".]]></template_content_html><template_data>$member, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+{$member->name} has requested to join "{$collab->title}".]]></template_content_plaintext></template><template><template_app>collab</template_app><template_name>notification_collab_invitation_received</template_name><template_content_html><![CDATA[
+{$sponsor->name} has invited you to join "{$collab->title}".]]></template_content_html><template_data>$sponsor, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+{$sponsor->name} has invited you to join "{$collab->title}".]]></template_content_plaintext></template></emails>

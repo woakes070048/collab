@@ -1,0 +1,30 @@
+<ips:template parameters="$category, $layout" />
+
+<div class='ipsColumns ipsColumns_collapsePhone collabCategoryCoverLayout collabCategoryCoverLayout_{$layout}' data-hideOnCoverEdit>
+	<div class='ipsColumn ipsColumn_fluid ipsClearfix'>
+		<div class='ipsPos_left ipsPad coverContent'>
+			<h1 class='ipsType_reset'>
+				{{if $layout != 'standard'}}<a href='{$category->url()}'>{{endif}}
+				{$category->_title}
+				{{if $layout != 'standard'}}</a>{{endif}}
+			</h1>
+			{{if $layout == 'subview'}}
+				<a href='{$category->url()}' class='ipsButton ipsButton_verySmall ipsButton_light'>{lang="browse"}</a>
+			{{else}}
+				<div class='collabCategoryDescription'>
+					{$category->description|raw}
+				</div>
+			{{endif}}
+			{{if $layout == 'index'}}
+				<div class="categoryCoverBrowseButton">
+					<a href='{$category->url()}' class='ipsButton ipsButton_veryLarge ipsButton_alternate'>{lang="browse"}</a>
+				</div>
+			{{endif}}
+			{{if $layout == 'standard' and $category->can('add')}}
+				<div class="categoryCoverAddButton ipsResponsive_hidePhone">
+					<a href='{$category->url()->setQueryString( 'do', 'add' )}' class='ipsButton ipsButton_positive'><i class="fa fa-plus-circle"></i> &nbsp;{lang="collab_start_new" sprintf="$category->collab_singular"}</a>
+				</div>
+			{{endif}}
+		</div>
+	</div>
+</div>

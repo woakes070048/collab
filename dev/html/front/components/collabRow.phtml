@@ -1,0 +1,108 @@
+<ips:template parameters="$table, $headers, $rows" />
+{{$rowIds = array();}}
+{{foreach $rows as $row}}
+	{{$idField = $row::$databaseColumnId;}}
+	{{$rowIds[] = $row->$idField;}}
+{{endforeach}}
+{{$iposted = ( method_exists( $table, 'container' ) AND $table->container() !== NULL ) ? $table->container()->contentPostedIn( null, $rowIds ) : array();}}
+{{if count( $rows )}}
+	{{$rowCount=0;}}
+	{{foreach $rows as $row}}
+		{{$rowCount++;}}
+		{{$idField = $row::$databaseColumnId;}}
+		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
+			<div class='ipsDataItem_icon ipsPos_top'>
+				{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
+				<span class='ipsItemStatus ipsItemStatus_large collabStatusIcon'>
+					{{if $row->isFull()}}
+						<i class="fa fa-circle"></i>
+					{{else}}
+					  	<i class="fa fa-circle-o"></i>
+					{{endif}}
+					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style1 membershipCount" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
+						{$member_count}
+					</span>
+					{{if $membership = $row->getMembership()}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive membershipStatus" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$collab->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_negative membershipStatus" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$collab->collab_singular"}'><i class='fa fa-times-circle'></i></span>
+						{{endif}}
+					{{endif}}
+				</span>
+			</div>
+			<div class='ipsDataItem_main'>
+				<h4 class='ipsDataItem_title marg0 ipsType_break'>
+					{{if $row->locked()}}
+						<i class='fa fa-lock' data-ipsTooltip title='{lang="topic_locked"}'></i>
+					{{endif}}
+										
+					{{if $row->prefix()}}
+						{template="prefix" group="global" app="core" params="$row->prefix( TRUE ), $row->prefix()"}
+					{{endif}}
+					
+					<a href='{$row->url()}' {{if $row->tableHoverUrl and $row->canView()}}data-ipsHover data-ipsHover-target='{$row->url()->setQueryString('preview', 1)}' data-ipsHover-timeout='1.5'{{endif}}>
+						{{if $row->mapped('title')}}{lang="$row->mapped('title')" wordbreak="true"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+					</a>
+				</h4>
+				<span>
+					{{if $row->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$row->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $row->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}							
+					{{if $row->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $row->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+					{{if $row->is_template and ( $row->canMakeModel() or $row->canUnmakeModel() )}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_marked_model"}'><i class='fa fa-flag'></i></span>
+					{{endif}}
+					{{if count( $row->tags() )}}
+						&nbsp;&nbsp;
+						{template="tags" group="global" app="core" params="$row->tags(), true, true"}
+					{{endif}}
+				</span>
+				<div class='ipsDataItem_meta ipsType_reset ipsType_light ipsType_blendLinks'>
+					{truncate="$row->short_description" length="256"}
+				</div>
+			</div>
+			<ul class='ipsDataItem_stats'>
+				{{foreach $row->stats(TRUE) as $k => $v}}
+					<li {{if $k == 'num_views'}}class='ipsType_light'{{elseif in_array( $k, $row->hotStats )}}class="ipsDataItem_stats_hot" data-text='{lang="hot_item"}' data-ipsTooltip title='{lang="hot_item_desc"}'{{endif}}>
+						<span class='ipsDataItem_stats_number'>{$v}</span>
+						<span class='ipsDataItem_stats_type'>{lang="forums_{$k}" pluralize="$v"}</span>
+						{{if $k == 'comments' && \IPS\collab\Collab::modPermission( 'unhide', NULL, $row->container() ) AND $row->queuedposts}}
+							&nbsp;<a href='{$row->url()->setQueryString( 'queued_posts', 1 )}' class='ipsType_warning ipsType_small ipsPos_right ipsResponsive_noFloat' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$row->topic_queuedposts"}'><i class='fa fa-warning'></i> <strong>{$row->topic_queuedposts}</strong></a>
+						{{endif}}
+					</li>
+				{{endforeach}}
+			</ul>
+			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+				<li>
+					{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
+				</li>
+				<li>
+					{$row->author()->link()|raw}
+				</li>
+				<li class="ipsType_light ipsResponsive_hidePhone">
+					{$row->getMembership( $row->author() )->title()}
+				</li>
+			</ul>
+			{{if $table->canModerate()}}
+				<div class='ipsDataItem_modCheck'>
+					<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->tableStates()}}{$row->tableStates()}{{endif}}'>
+				</div>
+			{{endif}}
+		</li>
+	{{endforeach}}
+{{endif}}

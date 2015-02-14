@@ -1,0 +1,51 @@
+<ips:template parameters="$collab" />
+
+<div data-controller='core.front.core.commentFeed' data-commentsType='comments' data-baseURL='{$collab->url()}' {{if $collab->isLastPage()}}data-lastPage{{endif}} data-feedID='file-{$collab->id}'>
+	<br>
+	{{if $collab->commentPageCount() > 1}}
+		{$collab->commentPagination( array( 'tab' ) )|raw}
+		<br><br>
+	{{endif}}
+	<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+		{{if count( $collab->comments() )}}
+			<form action="{$collab->url()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+				{{$commentCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
+				{{foreach $collab->comments() as $comment}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}
+						{{if $lined = TRUE and $commentCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$commentCount++;}}
+					{$comment->html()|raw}
+				{{endforeach}}
+				{template="commentMultimod" app="core" group="global" params="$collab"}
+			</form>
+		{{else}}
+			<p class='ipsType_normal ipsType_light ipsType_reset' data-role='noComments'>{lang="no_comments"}</p>
+		{{endif}}
+	</div>
+	{{if $collab->commentPageCount() > 1}}
+		<hr class='ipsHr'>
+		{$collab->commentPagination( array( 'tab' ) )|raw}
+	{{endif}}
+	{{if $collab->commentForm() || $collab->locked() || \IPS\Member::loggedin()->restrict_post || \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+		<br><br>
+		<div class='ipsAreaBackground ipsPad' data-role='replyArea'>
+			{{if $collab->commentForm()}}
+				{{if $collab->locked()}}
+					<strong class='ipsType_warning ipsComposeArea_warning'><i class='fa fa-info-circle'></i> {lang="collab_locked_can_comment"}</strong>
+				{{endif}}
+				{$collab->commentForm()|raw}
+			{{else}}
+				{{if $collab->locked()}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'collab_locked_cannot_comment'"}
+				{{elseif \IPS\Member::loggedin()->restrict_post}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+				{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+</div>

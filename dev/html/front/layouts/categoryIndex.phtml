@@ -1,0 +1,12 @@
+<ips:template parameters="" />
+<div class="collabLayout">
+	{template="pageHeader" group="global" app="core" params="\IPS\Member::loggedIn()->language()->addToStack('__app_collab')"}
+
+	{{foreach \IPS\collab\Category::roots() as $category}}
+	<section class="collabCategoryIndex">
+		<a href='{$category->url()}'>
+		{$category->coverPhoto( 'index' )|raw}
+		</a>
+	</section>
+	{{endforeach}}
+</div>

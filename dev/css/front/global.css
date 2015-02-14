@@ -1,0 +1,120 @@
+/** 
+ * Global CSS Styles
+ */
+
+i.fa {
+	line-height: inherit;
+}
+ 
+ header.collabHeader {
+	margin-bottom:20px;
+}
+
+html[dir="ltr"] #elEditCollab {
+	right: -5px;
+}
+html[dir="rtl"] #elEditCollab {
+	left: -5px;
+}
+
+html[dir="ltr"] #elEditCollab.editable {
+	right: 70px;
+}
+html[dir="rtl"] #elEditCollab.editable {
+	left: 70px;
+}
+
+@media ( max-width: 759px ) {
+  .collabHeader .headerContent {
+	text-align: center;
+	width: 100%;
+  }
+  .collabHeader .headerContent p {
+	margin:0;
+  }
+}
+
+.collabHeader .headerContent h1 {
+	font-size: 2em;
+	line-height: 2.2em;
+}
+
+.collabHeader .ipsCoverPhoto_button {
+	z-index: 2000;
+}
+
+@media ( min-width: 760px ) {
+
+  #elEditCollab {
+	position: absolute;
+	top: -5px;
+	z-index: 2000;
+  }
+  
+  #collabModOptions {
+	position: absolute;
+	right: 5px;
+	bottom: 5px;
+	z-index: 1;
+	width: 190px;
+  }
+}
+
+#collabModOptions {
+	clear: both;
+}
+
+#elCollabStats {
+	background: #222;
+	color: #fff;
+	min-height: 65px;
+	padding: 12px 12px 12px 12px;
+	font-size: 15px;
+	font-weight: 500;
+	z-index: 2000;
+	position: relative;
+}
+
+#elCollabStats .statsList a {
+	display: block;
+	color: lightblue;
+}
+
+html[dir="rtl"] #elCollabStats {
+	padding: 12px 155px 12px 12px;
+}
+	
+
+html[dir="ltr"] #elCollabStats > ul:last-child > li {
+	margin-right: 20px;
+	padding-right: 20px;
+	border-right: 1px solid rgba(0,0,0,0.1);
+}
+html[dir="rtl"] #elCollabStats > ul:last-child > li {
+	margin-left: 20px;
+	padding-left: 20px;
+	border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+#elCollabStats > [data-role="switchView"] .ipsList_inline,
+#elCollabStats > [data-role="switchView"] .ipsButton {
+	position: relative;
+	z-index: 1000;
+}
+
+#elCollabStats li:last-child {
+	border: 0;
+}
+
+#elCollabActions_menu .ipsMenu_item i {
+	width: 20px;
+}
+
+.collabHeader .ipsPageHead_special {
+	min-height: 150px;
+}
+
+.ipsBadge.ipsBadge_collab {
+	color: #888;
+	height: auto;
+}

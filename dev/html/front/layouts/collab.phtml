@@ -1,0 +1,33 @@
+<ips:template parameters="$collab, $activity" />
+
+<div class="collabLayout">
+	<div id="collabDescription" class="collabDescription">
+		{$collab->description|raw}
+	</div>
+
+	{{foreach $collab->enabledNodes() as $app => $config}}
+		{{$nodeCount = count( $config['nodes'] );}}
+		{{foreach $config['nodes'] as $node}}
+			{{if $nodeCount > 1}}
+			  {{$title_lang = $node['content_container_name'];}}
+			{{else}}
+			  {{$title_lang = "__app_" . $app;}}
+			{{endif}}
+			{{if count( $node['node']::roots() )}}
+				{template="nodeList" app="collab" group="components" params="$app, $node['node'], $title_lang"}
+			{{endif}}
+		{{endforeach}}
+	{{endforeach}}
+
+	{{if $activity}}
+	<div id="collabFeedback">
+		<h2 class="ipsType_sectionTitle ipsType_reset">{lang="collab_activity_feed"}</h2>
+		{$activity|raw}
+	</div>
+	{{endif}}
+
+	{{if !$collab->container()->disable_sharelinks}}
+		<hr class='ipsHr'>
+		{template="sharelinks" app="core" group="global" params="$collab"}
+	{{endif}}
+</div>

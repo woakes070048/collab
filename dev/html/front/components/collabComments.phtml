@@ -1,0 +1,61 @@
+<ips:template parameters="$collab, $comments" />
+
+<div data-controller='core.front.core.commentFeed,forums.front.topic.view' data-baseURL='{$collab->url()}' {{if $collab->isLastPage()}}data-lastPage{{endif}} data-feedID='collab-{$collab->collab}' class='cTopic ipsClear'>
+
+	<h2 class='ipsType_sectionTitle ipsType_reset ipsType_medium' data-role="comment_count" data-commentCountString="js_num_topic_posts" style="text-transform: lowercase">{lang="collab_comment_count" pluralize="$collab->posts" sprintf="$collab->collab_singular"}</h2>
+	{{if $collab->commentPageCount() > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			{$collab->commentPagination( array( 'sortby' ) )|raw}
+		</div>
+	{{endif}}
+
+	<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+		<form action="{$collab->url()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+			{{$postCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
+			{{if count( $comments )}}
+				{{foreach $comments as $comment}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}
+						{{if $lined = TRUE and $postCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$postCount++;}}
+					
+					{template="collabComment" group="components" app="collab" params="$collab, $comment"}
+				{{endforeach}}
+			{{endif}}
+			{template="commentMultimod" app="core" group="global" params="$collab"}
+		</form>
+	</div>
+
+	{{if $collab->commentPageCount() > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			{$collab->commentPagination( array( 'sortby' ) )|raw}
+		</div>
+	{{endif}}
+
+	{{if $collab->commentForm() || $collab->locked() || \IPS\Member::loggedIn()->restrict_post || \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+		<a id='replyForm'></a>
+		<div data-role='replyArea' class='cTopicPostArea ipsBox ipsBox_transparent ipsAreaBackground ipsPad {{if !$collab->canComment()}}cTopicPostArea_noSize{{endif}} ipsSpacer_top'>
+			{{if $collab->commentForm()}}
+				{{if $collab->locked()}}
+					<strong class='ipsType_warning ipsComposeArea_warning'><i class='fa fa-info-circle'></i> {lang="topic_locked_can_comment"}</strong>
+				{{endif}}
+				{$collab->commentForm()|raw}
+			{{else}}
+				{{if $collab->locked()}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'topic_locked_cannot_comment'"}
+				{{elseif \IPS\Member::loggedIn()->restrict_post}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+				{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+
+	<div class='ipsResponsive_noFloat ipsResponsive_showPhone ipsResponsive_block ipsSpacer_top'>
+		{template="follow" app="core" group="global" params="'collab', 'collab', $collab->collab_id, $collab->followers()->count( TRUE )"}
+	</div>
+
+</div>

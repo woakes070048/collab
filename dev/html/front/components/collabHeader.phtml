@@ -1,0 +1,27 @@
+<ips:template parameters="$collab" />
+<header class="collabHeader">
+	{$collab->coverPhoto()|raw}
+	<div id='elCollabStats' class='ipsClearfix'>
+		<div data-role='switchView' class='ipsResponsive_hidePhone ipsResponsive_block'>
+			<div class='ipsPos_right'>
+				{template="follow" app="core" group="global" params="'collab', 'collab', $collab->collab_id, $collab->followersCount()"}
+			</div>
+		</div>
+		<ul class='ipsList_inline ipsPos_left statsList'>
+			<li>
+				<a href="{$collab->url()->setQueryString( array( 'do' => 'members' ) )}" data-ipsDialog data-ipsdialog-title="{lang="collab_active_members"}" data-ipsDialog-size="narrow" data-ipstooltip _title="{lang="collab_see_active_members" sprintf="\strtolower($collab->collab_singular)"}">
+					<h4 class='ipsType_minorHeading'>{lang="collab_members_count"}</h4>
+					{$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )}
+				</a>
+			</li>
+			<li class='ipsResponsive_hidePhone'>
+				<h4 class='ipsType_minorHeading'>{lang="collab_created_date" sprintf="$collab->collab_singular"}</h4>
+				{datetime="$collab->created_date"}
+			</li>
+			<li>
+				<h4 class='ipsType_minorHeading'>{lang="collab_owned_by" sprintf="$collab->collab_singular"}</h4>
+				{$collab->author()->link()|raw}
+			</li>
+		</ul>
+	</div>
+</header>

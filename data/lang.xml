@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+ <app key="collab" version="10000">
+  <word key="__app_collab" js="0">Collaboration</word>
+  <word key="module__collab_collab" js="0">Collaboration</word>
+  <word key="__indefart_collab" js="0">a collab</word>
+  <word key="__indefart_collab_comment" js="0">a post in a collab</word>
+  <word key="r__collab_categories_manage" js="0">Manage Categories</word>
+  <word key="r__collab_settings_manage" js="0">Manage Settings</word>
+  <word key="menu__collab_collab" js="0">Collaboration</word>
+  <word key="menu__collab_collab_categories" js="0">Categories</word>
+  <word key="menu__collab_collab_settings" js="0">Settings</word>
+  <word key="group__collab_groupForm" js="0">Collaboration</word>
+  <word key="g_collabs_owned_limit" js="0">Maximum collabs a member of this group can own</word>
+  <word key="g_collabs_joined_limit" js="0">Maximum amount of collabs a member of this group can join</word>
+  <word key="modperms__core_Content_collab_Collab" js="0">Collabs</word>
+  <word key="collab_categories" js="0">Collab Categories</word>
+  <word key="can_pin_collab" js="0">Can Pin Collab</word>
+  <word key="can_unpin_collab" js="0">Can Unpin Collab</word>
+  <word key="can_feature_collab" js="0">Can Feature Collab</word>
+  <word key="can_unfeature_collab" js="0">Can Unfeature Collab</word>
+  <word key="can_edit_collab" js="0">Can Edit Collab</word>
+  <word key="can_hide_collab" js="0">Can Hide Collab</word>
+  <word key="can_unhide_collab" js="0">Can Unhide Collab</word>
+  <word key="can_view_hidden_collab" js="0">Can View Hidden Collab</word>
+  <word key="can_move_collab" js="0">Can Move Collab</word>
+  <word key="can_lock_collab" js="0">Can Lock Collab</word>
+  <word key="can_unlock_collab" js="0">Can Unlock Collab</word>
+  <word key="can_reply_to_locked_collab" js="0">Can Reply to Locked Collab</word>
+  <word key="can_delete_collab" js="0">Can Delete Collab</word>
+  <word key="can_edit_collab_comment" js="0">Can Edit Collab Comments</word>
+  <word key="can_hide_collab_comment" js="0">Can Hide Collab Comments</word>
+  <word key="can_unhide_collab_comment" js="0">Can Unhide Collab Comments</word>
+  <word key="can_view_hidden_collab_comment" js="0">Can View Hidden Collab Comments</word>
+  <word key="can_delete_collab_comment" js="0">Can Delete Collab Comments</word>
+  <word key="can_edit_collab_review" js="0">Can Edit Collab Reviews</word>
+  <word key="can_hide_collab_review" js="0">Can Hide Collab Reviews</word>
+  <word key="can_unhide_collab_review" js="0">Can Unhide Collab Reviews</word>
+  <word key="can_view_hidden_collab_review" js="0">Can View Hidden Collab Reviews</word>
+  <word key="can_delete_collab_review" js="0">Can Delete Collab Reviews</word>
+  <word key="collab_app_title" js="0">App Title</word>
+  <word key="collab_app_title_desc" js="0">You can change the name of the collaboration app to reflect the way you use it.</word>
+  <word key="tab_collab_category_settings" js="0">Category Details</word>
+  <word key="tab_collab_collabs_settings" js="0">Collab Settings</word>
+  <word key="collab_permissions" js="0">%s %s Permissions</word>
+  <word key="collab_moderation_settings" js="0">%s Moderation Abilities For %s Owners</word>
+  <word key="category_collabs_enable" js="0">Enable Collabs?</word>
+  <word key="category_collabs_enable_desc" js="0">This setting controls whether users can create new collabs in this category. If not, it will only be a container category.</word>
+  <word key="collabs_alias_singular" js="0">Alias (Singular)</word>
+  <word key="collabs_alias_singular_desc" js="0">What do you want to call a collaboration in this category (in singular context)?</word>
+  <word key="collabs_alias_plural" js="0">Alias (Plural)</word>
+  <word key="collabs_alias_plural_desc" js="0">What do you want to call collaborations in this category (in plural form)?</word>
+  <word key="collab_moderator_perms" js="0">Moderator Permissions</word>
+  <word key="category_max_collabs_owned" js="0">Maximum Collabs Per Owner</word>
+  <word key="category_max_collabs_owned_desc" js="0">This setting controls how many collabs a user may own in this category.</word>
+  <word key="category_max_collabs_joined" js="0">Maximum Collab Memberships Per User</word>
+  <word key="category_max_collabs_joined_desc" js="0">This setting controls the maximum amount of collabs a user may hold an active membership to in this category.</word>
+  <word key="category_max_collab_members" js="0">Maximum Members Per Collab</word>
+  <word key="category_max_collab_members_desc" js="0">This setting controls the maximum amount of allowed active members per collab in this category.</word>
+  <word key="collab_node_maxnodes" js="0">Maximum %s Per %s</word>
+  <word key="collab_node_maxnodes_desc" js="0">This setting controls the maximum amount of %s which can be created per %s.</word>
+  <word key="collab_allow_comments" js="0">Enable Comments?</word>
+  <word key="collab_allow_ratings" js="0">Enable Ratings?</word>
+  <word key="collab_allow_reviews" js="0">Enable Reviews?</word>
+  <word key="collab_node_enable_add" js="0">Owners Can Add %s?</word>
+  <word key="collab_node_enable_add_desc" js="0">If selected, %s owners will be able to add %s on their own whenever they want.</word>
+  <word key="collab_node_enable_edit" js="0">Owners Can Edit %s?</word>
+  <word key="collab_node_enable_edit_desc" js="0">If selected, %s owners will be able to edit existing %s to suit their needs.</word>
+  <word key="collab_node_enable_delete" js="0">Owners Can Delete %s?</word>
+  <word key="collab_node_enable_delete_desc" js="0">If selected, %s owners will be able to delete %s that they don't need.</word>
+  <word key="collab_node_enable_reorder" js="0">Owners Can Reorder %s?</word>
+  <word key="collab_node_enable_reorder_desc" js="0">If selected, %s owners will be able to change their arrangement of %s.</word>
+  <word key="collab_allow_node" js="0">Enable %s %s?</word>
+  <word key="collab_allow_node_desc" js="0">If enabled, %s in this category will be able to have their own %s.</word>
+  <word key="collab_allow_node_content_desc" js="0">If enabled, %s in this category will be able to have their own %s. This will allow the group to maintain its own %s content.</word>
+  <word key="collab_model_settings" js="0">Collab Model Settings</word>
+  <word key="collab_enable_model" js="0">Use Collab Models?</word>
+  <word key="collab_enable_model_desc" js="0">If needed, you can create and designate one or more %s in this category to act as a model for newly created %s. Newly created %s will then be set up with a default configuration based on how the model is configured.</word>
+  <word key="collab_force_model" js="0">Force Model?</word>
+  <word key="collab_force_model_desc" js="0">If you enable this option, users will be forced to select a %s model when they create a new %s. If only one model is available, it will be used automatically.</word>
+  <word key="collab_multiple_models" js="0">Model Choices</word>
+  <word key="collab_multiple_models_desc" js="0">If you allow multiple choices, newly created %s can have a configuration that combines all the models selected by the user.</word>
+  <word key="no_collabs_in_category" js="0">This category does not contain any %s</word>
+  <word key="collab_collab_tags" js="0">Tags</word>
+  <word key="collab_collab_auto_follow" js="0">Follow Content</word>
+  <word key="collab_collab_auto_follow_suffix" js="0">Receive automatic notifications of updates and activity</word>
+  <word key="collab_description" js="0">Description</word>
+  <word key="collab_default_title" js="0">Default Member Title</word>
+  <word key="collab_default_title_desc" js="0">You can choose a default title for all members.</word>
+  <word key="collab_create_state" js="0">Options</word>
+  <word key="create_collab_locked" js="0">Locked</word>
+  <word key="create_collab_pinned" js="0">Pinned</word>
+  <word key="create_collab_hidden" js="0">Hidden</word>
+  <word key="create_collab_featured" js="0">Featured</word>
+  <word key="collab_collab__save" js="0">Save</word>
+  <word key="collab_tab_description" js="0">Description</word>
+  <word key="collab_tab_settings" js="0">Settings</word>
+  <word key="collab_tab_permissions" js="0">Permissions</word>
+  <word key="collab_tab_members" js="0">Members</word>
+  <word key="collab_tab_roles" js="0">Roles</word>
+  <word key="collab_rules" js="0">Membership Rules</word>
+  <word key="collab_role_custom_title" js="0">Custom Member Title</word>
+  <word key="collab_role_custom_title_desc" js="0">You can choose a custom member title to give members with this role.</word>
+  <word key="collab_template" js="0">Group Model</word>
+  <word key="collab_no_template" js="0">None</word>
+  <word key="leave_comment" js="0">Leave Comment</word>
+  <word key="collab_collab__comment_placeholder" js="0">Type here to leave a comment...</word>
+  <word key="collab_comment_count" js="0">{# [1:Comment][?:Comments]}</word>
+  <word key="collab_youre_active" js="0">You are an active member.</word>
+  <word key="collab_youre_pending" js="0">Your membership request is pending.</word>
+  <word key="collab_youre_invited" js="0">You have been invited to be a member!</word>
+  <word key="collab_youre_banned" js="0">You have been banned.</word>
+  <word key="collab_review_count" js="0">{# [1:Review][?:Reviews]}</word>
+  <word key="collab_collab_rating_value" js="0">Choose A Rating</word>
+  <word key="collab_collab_review_text" js="0">Your Review</word>
+  <word key="collab_collab__review_placeholder" js="0">Write your review here...</word>
+  <word key="collab_locked_can_comment" js="0">This content has been locked, but your permissions allow you to still leave comments.</word>
+  <word key="collab_locked_cannot_comment" js="0">This content has been locked.</word>
+  <word key="collab_active_members" js="0">Active Members</word>
+  <word key="collab_see_active_members" js="0">See who is a member of this %s</word>
+  <word key="collab_active_members_title" js="0">Active Members of %s</word>
+  <word key="collab_activity_feed" js="0">Activity Feed</word>
+  <word key="collab_cat_sub" js="0">Sub:</word>
+  <word key="collab_active_members_count" js="0">{# [1:Active Member][?:Active Members]}</word>
+  <word key="collab_byline" js="0">Leader: %s</word>
+  <word key="collab_no_content" js="0">No content here yet</word>
+  <word key="collab_marked_model" js="0">Designated as a model</word>
+  <word key="collab_status" js="0">Status</word>
+  <word key="collabs_all" js="0">All</word>
+  <word key="collabs_join_closed" js="0">Closed Membership</word>
+  <word key="collabs_join_open" js="0">Open Membership</word>
+  <word key="collabs_join_invite" js="0">Invite Only</word>
+  <word key="collabs_join_free" js="0">Open Membership (without approval)</word>
+  <word key="collab_is_template" js="0">Items Marked As Models</word>
+  <word key="collab_join" js="0">Join %s</word>
+  <word key="collab_join_message" js="0">Join Request Message</word>
+  <word key="collab_invite_message" js="0">Invitation Message</word>
+  <word key="collab_invite_response" js="0">Respond to invitation:</word>
+  <word key="collab_accept_invitation" js="0">Accept the invitation and join the group.</word>
+  <word key="collab_deny_invitation" js="0">Deny the invitation. DO NOT join the group.</word>
+  <word key="collab_update_invitation" js="0">Update the notes on this invitation only.</word>
+  <word key="collab_invitees" js="0">Invitees</word>
+  <word key="collab_invite_button" js="0">Invite Members!</word>
+  <word key="collab_message_invitation_accepted" js="0">Congratulations. You are now a member!</word>
+  <word key="collab_message_invitation_denied" js="0">The invitation has been denied.</word>
+  <word key="collab_message_members_invited" js="0">Members have been invited!</word>
+  <word key="collab_message_join_request_sent" js="0">Join Request Sent!</word>
+  <word key="collab_message_join_request_updated" js="0">Join Request Updated!</word>
+  <word key="collab_message_membership_deleted" js="0">Membership has been removed</word>
+  <word key="collab_message_ownership_transferred" js="0">Ownership has been successfully transferred!</word>
+  <word key="collab_message_model_marked" js="0">This item has been flagged as a model!</word>
+  <word key="collab_message_model_unmarked" js="0">This item is no longer a model!</word>
+  <word key="collab_select_id" js="0">Select One</word>
+  <word key="collab_invite_member" js="0">Invite Member</word>
+  <word key="collab_members_filter_invited" js="0">Invited</word>
+  <word key="collab_members_filter_banned" js="0">Banned</word>
+  <word key="collab_members_filter_pending" js="0">Pending</word>
+  <word key="collab_members_filter_active" js="0">Active</word>
+  <word key="members_collab_joined" js="0">Joined</word>
+  <word key="members_collab_status" js="0">Status</word>
+  <word key="members_collab_roles" js="0">Roles</word>
+  <word key="members_collab_title" js="0">Title</word>
+  <word key="collab_dashboard" js="0">%s Dashboard</word>
+  <word key="collab_members" js="0">%s Members</word>
+  <word key="collab_roles" js="0">%s Roles</word>
+  <word key="collab_create_role" js="0">Create Role</word>
+  <word key="collab_role_name" js="0">Role Name</word>
+  <word key="collab_status_banned" js="0">Banned</word>
+  <word key="collab_status_invited" js="0">Invited</word>
+  <word key="collab_status_pending" js="0">Awaiting Approval</word>
+  <word key="collab_status_active" js="0">Active</word>
+  <word key="collab_member_edited" js="0">Member updated.</word>
+  <word key="collab_member_default_title" js="0">Inherit Member Title</word>
+  <word key="collab_member_default_title_desc" js="0">The title for this member will be inherited from roles or other %s settings.</word>
+  <word key="collab_member_custom_title" js="0">Custom Member Title</word>
+  <word key="collab_member_custom_title_desc" js="0">Any title you enter here will override default titles.</word>
+  <word key="collab_member_roles" js="0">Role</word>
+  <word key="collab_member_approved" js="0">Member has been approved.</word>
+  <word key="collab_member_banned" js="0">Member has been banned.</word>
+  <word key="collab_member_unbanned" js="0">Member has been unbanned.</word>
+  <word key="collab_member_deleted" js="0">Member has been removed!</word>
+  <word key="collab_role_created" js="0">Role has been created.</word>
+  <word key="collab_role_edited" js="0">Role has been edited.</word>
+  <word key="collab_role_deleted" js="0">Role has been deleted!</word>
+  <word key="collab_role_perms" js="0">Permissions</word>
+  <word key="collab_role_guests" js="0">Guests</word>
+  <word key="collab_role_members" js="0">All Active Members</word>
+  <word key="collab_perm_action" js="0">perform that action</word>
+  <word key="collab_perm_manageCollab" js="0">Manage Collab</word>
+  <word key="collab_perm_viewDashboard" js="0">View Dashboard</word>
+  <word key="collab_perm_inviteMember" js="0">Invite Members</word>
+  <word key="collab_perm_manageMembers" js="0">Manage Members</word>
+  <word key="collab_perm_editMember" js="0">Edit Members</word>
+  <word key="collab_perm_editMemberRoles" js="0">Edit Member Roles</word>
+  <word key="collab_perm_banMember" js="0">Ban Members</word>
+  <word key="collab_perm_deleteMember" js="0">Delete Members</word>
+  <word key="collab_perm_unbanMember" js="0">Un-ban Members</word>
+  <word key="collab_perm_approveMember" js="0">Approve Members</word>
+  <word key="collab_perm_manageRoles" js="0">Manage Roles</word>
+  <word key="collab_perm_addRole" js="0">Add Roles</word>
+  <word key="collab_perm_editRole" js="0">Edit Roles</word>
+  <word key="collab_perm_editRolePermissions" js="0">Edit Role Permissions</word>
+  <word key="collab_perm_deleteRole" js="0">Delete Roles</word>
+  <word key="collab_perm_moderateContent" js="0">Moderate Content</word>
+  <word key="collab_perm_nodeManage" js="0">Manage %s</word>
+  <word key="collab_perm_nodeAdd" js="0">Add %s</word>
+  <word key="collab_perm_nodeEdit" js="0">Edit %s</word>
+  <word key="collab_perm_nodeDelete" js="0">Delete %s</word>
+  <word key="collab_role_mod_permissions" js="0">Moderation Permissions</word>
+  <word key="collab_collab_notes" js="0">Member Notes</word>
+  <word key="collab_moderation_actions" js="0">%s Management</word>
+  <word key="collab_join_mode" js="0">Membership Mode</word>
+  <word key="collab_join_disabled" js="0">Closed</word>
+  <word key="collab_join_invite_only" js="0">Invite Only</word>
+  <word key="collab_join_approve" js="0">Open (needs approval)</word>
+  <word key="collab_join_free" js="0">Open (without approval)</word>
+  <word key="collab_increase_mainposts" js="0">Increase overall site posts as well as collab posts</word>
+  <word key="collab_increase_mainposts_desc" js="0">Posts are only added to collab totals by default. Do you want posts to also add to the users overall site count?</word>
+  <word key="collab_make_model" js="0">Flag as %s Model</word>
+  <word key="collab_unmake_model" js="0">Unflag as %s Model</word>
+  <word key="collab_membership_collab_id" js="0">Title</word>
+  <word key="collab_membership_title" js="0">Member Title</word>
+  <word key="collab_membership_roles" js="0">Roles</word>
+  <word key="collab_membership_status" js="0">Status</word>
+  <word key="collab_membership_joined" js="0">Joined</word>
+  <word key="collab_membership_members_count" js="0">Active / Total</word>
+  <word key="collab_manage_memberships" js="0">%s Memberships</word>
+  <word key="collab_manage_memberships_blurb" js="0">View and manage the status of your %s memberships.</word>
+  <word key="collab_leave" js="0">Leave</word>
+  <word key="collab_respond" js="0">Respond To Invite</word>
+  <word key="collab_update" js="0">Update Request</word>
+  <word key="collab_transfer" js="0">Transfer Ownership</word>
+  <word key="collab_edit_membership" js="0">Editing &quot;%s&quot; Membership</word>
+  <word key="collab_membership_updated" js="0">Membership Updated</word>
+  <word key="collab_member_notes" js="0">Notes</word>
+  <word key="collab_transfer_ownership" js="0">Transfer Ownership Of &quot;%s&quot;</word>
+  <word key="collab_new_owner" js="0">Select New Owner</word>
+  <word key="collab_member_posts" js="0">Posts Count</word>
+  <word key="collab_membership_join_notes" js="0">Membership Join Request Notes</word>
+  <word key="collab_membership_member_settings" js="0">Membership Settings</word>
+  <word key="collab_member_approve" js="0">Approve this member</word>
+  <word key="collab_perm__label" js="0">Category Permissions</word>
+  <word key="collab_perm__view" js="0">See Category</word>
+  <word key="collab_perm__read" js="0">View Collabs</word>
+  <word key="collab_perm__add" js="0">Create Collabs</word>
+  <word key="collab_perm__reply" js="0">Comment On Collabs</word>
+  <word key="collab_perm__rate" js="0">Rate Collabs</word>
+  <word key="collab_perm__join" js="0">Join Collabs</word>
+  <word key="collab_perm__review" js="0">Write Reviews</word>
+  <word key="collab_acplog_settings" js="0">Updated collaboration application settings</word>
+  <word key="collab_collab_title" js="0">Title</word>
+  <word key="collab_short_description" js="0">Short Description</word>
+  <word key="collab_start_new" js="0">Add New %s</word>
+  <word key="collab_select_category" js="0">Select Category</word>
+  <word key="collab_cat__collab_singular" js="0">Collab</word>
+  <word key="collab_cat__collabs_plural" js="0">Collabs</word>
+  <word key="collab_cat__member_title" js="0">%s Member</word>
+  <word key="collab_member_affiliations" js="0">Affiliations</word>
+  <word key="collab_default_creator_title" js="0">Creator</word>
+  <word key="collab_default_member_title" js="0">%s Member</word>
+  <word key="collab_default_guest_title" js="0">%s Guest</word>
+  <word key="collab_menu" js="0">%s Menu</word>
+  <word key="collab_homepage" js="0">%s Homepage</word>
+  <word key="collab_members_count" js="0">Active Members</word>
+  <word key="collab_created_date" js="0">Since</word>
+  <word key="collab_owned_by" js="0">%s Leader</word>
+  <word key="collab_settings" js="0">%s Settings</word>
+  <word key="collab_manage_nodes" js="0">Manage %s</word>
+  <word key="collab_edit" js="0">Edit %s</word>
+  <word key="collab_manage_members" js="0">Manage %s Members</word>
+  <word key="collab_manage_roles" js="0">Manage %s Roles</word>
+  <word key="collab_invite" js="0">Invite</word>
+  <word key="collab_member_of_collab" js="0">You are a member of this %s</word>
+  <word key="collab_collab_pl" js="0">Collaboration</word>
+  <word key="collab_pl" js="0">Items</word>
+  <word key="collab_comment_pl" js="0">Comments</word>
+  <word key="collab_review_pl" js="0">Reviews</word>
+  <word key="notifications__collab_invitation_received" js="0">When someone invites me to join a group</word>
+  <word key="notifications__collab_join_accepted" js="0">When I am accepted into a group</word>
+  <word key="notifications__collab_invitation_accepted" js="0">When someone accepts an invitation I send</word>
+  <word key="notifications__collab_join_requested" js="0">When someone requests to join a group I manage</word>
+  <word key="collab_notification_collab_join_requested" js="0">%s has requested to join the %s: &quot;%s&quot;</word>
+  <word key="collab_notification_collab_invitation_received" js="0">%s has invited you to join the %s: &quot;%s&quot;</word>
+  <word key="collab_notification_collab_join_accepted" js="0">%s has accepted you to the %s: &quot;%s&quot;</word>
+  <word key="collab_notification_collab_invitation_accepted" js="0">%s has accepted your invite to the %s: &quot;%s&quot;</word>
+  <word key="mailsub__collab_notification_collab_join_requested" js="0"><![CDATA[{$membership->member()->name} has requested to join {$collab->title}]]></word>
+  <word key="mailsub__collab_notification_collab_invitation_received" js="0"><![CDATA[You have been invited to join {$collab->title}]]></word>
+  <word key="mailsub__collab_notification_collab_join_accepted" js="0"><![CDATA[You have been accepted into {$collab->title}]]></word>
+  <word key="mailsub__collab_notification_collab_invitation_accepted" js="0"><![CDATA[{$membership->sponsor()->name} has accepted you into {$collab->title}]]></word>
+  <word key="emailtpl_notification_collab_join_requested" js="0">Collaboration Join Requested</word>
+  <word key="emailtpl_notification_collab_join_accepted" js="0">Collaboration Join Accepted</word>
+  <word key="emailtpl_notification_collab_invitation_received" js="0">Collaboration Invite Received</word>
+  <word key="emailtpl_notification_collab_invitation_accepted" js="0">Collaboration Invite Accepted</word>
+  <word key="collab_title_manage_members" js="0">%s Members</word>
+  <word key="collab_title_edit_membership" js="0">Editing Membership For: %s</word>
+  <word key="collab_title_manage_roles" js="0">%s Roles</word>
+  <word key="collab_title_add_role" js="0">Add New %s Role</word>
+  <word key="collab_title_edit_role" js="0">Editing Role: &quot;%s&quot;</word>
+  <word key="collab_title_invite_member" js="0">Invite Member</word>
+  <word key="loc_collab_viewing_category" js="0">Viewing %s</word>
+  <word key="loc_collab_viewing_collab" js="0">Viewing %s</word>
+  <word key="collab_join_error_restricted" js="0">You are restriced from joining this group.</word>
+  <word key="collab_join_error_full" js="0">This group has reached its maximum amount of allowed members.</word>
+  <word key="collab_join_error_disabled" js="0">Joining this group has been disabled.</word>
+  <word key="collab_join_error_invite_only" js="0">This group is invite only.</word>
+  <word key="collab_join_error_active" js="0">You are already an active member in this %s</word>
+  <word key="collab_join_error_banned" js="0">You have been banned from this %s</word>
+  <word key="collab_join_error_state" js="0">Your membership request cannot be processed.</word>
+  <word key="collab_not_found" js="0">The collab you requested could not be found.</word>
+  <word key="collab_node_perms_missing" js="0">The permissions for this page have not been configured!</word>
+  <word key="collab_node_unavailable" js="0">The selected node type has been disabled.</word>
+  <word key="collab_perm_error" js="0">You do not have permission to %s.</word>
+  <word key="collab_unauthorized_action" js="0">You are not authorized to perform that action.</word>
+  <word key="collab_asset_mismatch" js="0">The asset loaded is not part of the expected group.</word>
+  <word key="collab_member_invalid" js="0">Invalid Membership</word>
+  <word key="collab_role_invalid" js="0">Invalid Role</word>
+  <word key="collab_role_exists" js="0">Role name already exists!</word>
+  <word key="collab_invalid_membership" js="0">There was a problem loading the membership</word>
+  <word key="collab_owner_non_removable" js="0">You can't leave when you are the owner!</word>
+  <word key="collab_no_transfer_members" js="0">There are no qualified members in your group to transfer to!</word>
+  <word key="collab_delete_all" js="0">Delete All Associated Content?</word>
+  <word key="collab_delete_all_desc" js="0">If checked, all categories and content from collaborations will be deleted from your site. Uncheck for options to keep specific content.</word>
+  <word key="collab_deleting_collabs" js="0">Deleting Collaboration Content</word>
+  <word key="collab_keep_node" js="0">Keep %s?</word>
+  <word key="collab_keep_node_desc" js="0">Check this option to keep all %s and %s content associated with collaborations on your site.</word>
+  <word key="collab" js="0">Collab</word>
+  <word key="remove" js="0">Remove</word>
+  <word key="select" js="0">Select</word>
+  <word key="kick" js="0">Kick Out</word>
+  <word key="browse" js="0">Browse</word>
+  <word key="category_parent_id" js="0">Category Parent</word>
+  <word key="rating" js="0">Rating</word>
+  <word key="reviews" js="0">Reviews</word>
+  <word key="title" js="0">Title</word>
+  <word key="created_date" js="0">Date Created</word>
+  <word key="single" js="0">Only One</word>
+  <word key="multiple" js="0">Multiple</word>
+ </app>
+</language>

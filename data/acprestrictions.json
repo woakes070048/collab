@@ -1,0 +1,10 @@
+{
+    "collab": {
+        "categories": {
+            "collab_categories_manage": "collab_categories_manage"
+        },
+	"settings": {
+	    "collab_settings_manage": "collab_settings_manage"
+	}
+    }
+}

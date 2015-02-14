@@ -1,0 +1,22 @@
+<ips:template parameters="$collab, $page_title" />
+
+<header class="collabHeader">
+	<div class='ipsPageHead_special' id='elCollabHeader' data-controller='core.front.core.coverPhoto' data-url="{$collab->url()->csrf()}" data-coverOffset='{$coverPhoto->offset}'>
+			<ul class='ipsList_inline' id='elEditCollab' style="right: 10px; top:10px;">
+				{template="menuCollab" app="collab" group="components" params="$collab"}
+			</ul>
+		<div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
+			<div class='ipsColumn ipsColumn_fluid'>
+				<div class='ipsPos_left ipsPad cProfileHeader_name'>
+					<h1 class='ipsType_reset'>
+						{$page_title}	
+					</h1>
+					<p>{$collab->title}</p>
+				</div>
+			</div>
+		</div>
+		<div id="collabModOptions">
+			{template="menuModerators" app="collab" group="components" params="$collab"}
+		</div>
+	</div>
+</header>

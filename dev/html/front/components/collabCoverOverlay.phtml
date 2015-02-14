@@ -1,0 +1,72 @@
+<ips:template parameters="$collab" />
+
+{{$parents = array();}}
+{{foreach $collab->container()->parents() as $parent}}
+  {{$parents[] = $parent->_title;}}
+{{endforeach}}
+{{$parents[] = $collab->container()->_title;}}
+
+<ul class='ipsList_inline {{if \IPS\collab\Application::urlMatch( $collab ) and $collab->canEdit()}}editable{{endif}}' id='elEditCollab'>
+	{template="menuCollab" app="collab" group="components" params="$collab"}
+	{{if $collab->canJoin() and $collab->join_mode !== \IPS\collab\COLLAB_JOIN_INVITE}}
+	<li>
+		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_positive ipsButton_verySmall' title="{lang="collab_join" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join" sprintf="$collab->collab_singular"}</a>
+	</li>
+	{{endif}}
+</ul>
+<div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
+	<div class='ipsColumn ipsColumn_fluid'>
+		<div class='ipsPos_left ipsPad headerContent' style='padding-top:0'>
+			<h1 class='ipsType_reset'>
+				{$collab->title}
+				<span class='ipsResponsive_hidePhone'>
+					{{if $collab->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{$collab->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $collab->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}
+					{{if $collab->locked()}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="locked"}'><i class='fa fa-lock'></i></span>
+					{{endif}}
+					{{if $collab->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $collab->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+					{{if $membership = $collab->getMembership()}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$collab->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
+						{{endif}}
+						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED}}
+							<span class="ipsBadge ipsBadge_icon ipsBadge_negative" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$collab->collab_singular"}'><i class='fa fa-times-circle'></i></span>
+						{{endif}}
+					{{endif}}
+					{{if $collab->is_template and ( $collab->canMakeModel() or $collab->canUnmakeModel() )}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_intermediary" data-ipsTooltip title='{lang="collab_marked_model"}'><i class='fa fa-flag'></i></span>
+					{{endif}}
+				</span>
+			</h1>
+			<p>{$collab->collab_singular} &nbsp;( {expression="implode(' / ', $parents)"} )</p>
+			{{if count( $collab->tags() )}}
+				<div style="padding-bottom:10px" class="ipsResponsive_hidePhone">
+					{template="tags" group="global" app="core" params="$collab->tags()"}
+				</div>
+			{{endif}}
+			{{if $collab->container()->bitoptions[ 'allow_ratings' ]}}
+			<div class='ipsType_light ipsResponsive_hidePhone'>
+				{$collab->rating()|raw}
+			</div>
+			{{endif}}
+		</div>
+	</div>
+</div>
+<div id="collabModOptions">
+	{template="menuModerators" app="collab" group="components" params="$collab"}
+</div>

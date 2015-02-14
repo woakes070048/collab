@@ -1,0 +1,108 @@
+<ips:template parameters="$collab" />
+
+{{if $collab->hidden() === 1 and $collab->canUnhide()}}
+	<div class="ipsMessage ipsMessage_warning ipsSpacer_top">
+		<p class="ipsType_reset">{lang="topic_pending_approval"}</p>
+		<ul class='ipsList_inline ipsSpacer_top'>
+			<li><a href="{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}" class="ipsButton ipsButton_positive ipsButton_verySmall" title='{lang="approve_title"}'><i class="fa fa-check"></i> {lang="approve"}</a></li>
+			{{if $collab->canDelete()}}
+				<li><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  title='{lang="topic_delete_title"}' class='ipsButton ipsButton_negative ipsButton_verySmall'><i class='fa fa-times'></i> {lang="delete"}</a></li>
+			{{endif}}
+		</ul>
+	</div>
+{{endif}}
+
+<ul class="ipsToolList ipsClearfix {{if !( $collab->canPin() or $collab->canUnpin() or $collab->canFeature() or $collab->canUnfeature() or $collab->canHide() or $collab->canUnhide() or $collab->canMove() or $collab->canLock() or $collab->canUnlock() or $collab->canDelete() or $collab->availableSavedActions() )}}ipsResponsive_hidePhone{{endif}}">
+	{{if $collab->isMod() or $collab->collabCan( 'manageCollab' )}}
+		<li>
+			<a href='#elCollabActions_menu' id='elCollabActions' class='ipsButton ipsButton_link ipsButton_medium ipsButton_fullWidth' data-ipsMenu>{lang="collab_moderation_actions" sprintf="$collab->collab_singular"} <i class='fa fa-caret-down'></i></a>
+			<ul id='elCollabActions_menu' class='ipsMenu ipsMenu_auto ipsHide'>
+				{{if $collab->canEdit()}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=collabs&id={$collab->collab_id}&do=edit"}'>
+						<i class='fa fa-cogs'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_settings" sprintf="$collab->collab_singular"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{if $collab->collabCan( 'manageMembers' )}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=admin&collab={$collab->collab_id}&do=manageMembers"}'>
+						<i class='fa fa-users'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_manageMembers"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{if $collab->collabCan( 'manageRoles' )}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=roles&collab={$collab->collab_id}"}'>
+						<i class='fa fa-shield'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_manageRoles"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{foreach $collab->enabledNodes() as $app => $config}}
+					{{if $collab->collabCan( 'appManage-' . $app )}}
+						{{$appNodeCount = count( $config['nodes'] );}}
+						{{foreach $config['nodes'] as $node}}
+							<li class='ipsMenu_item'>
+								<a href='{url="app=collab&module=collab&controller=nodes&collab={$collab->collab_id}&nid={$node['nid']}"}'>
+									<i class='fa fa-{$config['icon']}'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{{if $appNodeCount > 1}}{lang="collab_manage_nodes" sprintf="$node['content_container_name']"}{{else}}{lang="collab_manage_nodes" sprintf="$config['app']->_title"}{{endif}}</span>
+								</a>
+							</li>
+						{{endforeach}}
+					{{endif}}
+				{{endforeach}}
+				{{if $collab->isMod()}}
+					<li class='ipsMenu_sep'><hr></li>
+				{{endif}}
+				{{if $collab->canFeature()}}
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'feature' ) )}'><i class="fa fa-star"></i> &nbsp;{lang="feature"}</a></li>
+				{{endif}}
+				{{if $collab->canUnfeature()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unfeature' ) )}' ><i class="fa fa-minus-circle"></i> &nbsp;{lang="unfeature"}</a></li>
+				{{endif}}
+				{{if $collab->canPin()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'pin' ) )}' ><i class="fa fa-thumb-tack"></i> &nbsp;{lang="pin"}</a></li>
+				{{endif}}
+				{{if $collab->canUnpin()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unpin' ) )}' ><i class="fa fa-minus-circle"></i> &nbsp;{lang="unpin"}</a></li>
+				{{endif}}
+				{{if $collab->canHide()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'hide' ) )}' data-ipsDialog data-ipsDialog-title="{lang="hide"}"><i class="fa fa-eye-slash"></i> &nbsp;{lang="hide"}</a></li>
+				{{endif}}
+				{{if $collab->canUnhide()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}' >{{if $collab->hidden() === 1}}<i class="fa fa-thumbs-up"></i> &nbsp;{lang="approve"}{{else}}<i class="fa fa-minus-circle"></i> &nbsp;{lang="unhide"}{{endif}}</a></li>
+				{{endif}}
+				{{if $collab->canLock()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'lock' ) )}' ><i class="fa fa-lock"></i> &nbsp;{lang="lock"}</a></li>
+				{{endif}}
+				{{if $collab->canUnlock()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unlock' ) )}' ><i class="fa fa-unlock"></i> &nbsp;{lang="unlock"}</a></li>
+				{{endif}}
+				{{if $collab->canMove()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'move' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="move"}"  ><i class="fa fa-sign-out"></i> &nbsp;{lang="move"}</a></li>
+				{{endif}}
+				{{if $collab->canMakeModel()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'makeModel' ) )}' ><i class="fa fa-flag"></i> &nbsp;{lang="collab_make_model" sprintf="$collab->collab_singular"}</a></li>
+				{{endif}}
+				{{if $collab->canUnmakeModel()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'unmakeModel' ) )}' ><i class="fa fa-flag-o"></i> &nbsp;{lang="collab_unmake_model" sprintf="$collab->collab_singular"}</a></li>
+				{{endif}}
+				{{if $collab->canMerge()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'merge' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="merge"}" ><i class="fa fa-level-up"></i> &nbsp;{lang="merge"}</a></li>
+				{{endif}}
+				{{if $collab->canDelete()}}				
+					<li class='ipsMenu_item'><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  ><i class="fa fa-trash"></i> &nbsp;{lang="delete"}</a></li>
+				{{endif}}
+				{{if $collab->availableSavedActions()}}
+					<li class='ipsMenu_sep'><hr></li>
+					{{foreach $collab->availableSavedActions() as $action}}
+						<li class="ipsMenu_item"><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'savedAction', 'action' => $action->_id ) )}' data-confirm>{$action->_title}</a></li>
+					{{endforeach}}
+				{{endif}}
+				{{if \IPS\Member::loggedIn()->modPermission('can_view_moderation_log')}}	
+					<li class='ipsMenu_sep'><hr></li>
+					<li class="ipsMenu_item"><a href='{$collab->url()->csrf()->setQueryString( array( 'do' => 'modLog' ) )}' data-ipsDialog data-ipsDialog-title='{lang="moderation_history"}'><i class="fa fa-history"></i> &nbsp;{lang="moderation_history"}</a></li>
+				{{endif}}
+			</ul>
+		</li>
+	{{endif}}
+</ul>
