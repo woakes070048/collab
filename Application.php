@@ -728,4 +728,4 @@ if ( defined( '\IPS\collab\DEMO' ) )
 	exit;
 }
 
-const DEMO = TRUE;
+const DEMO = FALSE;

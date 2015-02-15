@@ -125,6 +125,7 @@
   <word key="collab_byline" js="0">Leader: %s</word>
   <word key="collab_no_content" js="0">No content here yet</word>
   <word key="collab_marked_model" js="0">Designated as a model</word>
+  <word key="collab_collab_submit_comment" js="0">Submit Comment</word>
   <word key="collab_status" js="0">Status</word>
   <word key="collabs_all" js="0">All</word>
   <word key="collabs_join_closed" js="0">Closed Membership</word>

@@ -517,11 +517,11 @@ class _Collab extends \IPS\Content\Item implements
 		/**
 		 * @DEMO: Restrict amount of collabs in demo version
 		 */
-		if ( \IPS\collab\DEMO )
+		if ( $isNew and \IPS\collab\DEMO )
 		{
 			if ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_collabs' )->first() >= 10 )
 			{
-				\IPS\Output::i()->error( 'Demo version restricted to a maximum of 10 collaborations.' );
+				\IPS\Output::i()->error( 'Demo version restricted to a maximum of 10 collaborations.', 'GCDEMO', 200, '' );
 				exit;
 			}
 		}	
