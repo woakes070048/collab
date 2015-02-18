@@ -4,10 +4,11 @@ class collab_hook_theme_coreFrontGlobal extends _HOOK_CLASS_
 {
 
 /* !Hook Data - DO NOT REMOVE */
-public static $hookData = array (
+public static function hookData() {
+ return array_merge_recursive( array (
   'globalTemplate' => 
   array (
-    1 => 
+    0 => 
     array (
       'selector' => 'div:first',
       'type' => 'add_before',
@@ -25,8 +26,15 @@ public static $hookData = array (
 {{endif}}',
     ),
   ),
-);
+), parent::hookData() );
+}
 /* End Hook Data */
+
+
+
+
+
+
 
 
 }
