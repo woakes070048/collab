@@ -13,9 +13,10 @@ $lang = array(
 	'r__collab_settings_manage'		=> "Manage Settings",
 	
 	// ACP Menu
-	'menu__collab_collab'			=> "Collaboration",
-	'menu__collab_collab_categories'	=> "Categories",
-	'menu__collab_collab_settings'		=> "Settings",
+	'menu__collab_collab'				=> "Collaboration",
+	'menu__collab_collab_categories'		=> "Categories",
+	'menu__collab_collab_settings'			=> "Settings",
+	'notifications__collab_collabNotifications' 	=> "Collaboration",
 	
 	// Group Settings
 	'group__collab_groupForm'		=> "Collaboration",
