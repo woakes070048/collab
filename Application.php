@@ -309,18 +309,20 @@ class _Application extends \IPS\Application
 	 */
 	public static function activeCollab( $require=TRUE, $throw=FALSE )
 	{
-		
 		if ( isset( static::$activeCollab ) )
 		{
 			return static::$activeCollab;
 		}
 		
-		static::$activeCollab = FALSE;
+		/**
+		 * Since early calls to this may not want to throw an error,
+		 * but later calls might, only cache a result if we have one
+		 */
 		
 		try
 		{
 			/* Load a collab based on URL parameters */
-			static::$activeCollab = \IPS\collab\Collab::loadAndCheckPerms( (int) \IPS\Request::i()->collab );
+			static::$activeCollab = \IPS\collab\Collab::loadAndCheckPerms( \IPS\Request::i()->collab );
 		}
 		catch ( \OutOfRangeException $e )
 		{
