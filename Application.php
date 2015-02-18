@@ -397,8 +397,24 @@ class _Application extends \IPS\Application
 	{
 		if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
 		{
-			static::$request 	= static::$request ?: ( (object)( \IPS\Request::i()->url()->getFriendlyUrlData() ?: \IPS\Request::i() ) );
-			$param 			= $url->_queryString;
+			/**
+			 * Work out request parameters
+			 */
+			if ( ! isset ( static::$request ) )
+			{
+				try
+				{
+					static::$request = (object) \IPS\Request::i()->url()->getFriendlyUrlData();
+				}
+				catch ( \OutOfRangeException $e ) {}
+				
+				if ( ! static::$request )
+				{
+					static::$request = \IPS\Request::i();
+				}
+			}
+			
+			$param = $url->_queryString;
 
 			/**
 			 * Compare the object url to the current url
