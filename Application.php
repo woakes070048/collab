@@ -404,7 +404,8 @@ class _Application extends \IPS\Application
 			{
 				try
 				{
-					static::$request = (object) \IPS\Request::i()->url()->getFriendlyUrlData();
+					static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
+					static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
 				}
 				catch ( \OutOfRangeException $e ) {}
 				
