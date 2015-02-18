@@ -500,7 +500,7 @@ class _Collab extends \IPS\Content\Item implements
 	public function coverPhoto()
 	{		
 		$photo = parent::coverPhoto();
-		$photo->editable = \IPS\collab\Application::urlMatch( $this );
+		$photo->editable = $this->canEdit() and \IPS\collab\Application::urlMatch( $this );
 		$photo->overlay = \IPS\Theme::i()->getTemplate( 'components', 'collab', 'front' )->collabCoverOverlay( $this );
 		return $photo;
 	}

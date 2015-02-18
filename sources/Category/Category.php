@@ -1192,7 +1192,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$photo = parent::coverPhoto();
 		$photo->overlay = \IPS\Theme::i()->getTemplate( 'components', 'collab', 'front' )->categoryCoverOverlay( $this, $layout );
 		
-		if ( $layout != 'standard' )
+		if ( $layout != 'standard' or ! $this->canEdit() )
 		{
 			$photo->editable = FALSE;
 		}
