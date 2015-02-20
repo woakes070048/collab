@@ -618,18 +618,22 @@ class _Application extends \IPS\Application
 		}
 		else
 		{
-			if ( method_exists( $obj, 'container' ) )
+			try
 			{
-				return $obj->container();
-			}
-			else if ( method_exists( $obj, 'item' ) )
-			{
-				$item = $obj->item();
-				if ( method_exists( $item, 'container' ) )
+				if ( method_exists( $obj, 'container' ) )
 				{
-					return $item->container();
+					return $obj->container();
+				}
+				else if ( method_exists( $obj, 'item' ) )
+				{
+					$item = $obj->item();
+					if ( method_exists( $item, 'container' ) )
+					{
+						return $item->container();
+					}
 				}
 			}
+			catch ( \BadMethodExceptionCall $e ) {}
 		}
 		return NULL;
 	}
