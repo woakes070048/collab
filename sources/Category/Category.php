@@ -622,8 +622,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		foreach ( \IPS\collab\Application::collabOptions() as $app => $nodes )
 		{
 			$application = \IPS\Application::load( $app );
-			$form->addTab( $application->_title, $iconMap[ $application->directory ] ?: $application->_icon );
-			$collabs_enable->options[ 'togglesOn' ] = array_merge( $collabs_enable->options[ 'togglesOn' ], array( $form_id . 'tab_' . $lang->get( "__app_{$application->directory}" ) ) );
+			$form->addTab( "__app_{$application->directory}", $iconMap[ $application->directory ] ?: $application->_icon );
+			$collabs_enable->options[ 'togglesOn' ] = array_merge( $collabs_enable->options[ 'togglesOn' ], array( $form_id . 'tab__app_' . $application->directory ) );
 
 			/* Node Options */
 			foreach ( $nodes as $option )
