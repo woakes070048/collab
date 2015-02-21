@@ -554,7 +554,7 @@
 	</li>
 {{endforeach}}]]></template>
  <template template_group="components" template_name="menuCollab" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<li>
-	<a class='ipsButton ipsButton_important ipsButton_verySmall' data-ipsMenu data-ipsMenu-appendTo='#elCollabMenu' id='elCollabMenu' href='#elCollabMenu_menu'>
+	<a class='ipsButton ipsButton_important ipsButton_verySmall' id='elCollabMenu' href='#elCollabMenu_menu' data-ipsMenu>
 		<i class='fa fa-bars'></i>&nbsp;<span class='ipsResponsive_hidePhone ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_menu" sprintf="$collab->collab_singular"} <i class='fa fa-caret-down'></i></span>
 	</a>
 	<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCollabMenu_menu'>
