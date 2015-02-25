@@ -182,7 +182,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			 * Using a strategy that doesn't die with an EX0 if for some reason the title language
 			 * string doesn't exist in the database.
 			 */			
-			$lang 	= \IPS\Http\Url::seoTitle( \IPS\Lang::load( \IPS\Lang::defaultLanguage() );
+			$lang 	= \IPS\Lang::load( \IPS\Lang::defaultLanguage() );
 			$title 	= 'Category ' . $this->id;
 			
 			if ( $lang->checkKeyExists( 'collab_category_' . $this->id ) )
