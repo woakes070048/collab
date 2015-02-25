@@ -54,19 +54,6 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 
 	/**
 	 * @brief	[Node] ACP Restrictions
-	 * @code
-	 	array(
-	 		'app'		=> 'core',				// The application key which holds the restrictrions
-	 		'module'	=> 'foo',				// The module key which holds the restrictions
-	 		'map'		=> array(				// [Optional] The key for each restriction - can alternatively use "prefix"
-	 			'add'			=> 'foo_add',
-	 			'edit'			=> 'foo_edit',
-	 			'permissions'	=> 'foo_perms',
-	 			'delete'		=> 'foo_delete'
-	 		),
-	 		'all'		=> 'foo_manage',		// [Optional] The key to use for any restriction not provided in the map (only needed if not providing all 4)
-	 		'prefix'	=> 'foo_',				// [Optional] Rather than specifying each  key in the map, you can specify a prefix, and it will automatically look for restrictions with the key "[prefix]_add/edit/permissions/delete"
-	 * @encode
 	 */
 	protected static $restrictions = array(
 		'app'		=> 'collab',
@@ -179,7 +166,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected function get_description()
 	{
-		return \IPS\Member::loggedIn()->language()->checkKeyExists( "collab_category_{$this->id}_desc" ) ? \IPS\Member::loggedIn()->language()->get("collab_category_{$this->id}_desc") : '';
+		return \IPS\Member::loggedIn()->language()->checkKeyExists( "collab_category_{$this->id}_desc" ) ? \IPS\Member::loggedIn()->language()->get( "collab_category_{$this->id}_desc" ) : '';
 	}
 
 	/**
@@ -189,13 +176,25 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	public function get_name_seo()
 	{
-		if( !$this->_data['name_seo'] )
+		if( ! $this->_data[ 'name_seo' ] )
 		{
-			$this->name_seo	= \IPS\Http\Url::seoTitle( \IPS\Lang::load( \IPS\Lang::defaultLanguage() )->get( 'collab_category_' . $this->id ) );
+			/**
+			 * Using a strategy that doesn't die with an EX0 if for some reason the title language
+			 * string doesn't exist in the database.
+			 */			
+			$lang 	= \IPS\Http\Url::seoTitle( \IPS\Lang::load( \IPS\Lang::defaultLanguage() );
+			$title 	= 'Category ' . $this->id;
+			
+			if ( $lang->checkKeyExists( 'collab_category_' . $this->id ) )
+			{
+				$title = $lang->get( 'collab_category_' . $this->id );
+			}
+			
+			$this->name_seo	= \IPS\Http\Url::seoTitle( $title );
 			$this->save();
 		}
 
-		return $this->_data['name_seo'] ?: \IPS\Http\Url::seoTitle( \IPS\Lang::defaultLanguage() )->get( 'collab_category_' . $this->id );
+		return $this->_data[ 'name_seo' ];
 	}
 
 	/**
@@ -512,8 +511,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$collab_plural_lang 	= "collab_cat_{$this->id}_collabs_plural";
 		$member_title_lang 	= "collab_cat_{$this->id}_member_title";
 		$form_id 		= $this->id ? "form_{$this->id}_" : "form_new_";
-		$_singular 		= ucwords( $lang->get( $collab_singular_lang ) );
-		$_plural		= ucwords( $lang->get( $collab_plural_lang ) );
+		$_singular 		= ucwords( $lang->checkKeyExists( $collab_singular_lang ) ? $lang->get( $collab_singular_lang ) : $lang->get( 'collab_cat__collab_singular' ) );
+		$_plural		= ucwords( $lang->checkKeyExists( $collab_plural_lang ) ? $lang->get( $collab_plural_lang ) : $lang->get( 'collab_cat__collab_plural' ) );
 		$_lc_singular		= mb_strtolower( $_singular );
 		$_lc_plural		= mb_strtolower( $_plural );
 		$iconMap		= \IPS\collab\Application::iconMap();
@@ -523,7 +522,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		/**
 		 * @DEMO: Restrict amount of categories available in demo version
 		 */
-		if ( \IPS\collab\DEMO )
+		if ( \IPS\collab\DEMO and ! $this->id )
 		{
 			if ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_categories' )->first() >= 5 )
 			{
@@ -923,10 +922,10 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$this->name_seo	= \IPS\Http\Url::seoTitle( $values[ 'category_name' ][ \IPS\Lang::defaultLanguage() ] );
 
 		/* Custom language fields */
-		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values['category_name'] );
-		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_desc", $values['category_description'] );
-		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collab_singular", $values['collabs_alias_singular'] );
-		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collabs_plural", $values['collabs_alias_plural'] );
+		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values[ 'category_name' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_desc", $values[ 'category_description' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collab_singular", $values[ 'collabs_alias_singular' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collabs_plural", $values[ 'collabs_alias_plural' ] );
 
 		$save_values = array();
 		foreach ( $values as $key => $value )
@@ -1274,7 +1273,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			\IPS\Lang::saveCustom( 'collab', $langKey, iterator_to_array( \IPS\Db::i()->select( 'word_custom, lang_id', 'core_sys_lang_words', array( 'word_key=?', $oldLangKey ) )->setKeyField( 'lang_id' )->setValueField('word_custom') ) );
 		}
 
-		\IPS\Lang::saveCustom('collab', "collab_category_{$this->id}", $oldTitle . ' ' . \IPS\Member::loggedIn()->language()->get('copy'));
+		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $oldTitle . ' ' . \IPS\Member::loggedIn()->language()->get( 'copy' ) );
 
 	}
 			
