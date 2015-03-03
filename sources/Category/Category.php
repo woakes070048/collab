@@ -226,7 +226,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected function get__items()
 	{
-		return $this->private_collabs ? NULL : $this->collabs_count;
+		return $this->collabs_count;
 	}
 
 	/**
@@ -236,7 +236,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected function get__comments()
 	{
-		return $this->comments_count;
+		return NULL;
 	}
 
 	/**
@@ -276,7 +276,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected function get__unapprovedComments()
 	{
-		return $this->unapproved_comments_count;
+		return NULL;
 	}
 	
 	/**
@@ -322,7 +322,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected function set__comments( $val )
 	{
-		$this->comments_count = (int) $val;
+
 	}
 
 	/**
@@ -364,7 +364,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected function set__unapprovedComments( $val )
 	{
-		$this->unapproved_comments_count = $val;
+
 	}
 	
 	/**
@@ -1263,7 +1263,6 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		
 		$oldId 			= $this->id;
 		$oldTitle 		= \IPS\Member::loggedIn()->language()->get( static::$titleLangPrefix . $this->_id );
-		$this->show_rules 	= 0;
 
 		parent::__clone();
 
