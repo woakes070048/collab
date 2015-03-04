@@ -622,7 +622,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		{
 			$application = \IPS\Application::load( $app );
 			$form->addTab( "__app_{$application->directory}", $iconMap[ $application->directory ] ?: $application->_icon );
-			$collabs_enable->options[ 'togglesOn' ] = array_merge( $collabs_enable->options[ 'togglesOn' ], array( $form_id . 'tab__app_' . $application->directory ) );
+			$collabs_enable->options[ 'togglesOn' ] = array_merge( $collabs_enable->options[ 'togglesOn' ], array( $form_id . 'tab___app_' . $application->directory ) );
 
 			/* Node Options */
 			foreach ( $nodes as $option )
@@ -1259,6 +1259,18 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		if ( $this->skipCloneDuplication === TRUE )
 		{
 			return;
+		}
+		
+		/**
+		 * @DEMO: Restrict amount of categories available in demo version
+		 */
+		if ( \IPS\collab\DEMO )
+		{
+			if ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_categories' )->first() >= 5 )
+			{
+				\IPS\Output::i()->error( 'Demo version restricted to a maximum of 5 categories.', 'GCDEMO', 200, '' );
+				exit;
+			}
 		}
 		
 		$oldId 			= $this->id;
