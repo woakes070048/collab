@@ -1257,7 +1257,7 @@
 		</div>
 	{{endif}}
 </div>]]></template>
- <template template_group="tabs" template_name="reviews" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<div data-controller='core.front.core.commentFeed' data-commentsType='reviews' data-baseURL='{$collab->url()}' {{if $collab->isLastPage('reviews')}}data-lastPage{{endif}} data-feedID='file-{$collab->id}-reviews'>
+ <template template_group="tabs" template_name="reviews" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<div data-controller='core.front.core.commentFeed' data-commentsType='reviews' data-baseURL='{$collab->url()}' {{if $collab->isLastPage('reviews')}}data-lastPage{{endif}}>
 	{{if $collab->canReview()}}
 		{{if $collab->locked()}}
 			<strong class='ipsType_warning'><i class='fa fa-info-circle'></i> {lang="item_locked_can_review"}</strong>
