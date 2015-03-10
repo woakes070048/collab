@@ -417,6 +417,7 @@ class _Application extends \IPS\Application
 				}
 			}
 			
+			/* Filter out any empty parameters */
 			$param = $url->_queryString;
 
 			/**
@@ -425,7 +426,8 @@ class _Application extends \IPS\Application
 			 */
 			foreach ( $param as $k => $v )
 			{
-				if ( static::$request->$k != $v )
+				
+				if ( $k and static::$request->$k != $v )
 				{
 					// Nope.
 					return FALSE;
@@ -633,7 +635,7 @@ class _Application extends \IPS\Application
 					}
 				}
 			}
-			catch ( \BadMethodExceptionCall $e ) {}
+			catch ( \BadMethodCallException $e ) {}
 		}
 		return NULL;
 	}
