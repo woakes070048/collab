@@ -158,6 +158,7 @@ $lang = array(
 	
 	// Collab Join / Invite Request Form
 	'collab_join'				=> "Join %s",
+	'collab_join_invite'			=> "Respond To Invite",
 	'collab_join_message'			=> "Join Request Message",
 	'collab_invite_message'			=> "Invitation Message",
 	'collab_invite_response'		=> "Respond to invitation:",

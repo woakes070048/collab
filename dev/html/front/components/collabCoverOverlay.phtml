@@ -12,6 +12,10 @@
 	<li>
 		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_positive ipsButton_verySmall' title="{lang="collab_join" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join" sprintf="$collab->collab_singular"}</a>
 	</li>
+	{{elseif $membership = $collab->getMembership() and $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
+	<li>
+		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_positive ipsButton_verySmall' title="{lang="collab_join_invited" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join_invited" sprintf="$collab->collab_singular"}</a>
+	</li>
 	{{endif}}
 </ul>
 <div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
