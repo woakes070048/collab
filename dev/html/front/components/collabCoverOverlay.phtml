@@ -5,18 +5,19 @@
   {{$parents[] = $parent->_title;}}
 {{endforeach}}
 {{$parents[] = $collab->container()->_title;}}
+{{$membership = $collab->getMembership();}}
 
 <ul class='ipsList_inline {{if \IPS\collab\Application::urlMatch( $collab ) and $collab->canEdit()}}editable{{endif}}' id='elEditCollab'>
-	{template="menuCollab" app="collab" group="components" params="$collab"}
 	{{if $collab->canJoin() and $collab->join_mode !== \IPS\collab\COLLAB_JOIN_INVITE}}
 	<li>
 		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_positive ipsButton_verySmall' title="{lang="collab_join" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join" sprintf="$collab->collab_singular"}</a>
 	</li>
-	{{elseif $membership = $collab->getMembership() and $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
+	{{elseif $membership and $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
 	<li>
-		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_positive ipsButton_verySmall' title="{lang="collab_join_invited" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join_invited" sprintf="$collab->collab_singular"}</a>
+		<a href='{$collab->url()->setQueryString( array( 'do' => 'joinRequest' ) )}' class='ipsButton ipsButton_intermediate ipsButton_verySmall' title="{lang="collab_join_invited" sprintf="$collab->collab_singular"}"><i class='fa fa-user'></i> &nbsp;{lang="collab_join_invited" sprintf="$collab->collab_singular"}</a>
 	</li>
 	{{endif}}
+	{template="menuCollab" app="collab" group="components" params="$collab"}
 </ul>
 <div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
 	<div class='ipsColumn ipsColumn_fluid'>
@@ -38,7 +39,7 @@
 					{{if $collab->mapped('featured')}}
 						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
 					{{endif}}
-					{{if $membership = $collab->getMembership()}}
+					{{if $membership}}
 						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
 							<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
 						{{endif}}
