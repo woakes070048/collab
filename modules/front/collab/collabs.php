@@ -454,7 +454,6 @@ class _collabs extends \IPS\Content\Controller
 		$response_options = array(
 			'accept' 	=> 'collab_accept_invitation',
 			'deny'	 	=> 'collab_deny_invitation',
-			'update' 	=> 'collab_update_invitation',
 		);
 		
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_invite_response', NULL, TRUE, array( 'options' => $response_options ) ) );
@@ -483,16 +482,11 @@ class _collabs extends \IPS\Content\Controller
 					$membership->delete();
 					\IPS\Output::i()->redirect( $collab->url(), 'collab_message_invitation_denied' );
 					break;
-					
-				case 'update':
-				
-					$membership->save();
-					break;
 			}
 		}
 
 		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack( 'collab_join', FALSE, array( 'sprintf' => array( $collab->collab_singular ) ) );
-		\IPS\Output::i()->output = \IPS\Theme::i()->getTemplate( 'layouts' )->collabPublicWrapper( $collab, \IPS\Theme::i()->getTemplate( 'forms' )->collabJoinRequest( $collab, $form, $membership ) );
+		\IPS\Output::i()->output = \IPS\Theme::i()->getTemplate( 'forms' )->collabJoinRequest( $collab, $form, $membership );
 		
 	}
 
