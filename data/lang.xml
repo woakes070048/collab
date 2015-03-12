@@ -135,6 +135,7 @@
   <word key="collabs_join_free" js="0">Open Membership (without approval)</word>
   <word key="collab_is_template" js="0">Items Marked As Models</word>
   <word key="collab_join" js="0">Join %s</word>
+  <word key="collab_join_invited" js="0">Respond To Invite</word>
   <word key="collab_join_message" js="0">Join Request Message</word>
   <word key="collab_invite_message" js="0">Invitation Message</word>
   <word key="collab_invite_response" js="0">Respond to invitation:</word>
