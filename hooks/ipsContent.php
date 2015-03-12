@@ -40,7 +40,7 @@ abstract class collab_hook_ipsContent extends _HOOK_CLASS_
 							try
 							{
 								$role = \IPS\collab\Collab\Role::load( $id );
-								if ( $role->can( 'moderateContent' ) and $rolePerms = \unserialize( $role->mod_perms ) )
+								if ( $role->roleCan( 'moderateContent' ) and $rolePerms = \unserialize( $role->mod_perms ) )
 								{
 									if ( $rolePerms[ "can_{$type}_{$title}" ] )
 									{
