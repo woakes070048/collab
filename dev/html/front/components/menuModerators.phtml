@@ -50,7 +50,7 @@
 						{{endforeach}}
 					{{endif}}
 				{{endforeach}}
-				{{if $collab->isMod()}}
+				{{if $collab->isMod() or $collab->availableSavedActions()}}
 					<li class='ipsMenu_sep'><hr></li>
 				{{endif}}
 				{{if $collab->canFeature()}}

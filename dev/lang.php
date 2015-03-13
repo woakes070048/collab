@@ -50,6 +50,10 @@ $lang = array(
 	'can_view_hidden_collab_review'		=> "Can View Hidden Collab Reviews",
 	'can_delete_collab_review'		=> "Can Delete Collab Reviews",
 	
+	// Moderator Permissions
+	'modperms__collab_modPermissions'	=> "Collab Management",
+	'can_bypass_collab_permissions'		=> "Unrestricted by collab permissions",
+	
 	// Category Settings Form
 	'collab_app_title'			=> "App Title",
 	'collab_app_title_desc'			=> "You can change the name of the collaboration app to reflect the way you use it.",

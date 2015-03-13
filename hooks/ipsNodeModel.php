@@ -123,7 +123,17 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		
 		if ( $this->collab_id )
 		{
+			/* Assume we can't until we discover otherwise */
 			$collabCan = FALSE;
+			
+			/**
+			 * Entire member groups cannot be given access to collabs
+			 */
+			if ( $member instanceof \IPS\Member\Group )
+			{
+				return FALSE;
+			}
+		
 			try
 			{
 				$collab = \IPS\collab\Collab::load( $this->collab_id );
@@ -132,10 +142,19 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 					return FALSE;
 				}
 			}
-			catch ( \OutOfRangeException $e ) {
+			catch ( \OutOfRangeException $e ) 
+			{
 				return FALSE;
 			}
 			
+			/**
+			 * Some moderators may be able to bypass collab permissions
+			 */
+			if ( $member->modPermission( 'can_bypass_collab_permissions' ) )
+			{
+				$collabCan = TRUE;
+			}
+		
 			/* If a collab is hidden, then hide all of it's content too */
 			if ( $permission == 'view' and $collab->hidden() and ! \IPS\collab\Collab::modPermission( 'view_hidden', $member, $collab->container() ) )
 			{
@@ -148,50 +167,56 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 				return FALSE;
 			}
 			
-			/* If this is not permission-dependant, return TRUE */
-			if ( 
-				! ( $this instanceof \IPS\Node\Permissions ) or
-				
-				/** 
-				 * IPS Databases Compatibility 
-				 * Categories implement permissions, but have a soft option to disable them.
-				 */
-				( 
-					$this instanceof \IPS\cms\Categories and
-					! $this->has_perms
+			/**
+			 * Check collab permissions if we're not already authorized
+			 */
+			if ( ! $collabCan )
+			{
+				/* If this is not permission-dependant, return TRUE */
+				if ( 
+					! ( $this instanceof \IPS\Node\Permissions ) or
+					
+					/** 
+					 * IPS Databases Compatibility 
+					 * Categories implement permissions, but have a soft option to disable them.
+					 */
+					( 
+						$this instanceof \IPS\cms\Categories and
+						! $this->has_perms
+					)
 				)
-			)
-			{
-				$collabCan = TRUE;
-			}
-			else
-			{
-				$permissions = $this->collabPermissions();
-
-				if( $membership = $collab->getMembership( $member ) )
 				{
-					if ( $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
-					{
-						/* Give permission based on assigned roles */
-						$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and count( array_intersect( array_merge( array( 0 ), explode( ',', $membership->roles ) ), explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) ) );
-					}
-					else if ( $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED )
-					{
-						/* Banned */
-						$collabCan = FALSE;
-					}
-					else
-					{
-						/* Give the same permission that a guest would get */
-						$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and in_array( '-1', explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) );					
-					}
+					$collabCan = TRUE;
 				}
 				else
 				{
-					/* Give guest permission */
-					$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and in_array( '-1', explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) );
+					$permissions = $this->collabPermissions();
+
+					if( $membership = $collab->getMembership( $member ) )
+					{
+						if ( $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
+						{
+							/* Give permission based on assigned roles */
+							$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and count( array_intersect( array_merge( array( 0 ), explode( ',', $membership->roles ) ), explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) ) );
+						}
+						else if ( $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED )
+						{
+							/* Banned */
+							$collabCan = FALSE;
+						}
+						else
+						{
+							/* Give the same permission that a guest would get */
+							$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and in_array( '-1', explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) );					
+						}
+					}
+					else
+					{
+						/* Give guest permission */
+						$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and in_array( '-1', explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) );
+					}
 				}
-			}			
+			}
 		}
 		
 		return $collabCan and parent::can( $permission, $member );

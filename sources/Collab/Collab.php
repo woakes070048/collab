@@ -593,23 +593,24 @@ class _Collab extends \IPS\Content\Item implements
 	/**
 	 * Can the logged in member perform moderation actions?
 	 *
+	 * @param 	\IPS\Member|NULL	$member		The member to check permission for or NULL for currently logged in member
 	 * @return	bool
 	 */
-	public function isMod()
+	public function isMod( $member=NULL )
 	{
-		return (
-			$this->canEdit() or 
-			$this->canPin() or 
-			$this->canUnpin() or 
-			$this->canFeature() or 
-			$this->canUnfeature() or 
-			$this->canHide() or 
-			$this->canUnhide() or 
-			$this->canMove() or 
-			$this->canLock() or 
-			$this->canUnlock() or 
-			$this->canDelete() or 
-			$this->availableSavedActions()
+		return 
+		(
+			$this->canEdit( $member ) or 
+			$this->canPin( $member ) or 
+			$this->canUnpin( $member ) or 
+			$this->canFeature( $member ) or 
+			$this->canUnfeature( $member ) or 
+			$this->canHide( $member ) or 
+			$this->canUnhide( $member ) or 
+			$this->canMove( $member ) or 
+			$this->canLock( $member ) or 
+			$this->canUnlock( $member ) or 
+			$this->canDelete( $member )
 		);
 	}
 
