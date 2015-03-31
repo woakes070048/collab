@@ -432,30 +432,30 @@ class _Collab extends \IPS\Content\Item implements
 	{		
 		parent::processForm( $values );
 		
-		$this->short_description 	= $values['collab_short_description'];
-		$this->description 		= $values['collab_description'];
-		$this->default_member_title 	= $values['collab_default_title'];
+		$this->short_description 	= $values[ 'collab_short_description' ];
+		$this->description 		= $values[ 'collab_description' ];
+		$this->default_member_title 	= $values[ 'collab_default_title' ];
 		$this->title_seo		= \IPS\Http\Url::seoTitle( $this->title );
 		
 		/* Moderator actions */
-		if ( isset( $values['collab_create_state'] ) )
+		if ( isset( $values[ 'collab_create_state' ] ) )
 		{
-			if ( in_array( 'lock', $values['collab_create_state'] ) )
+			if ( in_array( 'lock', $values[ 'collab_create_state' ] ) )
 			{
 				$this->state = 'closed';	
 			}
 
-			if ( in_array( 'hide', $values['collab_create_state'] ) )
+			if ( in_array( 'hide', $values[ 'collab_create_state' ] ) )
 			{
 				$this->approved = -1;
 			}
 
-			if ( in_array( 'pin', $values['collab_create_state'] ) )
+			if ( in_array( 'pin', $values[ 'collab_create_state' ] ) )
 			{
 				$this->pinned = 1;
 			}
 
-			if ( in_array( 'feature', $values['collab_create_state'] ) )
+			if ( in_array( 'feature', $values[ 'collab_create_state' ] ) )
 			{
 				$this->featured = 1;
 			}
@@ -528,6 +528,9 @@ class _Collab extends \IPS\Content\Item implements
 		
 		parent::save();
 		
+		/**
+		 * Automatically give the collab creator a membership
+		 */
 		if ( $isNew )
 		{
 			$membership = new \IPS\collab\Collab\Membership;

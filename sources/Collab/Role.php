@@ -247,7 +247,9 @@ class _Role extends \IPS\Node\Model
 				}
 			}
 			
-		}	
+		}
+		
+		parent::form( $form );
 	}
 
 	/**

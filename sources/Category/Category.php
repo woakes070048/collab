@@ -630,7 +630,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$nodeClass 	= $option[ 'node' ];
 				$nid 		= md5( $nodeClass );
 				$nodeTitle 	= ucwords( $lang->get( $nodeClass::$nodeTitle ) );
-				$contentTitle 	= $option[ 'content' ] ? ucwords( $lang->get( $option[ 'content' ]::$title ) ) : NULL;
+				$contentClass	= $option[ 'content' ];
+				$contentTitle 	= $contentClass ? ucwords( $lang->get( $contentClass::$title ) ) : NULL;
 				
 				$form->addHeader( $contentTitle . ' ' . $nodeTitle );
 				
@@ -670,10 +671,10 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 					$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_permissions_' . $nid ) );
 				}
 				
-				if ( isset ( $modoptions[ $option[ 'content' ] ] ) )
+				if ( isset ( $modoptions[ $contentClass ] ) )
 				{
 					/* Moderation Options */
-					$s = $modoptions[ $option[ 'content' ] ];
+					$s = $modoptions[ $contentClass ];
 					$lang->words[ 'collab_modperms__' . $s[ 'key' ] ] = $lang->addToStack( 'collab_moderation_settings', FALSE, array( 'sprintf' => array( $lang->addToStack( 'modperms__' . $s[ 'key' ] ), $lang->addToStack( $collab_singular_lang ) ) ) );
 					$form->addHeader( 'collab_modperms__' . $s[ 'key' ] );
 					$toggles = $this->addModerationSettings( $form, $s[ 'key' ], $s[ 'ext' ] );
@@ -682,6 +683,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 
 			}
 		}
+		
+		parent::form( $form );
 		
 	}
 	
@@ -985,7 +988,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$matrix = new \IPS\Helpers\Form\Matrix;
 		$matrix->manageable = FALSE;
 		$matrix->langPrefix = $nodeClass::$permissionLangPrefix . 'perm__';
-		$matrix->columns = array(
+		$matrix->columns = array
+		(
 			'label'		=> function( $key, $value, $data )
 			{
 				return $value;
@@ -1008,7 +1012,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$rows = array();
 		foreach ( \IPS\Member\Group::groups() as $group )
 		{
-			$rows[ $group->g_id ] = array(
+			$rows[ $group->g_id ] = array
+			(
 				'label'	=> $group->name,
 				'view'	=> TRUE,
 			);
@@ -1026,19 +1031,31 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	public function setNodePermissions( $permissions, $nodeClass )
 	{
-		/* Delete current rows */
+		/**
+		 * Delete existing category permission set for this node class
+		 */
 		\IPS\Db::i()->delete( 'core_permission_index', array( 'app=? AND perm_type=? AND perm_type_id=?', $permissions[ 'app' ], $permissions[ 'perm_type' ], $permissions[ 'perm_type_id' ] ) );
 		
-		/* Insert */
+		/**
+		 * Save the new node class permissions
+		 */
 		\IPS\Db::i()->insert( 'core_permission_index', $permissions );
 		
-		unset( $permissions[ 'perm_id' ], $permissions[ 'app' ], $permissions[ 'perm_type' ], $permissions[ 'perm_type_id' ] );
-		
+		/**
+		 * Update all stock permissions on nodes which belong to collabs in this category
+		 * to match the permissions that were just set for the category
+		 */
 		if ( \IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) )
 		{
+			unset( $permissions[ 'perm_id' ], $permissions[ 'app' ], $permissions[ 'perm_type' ], $permissions[ 'perm_type_id' ] );
+			
 			\IPS\Db::i()->update( 'core_permission_index', $permissions, 
-				array( 'app=? AND perm_type=? AND collab_categories.category_id=?', $nodeClass::$permApp, $nodeClass::$permType, $this->_id ),
-				array( 
+				array
+				( 
+					'app=? AND perm_type=? AND collab_categories.category_id=?', $nodeClass::$permApp, $nodeClass::$permType, $this->_id 
+				),
+				array
+				( 
 					array( 'from' => $nodeClass::$databaseTable, 	'where' => array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=core_permission_index.perm_type_id' ) ),
 					array( 'from' => 'collab_collabs', 		'where' => array( 'collab_collabs.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) ),
 					array( 'from' => 'collab_categories', 		'where' => array( 'collab_categories.category_id=collab_collabs.category_id' ) )
@@ -1244,8 +1261,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			'rules_text' => "collab_category_{$this->id}_rules", 
 			'permission_custom_error' => "collab_category_{$this->id}_permerror",
 			'collab_singular' => "collab_cat_{$this->id}_collab_singular",
-			'collab_plural' => "collab_cat_{$this->id}_collabs_plural"
-			
+			'collab_plural' => "collab_cat_{$this->id}_collabs_plural",
 		);
 	}
 	
@@ -1281,7 +1297,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		foreach ( $this->langKeys() as $fieldKey => $langKey )
 		{
 			$oldLangKey = str_replace( $this->id, $oldId, $langKey );
-			\IPS\Lang::saveCustom( 'collab', $langKey, iterator_to_array( \IPS\Db::i()->select( 'word_custom, lang_id', 'core_sys_lang_words', array( 'word_key=?', $oldLangKey ) )->setKeyField( 'lang_id' )->setValueField('word_custom') ) );
+			\IPS\Lang::saveCustom( 'collab', $langKey, iterator_to_array( \IPS\Db::i()->select( 'word_custom, lang_id', 'core_sys_lang_words', array( 'word_key=?', $oldLangKey ) )->setKeyField( 'lang_id' )->setValueField( 'word_custom' ) ) );
 		}
 
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $oldTitle . ' ' . \IPS\Member::loggedIn()->language()->get( 'copy' ) );
