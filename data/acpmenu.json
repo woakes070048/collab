@@ -11,6 +11,12 @@
             "controller": "settings",
             "do": "",
             "restriction": "collab_settings_manage"
+        },
+        "tools": {
+            "tab": "community",
+            "controller": "tools",
+            "do": "",
+            "restriction": "collab_settings_manage"
         }
     }
 }

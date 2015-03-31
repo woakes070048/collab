@@ -239,23 +239,27 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 			catch ( \UnderflowException $e )
 			{
 				// If none exist, and this is a collab node, then we create them automatically based on collab category defaults
-				if ( $this->collab_id and $collab = \IPS\collab\Collab::load( $this->collab_id ) )
+				try
 				{
-					try
+					if ( $this->collab_id and $collab = \IPS\collab\Collab::load( $this->collab_id ) )
 					{
-						/**
-						 * This grabs the default permission set for this node type for this collab category
-						 */
-						$permissions = \IPS\Db::i()->select( array( 'perm_view', 'perm_2', 'perm_3', 'perm_4', 'perm_5', 'perm_6', 'perm_7' ), 'core_permission_index', array( "app=? AND perm_type=? AND perm_type_id=?", 'collab', static::$permApp . '_' . static::$permType, $collab->container()->_id ) )->first();
-						
-						// Now save it to the node
-						$permissions[ 'app' ] 		= static::$permApp;
-						$permissions[ 'perm_type' ] 	= static::$permType;
-						$permissions[ 'perm_type_id' ] 	= $this->_id;
-						$this->setPermissions( $permissions, new \IPS\Helpers\Form\Matrix );
+						try
+						{
+							/**
+							 * This grabs the default permission set for this node type for this collab category
+							 */
+							$permissions = \IPS\Db::i()->select( array( 'perm_view', 'perm_2', 'perm_3', 'perm_4', 'perm_5', 'perm_6', 'perm_7' ), 'core_permission_index', array( "app=? AND perm_type=? AND perm_type_id=?", 'collab', static::$permApp . '_' . static::$permType, $collab->container()->_id ) )->first();
+							
+							// Now save it to the node
+							$permissions[ 'app' ] 		= static::$permApp;
+							$permissions[ 'perm_type' ] 	= static::$permType;
+							$permissions[ 'perm_type_id' ] 	= $this->_id;
+							$this->setPermissions( $permissions, new \IPS\Helpers\Form\Matrix );
+						}
+						catch ( \UnderflowException $e ) {}
 					}
-					catch ( \UnderflowException $e ) {}
 				}
+				catch ( \OutOfRangeException $e ) {}
 			}
 		}
 		
@@ -374,7 +378,8 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 			if ( $collab and \IPS\collab\Application::collabOptions( md5( get_called_class() ) ) )
 			{
 				/** 
-				 * Force saving collab category default permissions to this node
+				 * This will ensure permissions are set for this node, and if it is a collab node,
+				 * then permissions will be created based on the defaults set for the category
 				 */
 				$this->permissions();
 			}

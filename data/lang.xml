@@ -10,6 +10,7 @@
   <word key="menu__collab_collab" js="0">Collaboration</word>
   <word key="menu__collab_collab_categories" js="0">Categories</word>
   <word key="menu__collab_collab_settings" js="0">Settings</word>
+  <word key="menu__collab_collab_tools" js="0">Import Tools</word>
   <word key="notifications__collab_collabNotifications" js="0">Collaboration</word>
   <word key="group__collab_groupForm" js="0">Collaboration</word>
   <word key="g_collabs_owned_limit" js="0">Maximum collabs a member of this group can own</word>
@@ -41,6 +42,8 @@
   <word key="can_delete_collab_review" js="0">Can Delete Collab Reviews</word>
   <word key="modperms__collab_modPermissions" js="0">Collab Management</word>
   <word key="can_bypass_collab_permissions" js="0">Unrestricted by collab permissions</word>
+  <word key="collab_manage_tools" js="0">Collaboration Import Tools</word>
+  <word key="collab_migrate_missing_data" js="0">Import data unavailable</word>
   <word key="collab_app_title" js="0">App Title</word>
   <word key="collab_app_title_desc" js="0">You can change the name of the collaboration app to reflect the way you use it.</word>
   <word key="tab_collab_category_settings" js="0">Category Details</word>

@@ -220,7 +220,8 @@ class _Application extends \IPS\Application
 		{
 			if ( $ext instanceof \IPS\Content\ExtensionGenerator )
 			{
-				$modoptions[ $ext->class ] = array(
+				$modoptions[ $ext->class ] = array
+				(
 					'key' => $key,
 					'ext' => $ext
 				);

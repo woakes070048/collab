@@ -16,6 +16,7 @@ $lang = array(
 	'menu__collab_collab'				=> "Collaboration",
 	'menu__collab_collab_categories'		=> "Categories",
 	'menu__collab_collab_settings'			=> "Settings",
+	'menu__collab_collab_tools'			=> "Import Tools",
 	'notifications__collab_collabNotifications' 	=> "Collaboration",
 	
 	// Group Settings
@@ -53,6 +54,11 @@ $lang = array(
 	// Moderator Permissions
 	'modperms__collab_modPermissions'	=> "Collab Management",
 	'can_bypass_collab_permissions'		=> "Unrestricted by collab permissions",
+	
+	// Collab Tools
+	'collab_manage_tools'			=> "Collaboration Import Tools",
+	'collab_migrate_missing_data'		=> "Import data unavailable",
+	
 	
 	// Category Settings Form
 	'collab_app_title'			=> "App Title",

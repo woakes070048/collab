@@ -56,12 +56,13 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 				\IPS\IPS\Output::i()->error( 'collab_node_unavailable', '2CP01/B', 404, '' );
 			}
 		}
-		catch ( \OutOfRangeException $e ) {
+		catch ( \OutOfRangeException $e ) 
+		{
 			\IPS\IPS\Output::i()->error( 'collab_not_found', '2CP01/B', 404, '' );
 		}
 		
 		/* Check permission */
-		if( !$node->canManagePermissions() )
+		if( ! $node->canManagePermissions() )
 		{
 			\IPS\Output::i()->error( 'node_noperm_edit', '2S101/O', 403, '' );
 		}
