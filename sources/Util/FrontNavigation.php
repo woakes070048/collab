@@ -38,8 +38,13 @@ class _FrontNavigation
 	 */
 	public function __call( $method, $args )
 	{
+		/**
+		 * Since this utility is being used, we know that we are in a collaboration context,
+		 * so the active link should always be the collaboration navigation link.
+		 */
 		if ( $method == 'active' )
 		{
+			/* Return TRUE only if this is the navigation item for the collab app */
 			return get_class( $this->obj ) == 'IPS\collab\extensions\core\FrontNavigation\navigation';
 		}
 		

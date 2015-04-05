@@ -19,6 +19,11 @@ class collab_hook_ipsApplication extends _HOOK_CLASS_
 	{
 		$_extensions = call_user_func_array( 'parent::allExtensions', func_get_args() );
 		
+		/**
+		 * If this page belongs to a collab, we wrap all FrontNavigation extensions in our own utility wrapper 
+		 * so that we can intervene the default logic and make the collab link active instead of the app that is
+		 * being used within the collab.
+		 */
 		if ( \IPS\collab\Application::affectiveCollab() and $app == 'core' and $extension == 'FrontNavigation' )
 		{
 			foreach ( $_extensions as $id => &$nav )
