@@ -31,7 +31,7 @@ class _navigation
 	 */
 	public function canView()
 	{
-		return TRUE;
+		return ! \IPS\Application::load( 'collab' )->hide_tab and \IPS\Member::loggedIn()->canAccessModule( \IPS\Application\Module::get( 'collab', 'collab' ) );
 	}
 	
 	/**
