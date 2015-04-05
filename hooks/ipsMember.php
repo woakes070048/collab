@@ -125,67 +125,89 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 	{
 		/* Write our count to bypass the magic __set method */
 		$this->_data[ 'member_posts' ] = 0;
+
 		foreach ( \IPS\Content::routedClasses( $this, TRUE, TRUE, FALSE ) as $class )
 		{
-			$itemClass = NULL;
-			
-			if ( isset ( $class::$itemClass ) )
+			if ( $class::memberPostCount( $this ) !== 0 )
 			{
-				$itemClass = $class::$itemClass;
-				if ( isset ( $itemClass::$containerNodeClass ) )
-				{
-					$nodeClass = $itemClass::$containerNodeClass;
-				}
-			}
-			else
-			{		
-				if ( isset ( $class::$containerNodeClass ) )
-				{
-					$nodeClass = $class::$containerNodeClass;
-				}
-			}
-			
-			if 
-			( 	/** 
-				 * Check if container node is provisioned for collab usage...
-				 * and if so, build a query that only includes posts from
-				 * non-collab categories and also collab categories that are
-				 * configured to include posts in the main site post count.
-				 */
-				isset ( $nodeClass ) and 
-				\IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) 
-			)
-			{
-				$_is_author		= $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['author'] . '=?';
-				$_not_collab		= $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0';
-				$_increase_mainposts 	= "( collab_categories.category_bitoptions & 64 ) != 0";
+				$itemClass = NULL;
 				
-				$select = \IPS\Db::i()->select( 
-					'COUNT(*)', 
-					$class::$databaseTable, 
-					array( "{$_is_author} AND ( {$_not_collab} OR {$_increase_mainposts} )", $this->member_id ) 
-					);
-					
-				if ( isset ( $itemClass ) )
+				if ( isset ( $class::$itemClass ) )
 				{
-					$select->join( $itemClass::$databaseTable, array( $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnId . '=' . $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['item'] ) );
-					$select->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=' . $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnMap['container'] ) );
+					$itemClass = $class::$itemClass;
+					if ( isset ( $itemClass::$containerNodeClass ) )
+					{
+						$nodeClass = $itemClass::$containerNodeClass;
+					}
+				}
+				else
+				{		
+					if ( isset ( $class::$containerNodeClass ) )
+					{
+						$nodeClass = $class::$containerNodeClass;
+					}
+				}
+				
+				if 
+				( 	/** 
+					 * Check if container node is provisioned for collab usage...
+					 * and if so, build a query that only includes posts from
+					 * non-collab categories and also collab categories that are
+					 * configured to include posts in the main site post count.
+					 */
+					isset ( $nodeClass ) and 
+					\IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) 
+				)
+				{
+					$_is_author		= $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap[ 'author' ] . '=?';
+					$_not_collab		= $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0';
+					$_increase_mainposts 	= "( collab_categories.category_bitoptions & 64 ) != 0";
+					
+					$where 	= array( array( "{$_is_author} AND ( {$_not_collab} OR {$_increase_mainposts} )", $this->member_id ) );
+					$_joins = array();
+					
+					/**
+					 * Special Cases
+					 */
+					switch ( $class )
+					{
+						case 'IPS\forums\Topic\Post':
+						
+							$where[] = array( 'forums_forums.inc_postcount=1' );
+							break;
+					
+					}
+					
+					$select = \IPS\Db::i()->select( 'COUNT(*)', $class::$databaseTable, $where );
+					
+					if ( isset ( $itemClass ) )
+					{
+						$select->join( $itemClass::$databaseTable, array( $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnId . '=' . $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['item'] ) );
+						$select->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=' . $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnMap['container'] ) );
+					}
+					else
+					{
+						$select->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=' . $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['container'] ) );
+					}
+					
+					$select->join( 'collab_collabs', array( 'collab_collabs.collab_id='. $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
+					$select->join( 'collab_categories', array( 'collab_collabs.category_id=collab_categories.category_id' ) );
+					
+					/**
+					 * Special Joins
+					 */
+					foreach( $_joins as $_table => $_where )
+					{
+						$select->join( $_table, $_where );
+					}
+					
+					$this->_data[ 'member_posts' ] += $select->first();
 				}
 				else
 				{
-					$select->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=' . $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['container'] ) );
+					/* It's not collab content, so count it all */
+					$this->_data[ 'member_posts' ] += $class::memberPostCount( $this );
 				}
-				
-				$select->join( 'collab_collabs', array( 'collab_collabs.collab_id='. $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
-				$select->join( 'collab_categories', array( 'collab_collabs.category_id=collab_categories.category_id' ) );
-				
-				$this->_data[ 'member_posts' ] += $select->first();
-			}
-			else
-			{
-				/* It's not collab content, so count it all */
-				$select = \IPS\Db::i()->select( 'COUNT(*)', $class::$databaseTable, array( $class::$databasePrefix . $class::$databaseColumnMap['author'] . '=?', $this->member_id ) );
-				$this->_data[ 'member_posts' ] += $select->first();
 			}
 		}
 		
