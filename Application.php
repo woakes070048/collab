@@ -111,7 +111,8 @@ class _Application extends \IPS\Application
 	 */
 	public static function memberStatuses()
 	{
-		$statuses = array(
+		$statuses = array
+		(
 			COLLAB_MEMBER_BANNED 	=> 'collab_status_banned',
 			COLLAB_MEMBER_INVITED	=> 'collab_status_invited',
 			COLLAB_MEMBER_PENDING	=> 'collab_status_pending',
@@ -472,7 +473,7 @@ class _Application extends \IPS\Application
 	public static $affectiveCollab = NULL;
 	
 	/**
-	 * Try to determine an affective collab for this page
+	 * Try to determine what collab this page belongs to
 	 *
 	 * @param	bool		$require		Require
 	 * @param	bool		$throw			Throw exception
@@ -486,7 +487,7 @@ class _Application extends \IPS\Application
 		}
 		
 		/**
-		 *  #1: The page specifically belongs to a collab object
+		 *  Option #1: The page specifically belongs to a collab owned object
 		 */
 		if ( isset ( static::$inferredCollab ) )
 		{
@@ -494,7 +495,7 @@ class _Application extends \IPS\Application
 		}
 		
 		/**
-		 *  #2: A collab was specified in the url
+		 *  Option #2: A collab was specified in the url
 		 */
 		if ( $collab = static::activeCollab( FALSE ) )
 		{
@@ -502,7 +503,7 @@ class _Application extends \IPS\Application
 		}
 		
 		/**
-		 *  #3: At some point, a collab owned object was loaded in the app
+		 *  Option #3: At some point, a collab owned object was loaded (by permission check)
 		 */
 		if ( ! empty ( static::$collabObjStack ) )
 		{
