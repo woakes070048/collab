@@ -7,9 +7,11 @@
 		<div id='elCollabStats' class='ipsClearfix'>
 			<div class="ipsGrid ipsGrid_collapsePhone collabCategoryChildren">
 			{{foreach $category->children() as $subcat}}
+				{{if $subcat->can( 'view' )}}
 				<div class="ipsGrid_span_custom pad10_phone">
 					{$subcat->coverPhoto( 'subview' )|raw}
 				</div>
+				{{endif}}
 			{{endforeach}}
 			</div>
 		</div>

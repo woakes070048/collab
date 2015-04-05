@@ -121,9 +121,12 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		$member 	= $member ?: \IPS\Member::loggedIn();
 		$collabCan 	= TRUE;
 		
+		/**
+		 * The obvious way to check if this node is owned by a collab
+		 */
 		if ( $this->collab_id )
 		{
-			/* Assume we can't until we discover otherwise */
+			/* Assume we can't do anything until we discover otherwise */
 			$collabCan = FALSE;
 			
 			/**

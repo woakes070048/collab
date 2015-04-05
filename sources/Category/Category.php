@@ -551,6 +551,15 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$form_id . 'collab_increase_mainposts',
 			) ) 
 		) );
+		
+		$privacy_options = array
+		(
+			'public' => 'category_privacy_mode_public',
+			'private' => 'category_privacy_mode_private',
+		);
+		
+		$form->add( new \IPS\Helpers\Form\Radio( 'collab_category_privacy_mode', $this->privacy_mode ?: 'public', TRUE, array( 'options' => $privacy_options ) ) );
+		
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_name', NULL, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? "collab_category_{$this->id}" : NULL ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_description', NULL, FALSE, array(
 			'app'		=> 'collab',
@@ -925,6 +934,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$this->bitoptions[ 'multiple_model' ] 		= $values[ 'collab_multiple_models_choice' ];
 		
 		$this->name_seo	= \IPS\Http\Url::seoTitle( $values[ 'category_name' ][ \IPS\Lang::defaultLanguage() ] );
+		$this->privacy_mode = $values[ 'collab_category_privacy_mode' ];
 
 		/* Custom language fields */
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values[ 'category_name' ] );
@@ -1095,6 +1105,25 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		
 		switch ( $permission )
 		{
+			case 'view':
+				
+				/**
+				 * Hide private categories when the member can't add new collabs and 
+				 * also does not belong to any collab in the category.
+				 */
+				if 
+				( 
+					! $member->modPermission( 'can_bypass_collab_permissions' ) and
+					(
+						$this->privacy_mode == 'private' and 
+						! $this->can( 'add', $member )
+					)
+				)
+				{
+					$categoryCan = (bool) \IPS\Db::i()->select( 'COUNT(*)', 'collab_collabs', array( 'collab_collabs.category_id=? AND ( ( collab_memberships.member_id=? AND collab_memberships.status IN ( \'active\', \'invited\', \'pending\' ) ) OR collab_collabs.join_mode IN (2,3) )', $this->id, $member->member_id ) )->join( 'collab_memberships', array( 'collab_collabs.collab_id=collab_memberships.collab_id' ) )->first();
+				}
+				break;
+				
 			case 'add':
 			
 				/* Are collabs even enabled for this category? */

@@ -3,10 +3,12 @@
 	{template="pageHeader" group="global" app="core" params="\IPS\Member::loggedIn()->language()->addToStack('__app_collab')"}
 
 	{{foreach \IPS\collab\Category::roots() as $category}}
-	<section class="collabCategoryIndex">
-		<a href='{$category->url()}'>
-		{$category->coverPhoto( 'index' )|raw}
-		</a>
-	</section>
+		{{if $category->can( 'view' )}}
+		<section class="collabCategoryIndex">
+			<a href='{$category->url()}'>
+			{$category->coverPhoto( 'index' )|raw}
+			</a>
+		</section>
+		{{endif}}
 	{{endforeach}}
 </div>

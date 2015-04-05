@@ -253,6 +253,20 @@
                 "zerofill": false,
                 "auto_increment": false,
                 "binary": false
+            },
+            "category_privacy_mode": {
+                "name": "category_privacy_mode",
+                "type": "VARCHAR",
+                "length": 56,
+                "decimals": null,
+                "values": [],
+                "allow_null": false,
+                "default": "public",
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
             }
         },
         "indexes": {

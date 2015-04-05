@@ -661,10 +661,12 @@ class _Collab extends \IPS\Content\Item implements
 			throw new \UnexpectedValueException();
 		}
 		
-		/* Site administrators are super! */
-		if ( $member->isAdmin() )
+		/**
+		 * Some moderators may be able to bypass collab permissions
+		 */
+		if ( $member->modPermission( 'can_bypass_collab_permissions' ) )
 		{
-			return TRUE;
+			$collabCan = TRUE;
 		}
 		
 		/* Check permissions based on membership roles ( collab owners are also super ) */
@@ -673,17 +675,22 @@ class _Collab extends \IPS\Content\Item implements
 			/* Basic Membership Permission Test */
 			$collabCan = $membershipCan = 
 			(
-				( $member->member_id === $this->owner_id ) ? TRUE : 
-				( $membership->can( $perm ) and $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
+				$collabCan or
+				(
+					( $member->member_id === $this->owner_id ) ? TRUE : 
+					( $membership->can( $perm ) and $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
+				)
 			);
 			
 			/* More Advanced Permission Tests */
 			switch ( $perm )
 			{
 				case 'inviteMember':
+				
 					if ( isset ( $params[ 'invitee' ] ) )
 					{
-						$collabCan = ( 
+						$collabCan = 
+						( 
 							$membershipCan and 
 							$this->join_mode != \IPS\collab\COLLAB_JOIN_DISABLED and
 							$this->canJoin( $params[ 'invitee' ] )

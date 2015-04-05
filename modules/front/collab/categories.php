@@ -66,8 +66,23 @@ class _categories extends \IPS\Helpers\CoverPhoto\Controller
 	 */
 	protected function _category( \IPS\collab\Category $category )
 	{
+		$where = NULL;
+		
+		if ( $category->privacy_mode == 'private' )
+		{
+			$member = \IPS\Member::loggedIn();
+			$_collabs = iterator_to_array( \IPS\Db::i()->select( 'collab_collabs.collab_id', 'collab_collabs', array( 'collab_collabs.category_id=? AND ( ( collab_memberships.member_id=? AND collab_memberships.status IN ( \'active\', \'invited\', \'pending\' ) ) OR collab_collabs.join_mode IN (2,3) )', $category->id, $member->member_id ) )->join( 'collab_memberships', array( 'collab_collabs.collab_id=collab_memberships.collab_id' ) ) );
+			if ( count( $_collabs ) )
+			{
+				$where = array( array( 'collab_collabs.collab_id IN (' . implode( ',', $_collabs ) . ')' ) );
+			}
+			else
+			{
+				$where = array( array( '0' ) );
+			}
+		}
 	
-		$table 			= new \IPS\Helpers\Table\Content( 'IPS\collab\Collab', $category->url(), NULL, $category, NULL, NULL );
+		$table 			= new \IPS\Helpers\Table\Content( 'IPS\collab\Collab', $category->url(), $where, $category, NULL, NULL );
 		$table->tableTemplate 	= array( \IPS\Theme::i()->getTemplate( 'components', 'collab', 'front' ), 'categoryTable' );
 		$table->title 		= \IPS\Member::loggedIn()->language()->addToStack( $category->_title );
 		$table->rowsTemplate 	= array( \IPS\Theme::i()->getTemplate( 'components', 'collab', 'front' ), 'collabRow' );
