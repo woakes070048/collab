@@ -164,7 +164,6 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 					$_increase_mainposts 	= "( collab_categories.category_bitoptions & 64 ) != 0";
 					
 					$where 	= array( array( "{$_is_author} AND ( {$_not_collab} OR {$_increase_mainposts} )", $this->member_id ) );
-					$_joins = array();
 					
 					/**
 					 * Special Cases
@@ -193,14 +192,6 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 					$select->join( 'collab_collabs', array( 'collab_collabs.collab_id='. $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
 					$select->join( 'collab_categories', array( 'collab_collabs.category_id=collab_categories.category_id' ) );
 					
-					/**
-					 * Special Joins
-					 */
-					foreach( $_joins as $_table => $_where )
-					{
-						$select->join( $_table, $_where );
-					}
-					
 					$this->_data[ 'member_posts' ] += $select->first();
 				}
 				else
@@ -213,6 +204,10 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		
 		$this->changed[ 'member_posts' ] = $this->_data[ 'member_posts' ];
 		$this->save();
+		
+		/* Rules Fix */
+		\IPS\Application::appEnabled( 'rules', TRUE ) and \IPS\rules\Event::load( 'rules', 'Members', 'content_recounted' )->trigger( $this, $this->_data[ 'member_posts' ] );
+
 	}
 	
 	/**
@@ -235,13 +230,23 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 					\IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) 
 				)
 				{
+					$where = array( array( $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['author'] . '=? AND ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=?', $this->member_id, $collab->collab_id ) );
+					
+					/**
+					 * Special Cases
+					 */
+					switch ( $class )
+					{
+						case 'IPS\forums\Topic\Post':
+						
+							$where[] = array( 'forums_forums.inc_postcount=1' );
+							break;
+					
+					}
+				
 					$memberOrGuest->posts += \IPS\Db::i()
-						->select( 
-							'COUNT(*)', 
-							$class::$databaseTable, 
-							array( $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['author'] . '=? AND ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=?', $this->member_id, $collab->collab_id ) 
-						)
-						->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=?', $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['container'] ) )
+						->select( 'COUNT(*)', $class::$databaseTable, $where )
+						->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=?', $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap[ 'container' ] ) )
 						->first();
 				}
 			}
