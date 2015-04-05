@@ -671,7 +671,8 @@ class _Collab extends \IPS\Content\Item implements
 		if ( $membership = $this->getMembership( $member ) or $member->member_id === $this->owner_id )
 		{	
 			/* Basic Membership Permission Test */
-			$collabCan = $membershipCan = (
+			$collabCan = $membershipCan = 
+			(
 				( $member->member_id === $this->owner_id ) ? TRUE : 
 				( $membership->can( $perm ) and $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
 			);

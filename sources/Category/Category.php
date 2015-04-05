@@ -421,8 +421,10 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		
 		try
 		{
-			$this->templates = iterator_to_array( 
-				new \IPS\Patterns\ActiveRecordIterator( 
+			$this->templates = iterator_to_array
+			( 
+				new \IPS\Patterns\ActiveRecordIterator
+				( 
 					\IPS\Db::i()->select( '*', 'collab_collabs', array( 'category_id=? AND is_template=1', $this->_id ) )->setKeyField( 'collab_id' ),
 					'IPS\collab\Collab'
 				)
