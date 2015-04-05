@@ -104,6 +104,12 @@ $lang = array(
 	'collab_multiple_models'		=> "Model Choices",
 	'collab_multiple_models_desc'		=> "If you allow multiple choices, newly created %s can have a configuration that combines all the models selected by the user.",
 	
+	'collab_category_privacy_mode'		=> "Listing Mode",
+	'collab_category_privacy_mode_desc'	=> "In public listing mode, collabs are always visibly listed for any member with permissions to view this category. In private listing mode, collabs are only visibly listed when their join mode is open to all, or if a member is already an active member of that collab.",
+	'category_privacy_mode_public'		=> "Public Listing",
+	'category_privacy_mode_private'		=> "Private Listing",
+
+	
 	// Category View
 	'no_collabs_in_category'		=> "This category does not contain any %s",
 	
