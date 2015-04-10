@@ -1,7 +1,7 @@
 <?php
 
 
-namespace IPS\collab\modules\admin\importers;
+namespace IPS\collab\modules\admin\collab;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
@@ -34,14 +34,76 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 	protected function manage()
 	{
 		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack( 'Social Groups Importer' );
-		\IPS\Output::i()->output = "";
+		
+		$db = \IPS\Db::i();
+		
+		if ( $db->checkForTable( 'social_groups' ) )
+		{
+			$import_tables = array
+			( 
+				'social_groups', 
+				'social_groups_cat', 
+				'social_group_members',
+				'social_groups_invites', 
+				'social_groups_news',
+				'social_groups_pages',
+				'social_groups_notes',
+			);
+			
+			foreach ( $import_tables as $table )
+			{
+				if ( $db->checkForTable( $table ) )
+				{
+					if ( ! $db->checkForColumn( $table, 'imported_id' ) )
+					{
+						$db->addColumn( $table, array(
+							'name'			=> 'imported_id',
+							'type'			=> 'INT',
+							'length'		=> 1,
+							'null'			=> FALSE,
+							'default'		=> 0,
+						) );
+					}
+				}
+			}
+
+			$group_count = $db->select( 'COUNT(*)', 'social_groups', array( 'imported_id=0' ) )->first();
+			$group_cat_count = $db->select( 'COUNT(*)', 'social_groups_cat', array( 'imported_id=0' ) )->first();
+			
+			if ( $group_count or $group_cat_count )
+			{
+				\IPS\Output::i()->output .= "
+					<div class='ipsMessage ipsMessage_info'>
+						Groups ready to import: <strong>{$group_count}</strong><br>
+						Categories ready to import: <strong>{$group_cat_count}</strong>
+					</div>
+				";
+				
+				\IPS\Output::i()->output .= "<a href='" . $this->url->setQueryString( array( 'do' => 'socialGroupsWizard' ) ) . "' class='ipsButton ipsButton_positive ipsButton_large'>Begin Import</a>";
+			}
+			else
+			{
+				\IPS\Output::i()->output .= "
+					<div class='ipsMessage ipsMessage_success'>
+						Congratulations. All social groups have already been imported!
+					</div>
+				";
+			}
+		}
+		else
+		{
+			\IPS\Output::i()->output .= "
+				<div class='ipsMessage ipsMessage_error'>
+					Import not available. Social groups not detected.
+				</div>
+			";
+		}
 	}
-	
 	
 	/**
 	 * Social Groups Import Wizard
 	 */
-	protected socialGroupsWizard()
+	protected function socialGroupsWizard()
 	{
 		$db = \IPS\Db::i();
 		
@@ -50,37 +112,13 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 			\IPS\Output::i()->error( 'collab_migrate_missing_data', '2CM10/A', 403 );
 		}
 		
-		$import_tables = array
-		( 
-			'social_groups', 
-			'social_groups_cat', 
-			'social_group_members'
-			'social_groups_invites', 
-			'social_groups_news',
-		);
-		
-		foreach ( $import_tables as $table )
-		{
-			if ( $db->checkForTable( $table ) )
-			{
-				if ( ! $db->checkForColumn( $table, 'imported_id' ) )
-				{
-					$db->addColumn( $table, array(
-						'name'			=> 'imported_id',
-						'type'			=> 'INT',
-						'length'		=> 1,
-						'null'			=> FALSE,
-						'default'		=> 0,
-					) );
-				}
-			}
-		}
+		$this->socialGroupsImport();
 		
 	}
 	
-	protected socialGroupsImport()
+	protected function socialGroupsImport()
 	{
-		$import_url = \IPS\Request::i()->url();
+		$import_url = \IPS\Http\Url::internal( "app=collab&module=collab&controller=socialgroups&do=socialGroupsImport" );
 		
 		$importer = new \IPS\Helpers\MultipleRedirect( 
 				
@@ -110,6 +148,11 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						$data[ 'counts' ][ 'social_groups_cat' ] +
 						$data[ 'counts' ][ 'social_groups_news' ] +
 						0;
+						
+					if ( $data[ 'counts' ][ 'total' ] == 0 )
+					{
+						return NULL;
+					}
 					
 					$message = "Migrating Social Groups Categories";
 					$progress = 0;
@@ -202,8 +245,8 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 								try { $collab->owner_name = \IPS\Member::load( $collab->owner_id )->name; }
 								catch ( \UnderflowException $e ) {}
 								
-								/* Save the collab, get an ID */
-								$collab->save();
+								/* Save the collab, bypass creating a membership automatically, and secure an ID */
+								$collab->save( TRUE );
 								
 								/**
 								 * Import Collab Roles
@@ -450,28 +493,32 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						return NULL;
 				}
 				
-				return array( $data, $message, $progress );					
+				return array( $data, $message, (int) ( 100 * $progress ) );					
 			},
 			
 			/* Processing Complete */ 
 			function() 
 			{
-
+				\IPS\Output::i()->redirect( \IPS\Http\Url::internal( "app=collab&module=collab&controller=categories" ), 'Social Groups Import Complete.' );
 			}
 		);
+		
+		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack( 'Social Groups Importer' );
+		\IPS\Output::i()->output = $importer;
+		
 	}
 	
 	protected function _createCategory( $category, $perms, $parent_id=0 )
 	{
 		// Create Category
-		$nid 	 = md5( '\IPS\forums\Forum' );
+		$nid 	 = md5( 'IPS\forums\Forum' );
 		$node_id = 'node_' . $nid;
 		
 		$options = array
 		(
 			$node_id => array
 			(
-				'enabled' 	=> $category[ 'cat_locked' ],
+				'enabled' 	=> 1,
 				'maxnodes' 	=> 0,
 				'enable_add'	=> 1,
 				'enable_edit'	=> 1,
@@ -485,6 +532,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 		$collab_category->name_seo	= $category[ 'cat_seo_name' ];
 		$collab_category->parent_id 	= $parent_id;
 		$collab_category->_options	= $options;
+		$collab_category->collabs_enable = ! $category[ 'cat_locked' ];
 		
 		/**
 		 * Build Moderator Permissions
@@ -492,7 +540,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 		$modoptions 	= \IPS\collab\Application::modOptions();
 		$modperms	= array();
 		
-		if ( $ext = $modoptions[ '\IPS\forums\Topic' ] )
+		if ( isset( $modoptions[ 'IPS\forums\Topic' ] ) and $ext = $modoptions[ 'IPS\forums\Topic' ][ 'ext' ] )
 		{
 			$toggles = array( 'view_future' => array(), 'future_publish' => array(), 'pin' => array(), 'unpin' => array(), 'feature' => array(), 'unfeature' => array(), 'edit' => array(), 'hide' => array(), 'unhide' => array(), 'view_hidden' => array(), 'move' => array(), 'lock' => array(), 'unlock' => array(), 'reply_to_locked' => array(), 'delete' => array(), 'split_merge' => array() );
 			
@@ -510,7 +558,6 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						break;
 				}			
 			}
-			
 		}
 		
 		$collab_category->_mod_perms = $modperms;
@@ -527,6 +574,15 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 		 * Save the category... get an ID.
 		 */
 		$collab_category->save();
+		
+		/* Set default category permissions */
+		\IPS\Db::i()->insert( 'core_permission_index', array(
+			'app'			=> 'collab',
+			'perm_type'		=> 'collab_category',
+			'perm_type_id'		=> $collab_category->id,
+			'perm_view'		=> '*',
+			'perm_2'		=> '*'
+		) );
 		
 		/* Set forums permissions for this category */
 		$perms[ 'perm_type_id' ] = $collab_category->id;

@@ -34,7 +34,13 @@ class _tools extends \IPS\Dispatcher\Controller
 	protected function manage()
 	{
 		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack( 'collab_manage_tools' );
-		\IPS\Output::i()->output = "";
+		
+		\IPS\Output::i()->output .= "<h2>Social Groups Importer</h2>" . ( 
+			\IPS\Db::i()->checkForTable( 'social_groups' ) ? 
+			"<p><a href='" . \IPS\Http\Url::internal( "app=collab&module=collab&controller=socialgroups" ) . "' class='ipsButton ipsButton_positive ipsButton_large'><i class='fa fa-rocket'></i> Launch Importer</a></p>" :
+			"<p>No social groups detected</p>" 
+			);
+		
 	}
 
 	

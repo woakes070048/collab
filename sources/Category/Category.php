@@ -594,19 +594,19 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$form->add( new \IPS\Helpers\Form\Translatable( 'collabs_alias_singular', $this->collab_singular, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? $collab_singular_lang : NULL ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Translatable( 'collabs_alias_plural', $this->collab_plural, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? $collab_plural_lang : NULL ) ) ) );
 		
-		$form->addSeperator();
+		$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
 		
 		$form->add( new \IPS\Helpers\Form\Number( 'category_max_collabs_owned', $this->max_collabs_owned ?: 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'category_max_collabs_joined', $this->max_collabs_joined ?: 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'category_max_collab_members', $this->max_collab_members ?: 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
 				
-		$form->addSeperator();
+		$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
 		
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_allow_comments', $this->id ? $this->bitoptions[ 'allow_comments' ] : TRUE ) );
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_allow_ratings', $this->id ? $this->bitoptions[ 'allow_ratings' ] : TRUE ) );
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_allow_reviews', $this->id ? $this->bitoptions[ 'allow_reviews' ] : TRUE ) );
 		
-		$form->addSeperator();
+		$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
 		
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_increase_mainposts', $this->id ? $this->bitoptions[ 'increase_mainposts' ] : FALSE ) );
 		

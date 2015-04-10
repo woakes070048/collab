@@ -23,7 +23,7 @@
 	<div class='ipsColumn ipsColumn_fluid'>
 		<div class='ipsPos_left ipsPad headerContent' style='padding-top:0'>
 			<h1 class='ipsType_reset'>
-				{$collab->title}
+				<a href="{$collab->url()}" style="color:inherit">{$collab->title}</a>
 				<span class='ipsResponsive_hidePhone'>
 					{{if $collab->hidden() === -1}}
 						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{$collab->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>

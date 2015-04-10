@@ -94,6 +94,11 @@ section.collabCategoryIndex {
 
 .collabCategoryCoverLayout_index .collabCategoryDescription {
 	max-width: 75%;
+	width: 500px;
+}
+
+.collabCategoryCoverLayout .collabCategoryDescription a {
+	color: #bbb;
 }
 
 .collabCategoryCoverLayout_index .coverContent {
@@ -172,6 +177,10 @@ section.collabCategoryIndex {
 /* PHONES */
 @media screen and (max-width: 767px) {
 
+  section.collabCategoryIndex {
+	height:120px;
+  }
+	
   .pad10_phone {
 	padding: 10px;
   }

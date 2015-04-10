@@ -43,7 +43,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 	/**
 	 * Get collabs of a particular membership status or with specific permissions
 	 *
-	 * @param	mixed		$status		"all" for all statuses, or a membership status id (integer)
+	 * @param	mixed		$status		"all" for all statuses, or a membership status id
 	 * @param	string|array	$perms		permissions to check for
 	 * @param	array		$params		array of parameters to supply with permission check
 	 * @return	array				Array of Collab Active Records [\IPS\collab\Collab]
@@ -90,28 +90,23 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 	 * @return	mixed
 	 */
 	public function modPermission( $key=NULL )
-	{
+	{		
 		/**
-		 *  Check for content moderation ability in collabs
-		 *  so member can access ModCp
-		 *
-		 *  @TODO:
-		 *  Needs implementation in ModCp to display only
-		 *  content from associated collabs
-		 * 
-		 *  see:
-		 *  ./applications/core/extensions/core/ModCp/Unapproved.php 	~ function _getNext()
-		 *  ./system/Content/Item.php 					~ function getItemsWithPermission()
-		 *  ./system/Content/Comment.php 				~ function getItemsWithPermission()
-		 *
-		if ( $key === NULL )
+		 * Special case forums mod permissions
+		 */
+		if ( in_array( $key, array( 'forums', 'can_read_all_topics' ) ) )
 		{
-			if ( count ( $this->collabs( 'all', 'moderateContent' ) ) )
-			{
-				return TRUE;
+			if ( $collab = \IPS\collab\Application::affectiveCollab() )
+			{			
+				if ( $membership = $collab->getMembership( $this ) )
+				{
+					if ( $membership->can( 'moderateContent' ) )
+					{
+						return TRUE;
+					}
+				}
 			}
 		}
-		*/
 		
 		return call_user_func_array( 'parent::modPermission', func_get_args() );
 	}

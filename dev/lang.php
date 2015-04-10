@@ -19,6 +19,20 @@ $lang = array(
 	'menu__collab_collab_tools'			=> "Import Tools",
 	'notifications__collab_collabNotifications' 	=> "Collaboration",
 	
+	'collab_copy_to_collab'			=> "Copy to a collab",
+	'collab_move_to_collab'			=> "Move to a collab",
+	'collab_extract_from_collab'		=> "Extract to main site",
+	'collab_id_select'			=> "Enter a collab ID",
+	'collab_node_copied_to_collab'		=> "Successfully copied to the collab",
+	'collab_node_moved_to_collab'		=> "Successfully moved to the collab",
+	'collab_node_extracted_from_collab'	=> "Successfully extracted to the main site",
+	
+	// Widgets
+	'block_featuredCollabs'			=> "Featured Collabs",
+	'block_featuredCollabs_desc'		=> "Show collabs that are currently featured",
+	'block_latestCollabs'			=> "Latest Collabs",
+	'block_latestCollabs_desc'		=> "Show the most recently started collabs",
+	
 	// Group Settings
 	'group__collab_groupForm'		=> "Collaboration",
 	'g_collabs_owned_limit'			=> "Maximum collabs a member of this group can own",
@@ -59,6 +73,8 @@ $lang = array(
 	'collab_manage_tools'			=> "Collaboration Import Tools",
 	'collab_migrate_missing_data'		=> "Import data unavailable",
 	
+	'collab_cat__collab_singular'		=> "Collab",
+	'collab_cat__collab_plural'		=> "Collabs",
 	
 	// Category Settings Form
 	'collab_app_title'			=> "App Title",

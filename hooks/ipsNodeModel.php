@@ -270,6 +270,59 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	}
 
 	/**
+	 * [Node] Get buttons to display in tree
+	 * Example code explains return value
+	 *
+	 * @param	string	$url		Base URL
+	 * @param	bool	$subnode	Is this a subnode?
+	 * @return	array
+	 */
+	public function getButtons( $url, $subnode=FALSE )
+	{
+		$buttons = parent::getButtons( $url, $subnode );
+		
+		/**
+		 * Check if this node is provisioned for collabs
+		 */
+		if ( \IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) )
+		{
+			if ( $this->collab_id )
+			{
+				if ( \IPS\Member::loggedIn()->hasAcpRestriction( 'collab', 'collab' ) )
+				{
+					$buttons[ 'collab_extract' ] = array
+					(
+						'icon'	=> 'arrow-left',
+						'title'	=> 'collab_extract_from_collab',
+						'link'	=> $url->setQueryString( array( 'do' => 'collabExtract', 'id' => $this->_id ) ),
+						'data'  => array( 'confirm' => TRUE ),					
+					);
+				}
+			}
+			else
+			{
+				$buttons[ 'collab_copy' ] = array
+				(
+					'icon'	=> 'files-o',
+					'title'	=> 'collab_copy_to_collab',
+					'link'	=> $url->setQueryString( array( 'do' => 'collabCopy', 'id' => $this->_id ) ),
+					'data'  => array( 'ipsDialog' => TRUE, 'ipsDialog-title' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_copy_to_collab' ) ),
+				);
+				
+				$buttons[ 'collab_move' ] = array
+				(
+					'icon'	=> 'arrow-right',
+					'title'	=> 'collab_move_to_collab',
+					'link'	=> $url->setQueryString( array( 'do' => 'collabMove', 'id' => $this->_id ) ),
+					'data'  => array( 'ipsDialog' => TRUE, 'ipsDialog-title' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_move_to_collab' ) ),
+				);
+			}
+		}
+		
+		return $buttons;
+	}
+	
+	/**
 	 * [Node] Does the currently logged in user have permission to edit this node?
 	 *
 	 * @return	bool
@@ -289,7 +342,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 *
 	 * @return	array
 	 */
-	public function collabPermissions( $defaults=array( 'perm_view' => '' ) )
+	public function collabPermissions( $defaults=array( 'perm_view' => '0', 'perm_2' => '0', 'perm_3' => '0', 'perm_4' => '0', 'perm_5' => '0', 'perm_6' => '0', 'perm_7' => '0' ) )
 	{
 		if ( isset ( $this->collabPermissions ) )
 		{

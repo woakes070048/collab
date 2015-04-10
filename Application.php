@@ -320,7 +320,6 @@ class _Application extends \IPS\Application
 		 * Since early calls to this may not want to throw an error,
 		 * but later calls might, only cache a result if we have one
 		 */
-		
 		try
 		{
 			/* Load a collab based on URL parameters */

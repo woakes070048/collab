@@ -207,8 +207,18 @@ class _admin extends \IPS\Dispatcher\Controller
 		$this->_authCheck( 'inviteMember' );
 		
 		$collab 	= $this->_getCollab();
+		$invitee	= NULL;
 		$form 		= new \IPS\Helpers\Form( 'invite_member_' . $collab->collab_id, 'collab_invite_button' );
 		$form->class	.= ' ipsPad';
+		
+		if ( \IPS\Request::i()->invitee )
+		{
+			try
+			{
+				$invitee = \IPS\Member::load( \IPS\Request::i()->invitee );
+			}
+			catch ( \OutOfRangeException $e ) {}
+		}
 		
 		$form->add( new \IPS\Helpers\Form\Member( 'collab_invitees', $invitee, TRUE, array( 'multiple' => 25 ) ) );
 		

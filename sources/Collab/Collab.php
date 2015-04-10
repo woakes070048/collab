@@ -508,9 +508,10 @@ class _Collab extends \IPS\Content\Item implements
 	/**
 	 * Save
 	 *
+	 * @param	bool	$bypassMembership	Bypass the automatic creation of collab owner membership
 	 * @return	void
 	 */
-	public function save()
+	public function save( $bypassMembership=FALSE )
 	{
 		$isNew = $this->_new;
 		
@@ -531,7 +532,7 @@ class _Collab extends \IPS\Content\Item implements
 		/**
 		 * Automatically give the collab creator a membership
 		 */
-		if ( $isNew )
+		if ( $isNew and ! $bypassMembership )
 		{
 			$membership = new \IPS\collab\Collab\Membership;
 			$membership->collab_id = $this->collab_id;
@@ -949,7 +950,7 @@ class _Collab extends \IPS\Content\Item implements
 	 *  Collab comments are used in the context of an activity feed by default,
 	 *  so we want to show the newest ones first
 	 */		
-	public function comments( $limit=NULL, $offset=NULL, $order='date', $orderDirection=NULL, $member=NULL, $includeHiddenComments=NULL, $cutoff=NULL, $extraWhereClause=NULL )
+	public function comments( $limit=NULL, $offset=NULL, $order='date', $orderDirection=NULL, $member=NULL, $includeHiddenComments=NULL, $cutoff=NULL, $extraWhereClause=NULL, $bypassCache=FALSE )
 	{
 		if ( $order === 'date' and $orderDirection === NULL )
 		{
@@ -1082,7 +1083,7 @@ class _Collab extends \IPS\Content\Item implements
 	 *
 	 * @return	void
 	 */
-	protected function nodeFamily( $siblings )
+	public function nodeFamily( $siblings )
 	{
 		$_familyline = array();
 		foreach ( $siblings as $sibling )
@@ -1129,7 +1130,14 @@ class _Collab extends \IPS\Content\Item implements
 				}
 			}
 		}
-				
+		
+		/* Copy Join Mode */
+		$this->join_mode = $collab->join_mode;
+		
+		/* Copy Default Member Title */
+		$this->default_member_title = $collab->default_member_title;
+		
+		$this->save();	
 	}
 
 	/**
@@ -1137,7 +1145,7 @@ class _Collab extends \IPS\Content\Item implements
 	 *
 	 * @return	void
 	 */
-	protected function addNodeModel( $node, $parent_id, $role_map )
+	public function addNodeModel( $node, $parent_id, $role_map=array() )
 	{
 		$copy 			= clone $node;
 		$parentColumn		= $copy::$databaseColumnParent;
@@ -1164,7 +1172,7 @@ class _Collab extends \IPS\Content\Item implements
 				{
 					$_new_roles[] = intval( $_role_id ) > 0 ? $role_map[ $_role_id ] : $_role_id;
 				}
-				$_new_permissions[ $perm ] = implode( ',', $_new_roles );
+				$_new_permissions[ $perm ] = implode( ',', array_filter( $_new_roles, 'mb_strlen' ) );
 			}
 			
 			/* Apply Permissions */

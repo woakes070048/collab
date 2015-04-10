@@ -192,7 +192,7 @@ class _collabs extends \IPS\Content\Controller
 					\IPS\collab\COLLAB_JOIN_FREE => 'collab_join_free' 
 				)
 			) ) );
-			$form->addSeperator();
+			$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
 			$form->add( new \IPS\Helpers\Form\Text( 'collab_default_title', $collab ? $collab->default_member_title : \IPS\Member::loggedIn()->language()->get( 'collab_default_member_title' ), FALSE, array( 'placeholder' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_default_member_title', FALSE, array( 'sprintf' => array( $collab->collab_singular ) ) ) ) ) );
 			$form->add( new \IPS\Helpers\Form\Editor( 'collab_rules', $collab->rules, FALSE, array(
 					'app'			=> 'collab',

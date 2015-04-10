@@ -1,0 +1,57 @@
+<ips:template parameters="$table, $headers, $collab, $showReadMarkers=TRUE" />
+{{$idField = $collab::$databaseColumnId;}}
+<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $collab->unread()}}ipsDataItem_unread{{endif}} {{if method_exists( $collab, 'tableClass' ) && $collab->tableClass()}}ipsDataItem_{$collab->tableClass()}{{endif}} {{if $collab->hidden()}}ipsModerated{{endif}}">
+	{{if $showReadMarkers}}
+		{{if $collab->unread()}}
+			<div class='ipsDataItem_icon ipsPos_top'>
+				<a href='{$collab->url( 'getNewComment' )}' title='{lang="first_unread_post"}' data-ipsTooltip>
+					<span class='ipsItemStatus'><i class="fa {{if in_array( $collab->$idField, $collab->containerWrapper()->contentPostedIn( null, array( $collab->$idField ) ) )}}fa-star{{else}}fa-circle{{endif}}"></i></span>
+				</a>
+			</div>
+		{{else}}
+			{{if in_array( $collab->$idField, $collab->containerWrapper()->contentPostedIn() )}}
+				<div class='ipsDataItem_icon ipsPos_top'>
+					<span class='ipsItemStatus ipsItemStatus_read ipsItemStatus_posted'><i class="fa fa-star"></i></span>
+				</div>
+			{{else}}
+				<div class='ipsDataItem_icon ipsPos_top'>&nbsp;</div>
+			{{endif}}
+		{{endif}}
+	{{endif}}
+	<div class='ipsDataItem_main'>
+		<h4 class='ipsDataItem_title ipsType_break'>
+			<a href='{$collab->url()}'>
+				{wordbreak="$collab->mapped('title')"}
+			</a>
+			{{if $collab->mapped('pinned') || $collab->mapped('featured') || $collab->hidden() === -1 || $collab->hidden() === 1}}
+				<span>
+					{{if $collab->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$collab->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $collab->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}							
+					{{if $collab->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $collab->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+				</span>
+			{{endif}}
+		</h4>
+		{{if $collab->commentPageCount() > 1}}
+			{$collab->commentPagination( array(), 'miniPagination' )|raw}
+		{{endif}}
+		<p class='ipsType_reset ipsType_medium ipsType_light'>
+			{lang="byline" htmlsprintf="$collab->author()->link()"} {datetime="$collab->mapped('date')"}
+			{{if \IPS\Request::i()->controller != 'collab'}}
+				{lang="in"} <a href="{$collab->container()->url()}">{$collab->container()->_title}</a>
+			{{endif}}
+		</p>
+	</div>
+	{{if method_exists( $table, 'canModerate' ) AND $table->canModerate()}}
+		<div class='ipsDataItem_modCheck'>
+			<input type='checkbox' data-role='moderation' name="moderate[{$collab->collab_id}]" data-actions="{expression="implode( ' ', $table->multimodActions( $collab ) )"}" data-state='{{if $collab->tableStates()}}{$collab->tableStates()}{{endif}}'>
+		</div>
+	{{endif}}
+</li>
