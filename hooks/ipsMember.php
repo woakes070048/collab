@@ -201,7 +201,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		$this->save();
 		
 		/* Rules Fix */
-		\IPS\Application::appEnabled( 'rules', TRUE ) and \IPS\rules\Event::load( 'rules', 'Members', 'content_recounted' )->trigger( $this, $this->_data[ 'member_posts' ] );
+		\IPS\Application::appIsEnabled( 'rules', TRUE ) and \IPS\rules\Event::load( 'rules', 'Members', 'content_recounted' )->trigger( $this, $this->_data[ 'member_posts' ] );
 
 	}
 	
