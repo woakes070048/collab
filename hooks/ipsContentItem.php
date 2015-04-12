@@ -141,7 +141,13 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 			/**
 			 * If the container node class uses permissions, we also need to filter by internal collab role permissions
 			 */
-			if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+			if 
+			(
+				! $member->modPermission( 'can_bypass_collab_permissions' ) and 
+				in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) and 
+				$permissionKey !== NULL and 
+				! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) 
+			)
 			{
 				$collabRoles = array();
 				
@@ -188,33 +194,36 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 		}
 		else
 		{					 
-			/**
-			 * Compile a list of all roles for member
-			 */
-			$all_roles = array( 0 );
-			foreach ( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ) as $membership )
+			if ( ! $member->modPermission( 'can_bypass_collab_permissions' ) )
 			{
-				if ( mb_strlen( $membership[ 'roles' ] ) )
+				/**
+				 * Compile a list of all roles for member
+				 */
+				$all_roles = array( 0 );
+				foreach ( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ) as $membership )
 				{
-					$all_roles = array_merge( $all_roles, explode( ',', $membership[ 'roles' ] ) );
+					if ( mb_strlen( $membership[ 'roles' ] ) )
+					{
+						$all_roles = array_merge( $all_roles, explode( ',', $membership[ 'roles' ] ) );
+					}
 				}
+				
+				$rolesregexp = implode( '|', $all_roles );
+				
+				$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=' . $member_id . ' AND collab_memberships.status=\'' . \IPS\collab\COLLAB_MEMBER_ACTIVE . '\' AND collab_memberships.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
+				
+				if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+				{
+					$joins[] = array( 'from' => 'core_permission_index', 'where' => array( "core_permission_index.app='" . $nodeClass::$permApp . "' AND core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );
+					$collabWhere = "core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
+				}
+				else
+				{
+					$collabWhere = "collab_memberships.id IS NOT NULL";
+				}
+				
+				$where[] = array( '( ( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 ) OR ( ' . $collabWhere . ' ) )' );
 			}
-			
-			$rolesregexp = implode( '|', $all_roles );
-			
-			$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=' . $member_id . ' AND collab_memberships.status=\'' . \IPS\collab\COLLAB_MEMBER_ACTIVE . '\' AND collab_memberships.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
-			
-			if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
-			{
-				$joins[] = array( 'from' => 'core_permission_index', 'where' => array( "core_permission_index.app='" . $nodeClass::$permApp . "' AND core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );
-				$collabWhere = "core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
-			}
-			else
-			{
-				$collabWhere = "collab_memberships.id IS NOT NULL";
-			}
-			
-			$where[] = array( '( ( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 ) OR ( ' . $collabWhere . ' ) )' );					
 		}
 		
 		return array
