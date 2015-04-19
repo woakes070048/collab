@@ -62,8 +62,10 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	 */
 	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL )
 	{		
-		if ( $nodeClass = static::$containerNodeClass )
+		if ( isset( static::$containerNodeClass ) )
 		{
+			$nodeClass = static::$containerNodeClass;
+
 			/**
 			 * If the container node is provisioned for collabs, then we either want to limit results to the affective collab,
 			 * or limit the results to non-collab content.
@@ -98,8 +100,10 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 		/**
 		 * Disabled until bugs are fixed in core
 		 */
-		if ( 0 and $nodeClass = static::$containerNodeClass )
+		if ( isset( static::$containerNodeClass ) )
 		{
+			$nodeClass = static::$containerNodeClass;
+		
 			/**
 			 * If the container node is provisioned for collabs, then we either want to limit results to the affective collab,
 			 * or limit the results to non-collab content.
