@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10000">
+ <app key="collab" version="10101">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -55,6 +55,8 @@
   <word key="can_bypass_collab_permissions" js="0">Unrestricted by collab permissions</word>
   <word key="collab_manage_tools" js="0">Collaboration Import Tools</word>
   <word key="collab_migrate_missing_data" js="0">Import data unavailable</word>
+  <word key="collab_cat__collab_singular" js="0">Collab</word>
+  <word key="collab_cat__collab_plural" js="0">Collabs</word>
   <word key="collab_app_title" js="0">App Title</word>
   <word key="collab_app_title_desc" js="0">You can change the name of the collaboration app to reflect the way you use it.</word>
   <word key="tab_collab_category_settings" js="0">Category Details</word>
@@ -275,7 +277,6 @@
   <word key="collab_short_description" js="0">Short Description</word>
   <word key="collab_start_new" js="0">Add New %s</word>
   <word key="collab_select_category" js="0">Select Category</word>
-  <word key="collab_cat__collab_singular" js="0">Collab</word>
   <word key="collab_cat__collabs_plural" js="0">Collabs</word>
   <word key="collab_cat__member_title" js="0">%s Member</word>
   <word key="collab_member_affiliations" js="0">Affiliations</word>
