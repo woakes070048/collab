@@ -77,7 +77,7 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 				
 				$collabClause = static::collabPermissionWhere( $member, $nodeClass, $permissionKey );
 				
-				$where = array_merge( $where, $collabClause[ 'where' ] );
+				$where = array_merge( $where ?: array(), $collabClause[ 'where' ] );
 				$joins = array_merge( $joins ?: array(), $collabClause[ 'joins' ] );
 			}
 			
