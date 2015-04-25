@@ -270,7 +270,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 						}
 						else
 						{
-							return $collab->guest_title();
+							return $collab->guestTitle();
 						}
 					}
 					break;

@@ -256,7 +256,7 @@ class _Collab extends \IPS\Content\Item implements
 	 *
 	 * @return	string		Language MD5 key
 	 */
-	public function guest_title()
+	public function guestTitle()
 	{
 		if ( \trim( $this->guest_title ) != '' )
 		{
