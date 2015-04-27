@@ -45,7 +45,15 @@ class _categories extends \IPS\Helpers\CoverPhoto\Controller
 		}
 		else
 		{
-			$this->index();
+			if ( count( \IPS\collab\Category::roots() ) == 1 )
+			{
+				$categories = \IPS\collab\Category::roots();
+				$this->_category( array_shift( $categories ) );
+			}
+			else
+			{
+				$this->index();
+			}
 		}
 	}
 	
