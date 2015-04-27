@@ -47,7 +47,6 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 				'social_groups_invites', 
 				'social_groups_news',
 				'social_groups_pages',
-				'social_groups_notes',
 			);
 			
 			foreach ( $import_tables as $table )
@@ -138,7 +137,6 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 							'social_groups'		=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups', 		array( 'imported_id=0' ) )->first(),
 							'social_groups_cat'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_cat', 	array( 'imported_id=0' ) )->first(),
 							'social_groups_news'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_news', 	array( 'imported_id=0' ) )->first(),
-							'social_groups_notes'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_notes', 	array( 'imported_id=0' ) )->first(),
 							'social_groups_pages'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_pages', 	array( 'imported_id=0' ) )->first(),
 						),
 					);
@@ -321,30 +319,29 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 								
 								foreach ( $members as $member )
 								{
-									$membership 		= new \IPS\collab\Collab\Membership;
-									$membership->collab_id 	= $collab->collab_id;
-									$membership->member_id 	= $member[ 'member_id' ];
-									$membership->joined	= $member[ 'join_date' ];
-									$membership->roles	= $role_map[ $member[ 'm_rank' ] ];
-									
-									/* Look for invitation (sponsor) */
+									$imported_id = -1;
 									try
 									{
-										$invite = \IPS\Db::i()->select( '*', 'social_groups_invites', array( 'inv_reciever=? AND inv_group=?', $member[ 'member_id' ], $group[ 'g_id' ] ) )->first();
-										$membership->sponsor_id = $invite[ 'inv_sender' ];
+										$_member = \IPS\Member::load( $member[ 'member_id' ] );
+										
+										$membership 		= $collab->getMembership( $_member ) ?: new \IPS\collab\Collab\Membership;
+										$membership->collab_id 	= $collab->collab_id;
+										$membership->member_id 	= $member[ 'member_id' ];
+										$membership->joined	= $member[ 'join_date' ];
+										$membership->roles	= $role_map[ $member[ 'm_rank' ] ];
+										
+										/**
+										 * Work out membership status
+										 */
+										if ( $member[ 'is_banned' ] ) 		$membership->status = \IPS\collab\COLLAB_MEMBER_BANNED;
+										else if ( ! $member[ 'is_approved' ] )	$membership->status = \IPS\collab\COLLAB_MEMBER_PENDING;
+										else					$membership->status = \IPS\collab\COLLAB_MEMBER_ACTIVE;
+										
+										$membership->save();
 									}
-									catch ( \UnderflowException $e ) {}
+									catch( \OutOfRangeException $e ) { }
 									
-									/**
-									 * Work out membership status
-									 */
-									if ( $member[ 'is_banned' ] ) 		$membership->status = \IPS\collab\COLLAB_MEMBER_BANNED;
-									else if ( ! $member[ 'is_approved' ] )	$membership->status = \IPS\collab\COLLAB_MEMBER_PENDING;
-									else					$membership->status = \IPS\collab\COLLAB_MEMBER_ACTIVE;
-									
-									$membership->save();
-									
-									\IPS\Db::i()->update( 'social_group_members', array( 'imported_id' => $membership->id ), array( 'member_id=? AND g_id=?', $member[ 'member_id' ], $group[ 'g_id' ] ) );
+									\IPS\Db::i()->update( 'social_group_members', array( 'imported_id' => $imported_id ), array( 'member_id=? AND g_id=?', $member[ 'member_id' ], $group[ 'g_id' ] ) );
 								}
 								
 								/**
@@ -352,15 +349,30 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 								 */
 								foreach ( $invites as $invite )
 								{
-									$membership 		= new \IPS\collab\Collab\Membership;
-									$membership->collab_id 	= $collab->collab_id;
-									$membership->member_id 	= $invite[ 'inv_reciever' ];
-									$membership->sponsor_id = $invite[ 'inv_sender' ];
-									$membership->status 	= \IPS\collab\COLLAB_MEMBER_INVITED;
+									$imported_id = -1;
+									try
+									{
+										$_member = \IPS\Member::load( $invite[ 'inv_reciever' ] );
+										
+										if ( $membership = $collab->getMembership( $_member ) )
+										{
+											$membership->sponsor_id = $invite[ 'inv_sender' ];
+										}
+										else
+										{
+											$membership 		= new \IPS\collab\Collab\Membership;
+											$membership->collab_id 	= $collab->collab_id;
+											$membership->member_id 	= $invite[ 'inv_reciever' ];
+											$membership->sponsor_id = $invite[ 'inv_sender' ];
+											$membership->status 	= \IPS\collab\COLLAB_MEMBER_INVITED;										
+										}
 									
-									$membership->save();
+										$membership->save();
+										$imported_id = $membership->id;
+									}
+									catch( \OutOfRangeException $e ) { }
 									
-									\IPS\Db::i()->update( 'social_groups_invites', array( 'imported_id' => $membership->id ), array( 'inv_id=?', $invite[ 'inv_id' ] ) );
+									\IPS\Db::i()->update( 'social_groups_invites', array( 'imported_id' => $imported_id ), array( 'inv_id=?', $invite[ 'inv_id' ] ) );
 								}
 								
 								/**
