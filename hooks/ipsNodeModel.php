@@ -426,7 +426,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		$collab = FALSE;
 		if ( \IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) )
 		{
-			if ( $this->_new )
+			if ( $this->_new and ! isset( $this->collab_id ) )
 			{
 				if ( $collab = \IPS\collab\Application::affectiveCollab() )
 				{
