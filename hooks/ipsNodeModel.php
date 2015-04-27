@@ -226,6 +226,15 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	}
 	
 	/**
+	 * Reset Permissions
+	 */
+	public function clearPermissions()
+	{
+		$this->_permissions = NULL;
+		\IPS\Db::i()->delete( 'core_permission_index', array( 'app=? AND perm_type=? AND perm_type_id=?', static::$permApp, static::$permType, $this->_id ) );
+	}
+	
+	/**
 	 * Get corporate permissions
 	 *
 	 * @return	array
@@ -244,8 +253,10 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 				// If none exist, and this is a collab node, then we create them automatically based on collab category defaults
 				try
 				{
-					if ( $this->collab_id and $collab = \IPS\collab\Collab::load( $this->collab_id ) )
+					if ( $this->collab_id )
 					{
+						$collab = \IPS\collab\Collab::load( $this->collab_id );
+					
 						try
 						{
 							/**
