@@ -146,7 +146,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 					$data[ 'counts' ][ 'total' ] = 
 						$data[ 'counts' ][ 'social_groups' ] +
 						$data[ 'counts' ][ 'social_groups_cat' ] +
-						$data[ 'counts' ][ 'social_groups_news' ] +
+						//$data[ 'counts' ][ 'social_groups_news' ] +
 						0;
 						
 					if ( $data[ 'counts' ][ 'total' ] == 0 )
@@ -205,13 +205,13 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						}
 						
 						$data[ 'step' ] = 'groups';
-						$message 	= "Migrating Social Groups to Collaborations";
+						$message 	= "Migrating Social Groups to Collaborations (" . $data[ 'counts' ][ 'social_groups' ] . " total)";
 						$progress 	= $data[ 'progress' ] / $data[ 'counts' ][ 'total' ];
 						break;
 						
 					case 'groups':
 					
-						$groups = \IPS\Db::i()->select( '*', 'social_groups', array( 'imported_id=0' ), NULL, 50 );
+						$groups = \IPS\Db::i()->select( '*', 'social_groups', array( 'imported_id=0' ), NULL, 5 );
 						$join_map = array
 						(
 							0 => 3,
@@ -410,13 +410,16 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 											break;
 									}
 								}
-									
+								
+								$saved_forums = array();
+								
 								foreach ( $forums as $_forum )
 								{
 									try
 									{
 										$forum = \IPS\forums\Forum::load( $_forum[ 'f_id' ] );
 										$forum->collab_id = $collab->collab_id;
+										$forum->password = NULL;
 										
 										$collab_perms[ 'perm_type_id' ] = $forum->_id;
 										
@@ -425,14 +428,29 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 										\IPS\Db::i()->insert( 'core_permission_index', $collab_perms );
 										
 										/**
-										 * By deleting forum permissions, they will be re-created automatically
-										 * by GC (based on category defaults) when the forum is saved
+										 * Clear forum permissions and allow GC to re-create them automatically
+										 * based on category defaults when the permissions are re-requested.
 										 */
-										\IPS\Db::i()->delete( 'core_permission_index', array( 'app=? AND perm_type=? AND perm_type_id=?', 'forums', 'forum', $forum->_id ) );
+										$forum->clearPermissions();
+										$forum->permissions();
 										$forum->save();
 										
+										$saved_forums[] = $forum;
 									}
-									catch ( \Exception $e ) {}
+									catch ( \Exception $e ) { }
+								}
+								
+								/**
+								 * Ensure root group forums have a root parent id
+								 */
+								foreach( $saved_forums as $_forum )
+								{
+									if ( ! $_forum->parent() or $_forum->parent()->collab_id != $collab->collab_id )
+									{
+										$parentColumn = $_forum::$databaseColumnParent;
+										$_forum->$parentColumn = $_forum::$databaseColumnParentRootValue;
+										$_forum->save();
+									}
 								}
 								
 								\IPS\Db::i()->update( 'social_groups', array( 'imported_id' => $collab->collab_id ), array( 'g_id=?', $group[ 'g_id' ] ) );
@@ -445,11 +463,15 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 								$data[ 'progress' ]++;
 							}
 						}
-
+						
 						if ( ( $groups_left = \IPS\Db::i()->select( 'COUNT(*)', 'social_groups', array( 'imported_id=0' ) )->first() ) == 0 )
 						{
 							$data[ 'step' ] = 'news';
-							$message	= "Updating News Topics";
+							$message	= "Updating News Topics (" . $data[ 'counts' ][ 'social_groups_news' ] . " total)";
+						}
+						else
+						{
+							$message = "Migrating Social Groups to Collaborations (" . ( $data[ 'counts' ][ 'social_groups' ] - $groups_left ) . " out of " . $data[ 'counts' ][ 'social_groups' ] . " complete)";
 						}
 						
 						$progress	= $data[ 'progress' ] / $data[ 'counts' ][ 'total' ];
@@ -466,14 +488,16 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 								$topic = \IPS\forums\Topic::load( $news[ 't_id' ] );
 								$tags = array_merge( (array) $topic->tags(), array( 'news' ) );
 								$topic->setTags( array_unique( $tags ) );
+								$topic->pinned = 1;
+								$topic->save();
 								
 								\IPS\Db::i()->update( 'social_groups_news', array( 'imported_id' => $topic->tid ), array( 'news_id=?', $news[ 'news_id' ] ) );
-								$data[ 'progress' ]++;
+								//$data[ 'progress' ]++;
 							}
 							catch ( \OutOfRangeException $e )
 							{
 								\IPS\Db::i()->update( 'social_groups_news', array( 'imported_id' => -1 ), array( 'news_id=?', $news[ 'news_id' ] ) );
-								$data[ 'progress' ]++;
+								//$data[ 'progress' ]++;
 							}
 						}
 					
@@ -481,6 +505,10 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						{
 							$data[ 'step' ] = 'complete';
 							$message	= "Migration Complete!";
+						}
+						else
+						{
+							$message = "Updating News Topics (" . ( $data[ 'counts' ][ 'social_groups_news' ] - $groups_left ) . " out of " . $data[ 'counts' ][ 'social_groups_news' ] . " complete)";;
 						}
 						
 						$progress	= $data[ 'progress' ] / $data[ 'counts' ][ 'total' ];
@@ -490,6 +518,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 					default:
 					
 						/* Steps Complete */
+						sleep( 2 );
 						return NULL;
 				}
 				
