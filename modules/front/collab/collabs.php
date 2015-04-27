@@ -255,14 +255,19 @@ class _collabs extends \IPS\Content\Controller
 		$perPage 	= 20;
 		$thisPage 	= isset( \IPS\Request::i()->membersPage ) ? \IPS\Request::i()->membersPage : 1;
 		
-		$members_count 	= $collab->memberships( array ( 
+		$members_count 	= $collab->memberships( array
+				( 
 					'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 
 					'count' => TRUE, 
-				) );
-		$memberships 	= $collab->memberships( array ( 
+				) 
+		);
+		
+		$memberships 	= $collab->memberships( array
+				( 
 					'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 
 					'limit' => array( ( $thisPage - 1 ) * $perPage, $perPage ) 
-				) );
+				) 
+		);
 	
 		/* Display */
 		if ( \IPS\Request::i()->isAjax() and isset( \IPS\Request::i()->_infScroll ) )
