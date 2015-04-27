@@ -768,8 +768,8 @@ class _Collab extends \IPS\Content\Item implements
 		}
 	
 		$membership = \IPS\collab\Application::collabMembership( $this, $member ) ?: FALSE;
-		$this->memberships[ $member->member_id ] = $membership;
-		return $membership;
+		
+		return $this->memberships[ $member->member_id ] = $membership;
 	}
 	
 	/**

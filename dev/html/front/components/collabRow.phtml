@@ -95,7 +95,11 @@
 					{$row->author()->link()|raw}
 				</li>
 				<li class="ipsType_light ipsResponsive_hidePhone">
-					{$row->getMembership( $row->author() )->title()}
+					{{if $membership = $row->getMembership( $row->author() )}}
+						{$membership->title()}
+					{{else}}
+						{$row->guestTitle()}
+					{{endif}}
 				</li>
 			</ul>
 			{{if $table->canModerate()}}

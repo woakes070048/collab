@@ -1,7 +1,7 @@
 <ips:template parameters="$url, $pagination, $memberships" />
-<div data-ipsInfScroll data-ipsInfScroll-scrollScope="#elMembersList" data-ipsInfScroll-container="#elMembersList" data-ipsInfScroll-url="{$url}" data-ipsInfScroll-pageParam="membersPage" data-ipsInfScroll-pageBreakTpl="">
-	<div class="ipsJS_hide">{$pagination|raw}</div>
-	<div class='ipsFollowerList ipsPad ipsScrollbar'>
+<div>
+	<div class="ipsPad">{$pagination|raw}</div>
+	<div class='{{if \IPS\Request::i()->isAjax()}}ipsFollowerList {{endif}}ipsPad ipsScrollbar'>
 		<ul class="ipsDataList ipsList_reset" id="elMembersList">
 			{template="membersRows" app="collab" group="components" params="$memberships"}
 		</ul>
