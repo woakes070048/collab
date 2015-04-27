@@ -549,6 +549,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$form_id . 'collab_allow_ratings',
 				$form_id . 'collab_allow_reviews',
 				$form_id . 'collab_increase_mainposts',
+				$form_id . 'collab_category_privacy_mode',
 			) ) 
 		) );
 		
