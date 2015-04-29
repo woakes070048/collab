@@ -172,6 +172,16 @@ class _Role extends \IPS\Node\Model
 		$lang		= \IPS\Member::loggedIn()->language();
 		$_perm_checks	= array( 'inviteMember', 'moderateContent', 'manageMembers', 'manageRoles' );
 		
+		if ( $this->member_default )
+		{
+			$_badge[] = "<span style='color:green; font-weight:bold;'>Member Default</span>";
+		}
+		
+		if ( $this->owner_default and \IPS\Member::loggedIn()->modPermission( 'can_bypass_collab_permissions' ) )
+		{
+			$_badge[] = "<span style='color:blue; font-weight:bold;'>Owner Default</span>";
+		}
+		
 		foreach ( $_perm_checks as $perm )
 		{
 			if ( $this->roleCan( $perm ) )
@@ -219,6 +229,12 @@ class _Role extends \IPS\Node\Model
 		) );
 		
 		$form->add( new \IPS\Helpers\Form\Text( 'collab_role_custom_title', $role->member_title, FALSE ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_member_default_role', $role->member_default, TRUE ) );
+		
+		if ( \IPS\Member::loggedIn()->modPermission( 'can_bypass_collab_permissions' ) )
+		{
+			$form->add( new \IPS\Helpers\Form\YesNo( 'collab_owner_default_role', $role->owner_default, TRUE ) );
+		}
 		
 		if ( $collab->collabCan( 'editRolePermissions' ) )
 		{	
@@ -294,6 +310,7 @@ class _Role extends \IPS\Node\Model
 	 */
 	public function saveForm( $values )
 	{
+		$collab 	= \IPS\collab\Application::activeCollab();
 		$this->name 	= $values[ 'collab_role_name' ];
 		$perms 		= array();
 		$mod_perms 	= array();
@@ -319,8 +336,20 @@ class _Role extends \IPS\Node\Model
 		}
 		
 		$this->perms 		= implode( ',', $perms );
+		$this->collab_id	= $collab->collab_id;
 		$this->mod_perms 	= \serialize( $mod_perms );
 		$this->member_title	= $values[ 'collab_role_custom_title' ];
+		
+		if ( isset( $values[ 'collab_member_default_role' ] ) )
+		{
+			$this->member_default = $values[ 'collab_member_default_role' ];
+		}
+		
+		if ( isset( $values[ 'collab_owner_default_role' ] ) )
+		{
+			$this->owner_default = $values[ 'collab_owner_default_role' ];
+		}
+		
 		$this->save();
 		$this->postSaveForm( $values );
 	}
@@ -389,6 +418,33 @@ class _Role extends \IPS\Node\Model
 		}
 		
 		return FALSE;
+	}
+	
+	/**
+	 * [ActiveRecord] Save Changed Columns
+	 *
+	 * @return	void
+	 */
+	public function save()
+	{
+		parent::save();
+		
+		if ( $collab = $this->collab() )
+		{
+			/**
+			 * Make sure there is only 1 active default role for each type
+			 */
+			 
+			if ( $this->member_default )
+			{
+				\IPS\Db::i()->update( 'collab_roles', array( 'member_default' => 0 ), array( 'collab_id=? AND id!=?', $collab->collab_id, $this->id ) );
+			}
+			
+			if ( $this->owner_default )
+			{
+				\IPS\Db::i()->update( 'collab_roles', array( 'owner_default' => 0 ), array( 'collab_id=? AND id!=?', $collab->collab_id, $this->id ) );
+			}
+		}
 	}
 	
 }

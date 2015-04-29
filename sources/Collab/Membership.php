@@ -141,18 +141,14 @@ class _Membership extends \IPS\Patterns\ActiveRecord
 			return FALSE;
 		}
 		
-		foreach ( explode( ',', $this->roles ) as $id )
+		foreach ( $this->roles() as $role )
 		{
-			try
+			if ( $role->roleCan( $perm ) )
 			{
-				$role = \IPS\collab\Collab\Role::load( $id );
-				if ( $role->roleCan( $perm ) )
-				{
-					return TRUE;
-				}
+				return TRUE;
 			}
-			catch ( \Exception $e ) {}
 		}
+		
 		return FALSE;
 	}
 
@@ -221,14 +217,22 @@ class _Membership extends \IPS\Patterns\ActiveRecord
 			return $this->roleStack;
 		}
 		
+		$default_roles = 'FALSE';
 		$this->roleStack = array();
+		$roles = explode( ',', $this->roles ) ?: array();
 		
-		if ( $this->roles )
+		if ( $this->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
 		{
-			foreach ( \IPS\Db::i()->select( 'id', 'collab_roles', array( \IPS\Db::i()->findInSet( 'id', explode( ',', $this->roles ) ) ), 'weight ASC' ) as $role_id )
+			$default_roles = 'member_default=1';
+			if ( $this->member()->member_id == $this->collab()->owner_id )
 			{
-				$this->roleStack[] = \IPS\collab\Collab\Role::load( $role_id );
+				$default_roles .= ' OR owner_default=1';
 			}
+		}
+		
+		foreach ( \IPS\Db::i()->select( 'id', 'collab_roles', array( \IPS\Db::i()->findInSet( 'id', $roles ) . " OR ( collab_id=? AND ( {$default_roles} ) )", $this->collab()->collab_id ), 'weight ASC' ) as $role_id )
+		{
+			$this->roleStack[] = \IPS\collab\Collab\Role::load( $role_id );
 		}
 		
 		return $this->roleStack;
