@@ -159,47 +159,54 @@ class _collabs extends \IPS\Content\Controller
 			}
 			catch ( \BadMethodCallException $e ) {}
 			
-			$formElements = $class::formElements( $collab, $container );
-			$form->addTab( 'collab_tab_description' );
-			
-			foreach ( $formElements as $key => $object )
+			if ( $collab->collabCan( 'editDescription' ) )
 			{
-				if ( \IPS\Request::i()->_report AND !in_array( $key, array( 'title', 'content', 'description' ) ) )
-				{
-					continue;
-				}
+				$formElements = $class::formElements( $collab, $container );
+				$form->addTab( 'collab_tab_description' );
 				
-				if ( $key === 'poll' )
+				foreach ( $formElements as $key => $object )
 				{
-					$form->addTab( $class::$formLangPrefix . 'pollTab' );
+					if ( \IPS\Request::i()->_report AND !in_array( $key, array( 'title', 'content', 'description' ) ) )
+					{
+						continue;
+					}
+					
+					if ( $key === 'poll' )
+					{
+						$form->addTab( $class::$formLangPrefix . 'pollTab' );
+					}
+					elseif ( mb_substr( $key, 0, mb_strlen( 'tab_' ) ) == 'tab_' )
+					{
+						$form->addTab( 'collab_' . $key );
+					}
+					
+					$form->add( $object );
 				}
-				elseif ( mb_substr( $key, 0, mb_strlen( 'tab_' ) ) == 'tab_' )
-				{
-					$form->addTab( 'collab_' . $key );
-				}
-				
-				$form->add( $object );
 			}
-			
-			$collabAdmin = new \IPS\collab\modules\front\collab\admin( NULL, $collab );
-			
-			$form->addTab( 'collab_tab_settings' );
-			$form->add( new \IPS\Helpers\Form\Radio( 'collab_join_mode', $collab->join_mode, TRUE, array( 
-				'options' => array( 
-					\IPS\collab\COLLAB_JOIN_DISABLED => 'collab_join_disabled', 
-					\IPS\collab\COLLAB_JOIN_INVITE => 'collab_join_invite_only', 
-					\IPS\collab\COLLAB_JOIN_APPROVE => 'collab_join_approve', 
-					\IPS\collab\COLLAB_JOIN_FREE => 'collab_join_free' 
-				)
-			) ) );
-			$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
-			$form->add( new \IPS\Helpers\Form\Text( 'collab_default_title', $collab ? $collab->default_member_title : \IPS\Member::loggedIn()->language()->get( 'collab_default_member_title' ), FALSE, array( 'placeholder' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_default_member_title', FALSE, array( 'sprintf' => array( $collab->collab_singular ) ) ) ) ) );
-			$form->add( new \IPS\Helpers\Form\Editor( 'collab_rules', $collab->rules, FALSE, array(
-					'app'			=> 'collab',
-					'key'			=> 'Generic',
-					'autoSaveKey'		=> "collab-rules-{$collab->collab_id}",
-				)
-			) );
+						
+			if ( $collab->collabCan( 'editSettings' ) )
+			{
+				$form->addTab( 'collab_tab_settings' );
+				$form->add( new \IPS\Helpers\Form\Radio( 'collab_join_mode', $collab->join_mode, TRUE, array
+				( 
+					'options' => array
+					( 
+						\IPS\collab\COLLAB_JOIN_DISABLED => 'collab_join_disabled', 
+						\IPS\collab\COLLAB_JOIN_INVITE => 'collab_join_invite_only', 
+						\IPS\collab\COLLAB_JOIN_APPROVE => 'collab_join_approve', 
+						\IPS\collab\COLLAB_JOIN_FREE => 'collab_join_free' 
+					)
+				) ) );
+				$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
+				$form->add( new \IPS\Helpers\Form\Text( 'collab_default_title', $collab ? $collab->default_member_title : \IPS\Member::loggedIn()->language()->get( 'collab_default_member_title' ), FALSE, array( 'placeholder' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_default_member_title', FALSE, array( 'sprintf' => array( $collab->collab_singular ) ) ) ) ) );
+				$form->add( new \IPS\Helpers\Form\Editor( 'collab_rules', $collab->rules, FALSE, array
+					(
+						'app'			=> 'collab',
+						'key'			=> 'Generic',
+						'autoSaveKey'		=> "collab-rules-{$collab->collab_id}",
+					)
+				) );
+			}
 			
 			if ( $values = $form->values() )
 			{
@@ -224,8 +231,15 @@ class _collabs extends \IPS\Content\Controller
 					}
 				}
 				
-				$collab->rules = $values[ 'collab_rules' ];
-				$collab->join_mode = $values[ 'collab_join_mode' ];
+				if ( isset( $values[ 'collab_rules' ] ) )
+				{
+					$collab->rules = $values[ 'collab_rules' ];
+				}
+				
+				if ( isset( $values[ 'collab_join_mode' ] ) )
+				{
+					$collab->join_mode = $values[ 'collab_join_mode' ];
+				}
 
 				$collab->save();
 				$collab->processAfterEdit( $values );

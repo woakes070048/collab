@@ -55,7 +55,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	/**
 	 * @brief	[Node] ACP Restrictions
 	 */
-	protected static $restrictions = array(
+	protected static $restrictions = array
+	(
 		'app'		=> 'collab',
 		'module'	=> 'collab',
 		'prefix'	=> 'categories_'
@@ -74,7 +75,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	/**
 	 * @brief	The map of permission columns
 	 */
-	public static $permissionMap = array(
+	public static $permissionMap = array
+	(
 		'view'			=> 'view',
 		'read'			=> 2,
 		'add'			=> 3,
@@ -87,7 +89,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	/**
 	 * @brief	Database Column Map
 	 */
-	public static $databaseColumnMap = array(
+	public static $databaseColumnMap = array
+	(
 		'cover_photo'			=> 'cover_photo',
 		'cover_photo_offset'		=> 'cover_offset',
 	);
@@ -95,9 +98,12 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	/**
 	 * @brief	Bitwise values for category_bitoptions field
 	 */
-	public static $bitOptions = array(
-		'bitoptions' => array(
-			'bitoptions' => array(
+	public static $bitOptions = array
+	(
+		'bitoptions' => array
+		(
+			'bitoptions' => array
+			(
 				'allow_comments'		=> 1,
 				'allow_reviews'			=> 2,
 				'allow_ratings'			=> 4,
@@ -108,8 +114,9 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				'enable_model'			=> 128,
 				'require_model'			=> 256,
 				'multiple_model'		=> 512,
-			)
-		)
+				'restrict_owner'		=> 1024,
+			),
+		),
 	);
 
 	/**
@@ -540,6 +547,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$form->add( $collabs_enable = new \IPS\Helpers\Form\YesNo( 'category_collabs_enable', $this->id ? $this->collabs_enable : 0, FALSE, 
 			array( 'togglesOn' => array( 
 				$form_id . 'header_tab_collab_collabs_settings',
+				$form_id . 'collab_category_privacy_mode',
 				$form_id . 'collabs_alias_singular', 
 				$form_id . 'collabs_alias_plural', 
 				$form_id . 'category_max_collabs_owned',
@@ -549,7 +557,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$form_id . 'collab_allow_ratings',
 				$form_id . 'collab_allow_reviews',
 				$form_id . 'collab_increase_mainposts',
-				$form_id . 'collab_category_privacy_mode',
+				$form_id . 'collab_restrict_owner',
 			) ) 
 		) );
 		
@@ -610,6 +618,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
 		
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_increase_mainposts', $this->id ? $this->bitoptions[ 'increase_mainposts' ] : FALSE ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_restrict_owner', $this->bitoptions[ 'restrict_owner' ], TRUE, array() ) );
 		
 		/**
 		 * Collab Model Settings
@@ -933,6 +942,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$this->bitoptions[ 'enable_model' ]		= $values[ 'collab_enable_model_choice' ];
 		$this->bitoptions[ 'require_model' ] 		= $values[ 'collab_force_model_choice' ];
 		$this->bitoptions[ 'multiple_model' ] 		= $values[ 'collab_multiple_models_choice' ];
+		$this->bitoptions[ 'restrict_owner' ] 		= $values[ 'collab_restrict_owner' ];
 		
 		$this->name_seo	= \IPS\Http\Url::seoTitle( $values[ 'category_name' ][ \IPS\Lang::defaultLanguage() ] );
 		$this->privacy_mode = $values[ 'collab_category_privacy_mode' ];
