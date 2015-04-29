@@ -295,7 +295,11 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		/**
 		 * Check if this node is provisioned for collabs
 		 */
-		if ( \IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) )
+		if 
+		( 
+			\IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) and
+			! ( $this instanceof \IPS\collab\Collab\Role )
+		)
 		{
 			if ( $this->collab_id )
 			{
@@ -426,7 +430,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		$collab = FALSE;
 		if ( \IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) )
 		{
-			if ( $this->_new and ! isset( $this->collab_id ) )
+			if ( $this->_new and ! isset( $this->_data[ 'collab_id' ] ) )
 			{
 				if ( $collab = \IPS\collab\Application::affectiveCollab() )
 				{
@@ -451,7 +455,6 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 				$this->permissions();
 			}
 		}
-		
 	}
 	
 	/**
