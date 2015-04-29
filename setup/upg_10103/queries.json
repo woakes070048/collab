@@ -1,0 +1,84 @@
+[
+    {
+        "method": "changeColumn",
+        "params": [
+            "collab_memberships",
+            "roles",
+            {
+                "name": "roles",
+                "type": "VARCHAR",
+                "length": 256,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": "",
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        ]
+    },
+    {
+        "method": "addColumn",
+        "params": [
+            "collab_roles",
+            {
+                "name": "default",
+                "type": "INT",
+                "length": 1,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": "0",
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        ]
+    },
+    {
+        "method": "addColumn",
+        "params": [
+            "collab_roles",
+            {
+                "name": "owner_default",
+                "type": "INT",
+                "length": 1,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": "0",
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        ]
+    },
+    {
+        "method": "changeColumn",
+        "params": [
+            "collab_roles",
+            "default",
+            {
+                "name": "member_default",
+                "type": "INT",
+                "length": 1,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": "0",
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        ]
+    }
+]

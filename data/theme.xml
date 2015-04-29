@@ -405,29 +405,7 @@
 ]]></template>
  <template template_group="components" template_name="collabHeader" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<header class="collabHeader">
 	{$collab->coverPhoto()|raw}
-	<div id='elCollabStats' class='ipsClearfix'>
-		<div data-role='switchView' class='ipsResponsive_hidePhone ipsResponsive_block'>
-			<div class='ipsPos_right'>
-				{template="follow" app="core" group="global" params="'collab', 'collab', $collab->collab_id, $collab->followersCount()"}
-			</div>
-		</div>
-		<ul class='ipsList_inline ipsPos_left statsList'>
-			<li>
-				<a href="{$collab->url()->setQueryString( array( 'do' => 'members' ) )}" data-ipsDialog data-ipsdialog-title="{lang="collab_active_members"}" data-ipsDialog-size="narrow" data-ipstooltip _title="{lang="collab_see_active_members" sprintf="\strtolower($collab->collab_singular)"}">
-					<h4 class='ipsType_minorHeading'>{lang="collab_members_count"}</h4>
-					{$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )}
-				</a>
-			</li>
-			<li class='ipsResponsive_hidePhone'>
-				<h4 class='ipsType_minorHeading'>{lang="collab_created_date" sprintf="$collab->collab_singular"}</h4>
-				{datetime="$collab->created_date"}
-			</li>
-			<li>
-				<h4 class='ipsType_minorHeading'>{lang="collab_owned_by" sprintf="$collab->collab_singular"}</h4>
-				{$collab->author()->link()|raw}
-			</li>
-		</ul>
-	</div>
+	{template="collabStatBar" app="collab" group="components" params="$collab"}
 </header>]]></template>
  <template template_group="components" template_name="collabRow" template_data="$table, $headers, $rows" template_location="front" template_app="collab"><![CDATA[{{$rowIds = array();}}
 {{foreach $rows as $row}}
@@ -525,7 +503,11 @@
 					{$row->author()->link()|raw}
 				</li>
 				<li class="ipsType_light ipsResponsive_hidePhone">
-					{$row->getMembership( $row->author() )->title()}
+					{{if $membership = $row->getMembership( $row->author() )}}
+						{$membership->title()}
+					{{else}}
+						{$row->guestTitle()}
+					{{endif}}
 				</li>
 			</ul>
 			{{if $table->canModerate()}}
@@ -536,9 +518,33 @@
 		</li>
 	{{endforeach}}
 {{endif}}]]></template>
- <template template_group="components" template_name="membersList" template_data="$url, $pagination, $memberships" template_location="front" template_app="collab"><![CDATA[<div data-ipsInfScroll data-ipsInfScroll-scrollScope="#elMembersList" data-ipsInfScroll-container="#elMembersList" data-ipsInfScroll-url="{$url}" data-ipsInfScroll-pageParam="membersPage" data-ipsInfScroll-pageBreakTpl="">
-	<div class="ipsJS_hide">{$pagination|raw}</div>
-	<div class='ipsFollowerList ipsPad ipsScrollbar'>
+ <template template_group="components" template_name="collabStatBar" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
+<div id='elCollabStats' class='ipsClearfix'>
+	<div data-role='switchView' class='ipsResponsive_hidePhone ipsResponsive_block'>
+		<div class='ipsPos_right'>
+			{template="follow" app="core" group="global" params="'collab', 'collab', $collab->collab_id, $collab->followersCount()"}
+		</div>
+	</div>
+	<ul class='ipsList_inline ipsPos_left statsList'>
+		<li>
+			<a href="{$collab->url()->setQueryString( array( 'do' => 'members' ) )}" data-ipsDialog data-ipsdialog-title="{lang="collab_active_members"}" data-ipsDialog-size="narrow" data-ipstooltip _title="{lang="collab_see_active_members" sprintf="\strtolower($collab->collab_singular)"}">
+				<h4 class='ipsType_minorHeading'>{lang="collab_members_count"}</h4>
+				{$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )}
+			</a>
+		</li>
+		<li class='ipsResponsive_hidePhone'>
+			<h4 class='ipsType_minorHeading'>{lang="collab_created_date" sprintf="$collab->collab_singular"}</h4>
+			{datetime="$collab->created_date"}
+		</li>
+		<li>
+			<h4 class='ipsType_minorHeading'>{lang="collab_owned_by" sprintf="$collab->collab_singular"}</h4>
+			{$collab->author()->link()|raw}
+		</li>
+	</ul>
+</div>]]></template>
+ <template template_group="components" template_name="membersList" template_data="$url, $pagination, $memberships" template_location="front" template_app="collab"><![CDATA[<div>
+	<div class="ipsPad">{$pagination|raw}</div>
+	<div class='{{if \IPS\Request::i()->isAjax()}}ipsFollowerList {{endif}}ipsPad ipsScrollbar'>
 		<ul class="ipsDataList ipsList_reset" id="elMembersList">
 			{template="membersRows" app="collab" group="components" params="$memberships"}
 		</ul>

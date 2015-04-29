@@ -95,6 +95,8 @@ $lang = array(
 	'category_max_collabs_joined'		=> "Maximum Collab Memberships Per User",
 	'category_max_collabs_joined_desc'	=> "This setting controls the maximum amount of collabs a user may hold an active membership to in this category.",
 	'category_max_collab_members'		=> "Maximum Members Per Collab",
+	'collab_restrict_owner'			=> "Restrict Owner Permissions",
+	'collab_restrict_owner_desc'		=> "By default, collab owners are not subject to role restrictions. If you enable this option, they will only have permissions based on their role inside the collab.",
 	'category_max_collab_members_desc'	=> "This setting controls the maximum amount of allowed active members per collab in this category.",
 	'collab_node_maxnodes'			=> "Maximum %s Per %s",
 	'collab_node_maxnodes_desc'		=> "This setting controls the maximum amount of %s which can be created per %s.",
@@ -152,6 +154,8 @@ $lang = array(
 	'collab_role_custom_title_desc'		=> "You can choose a custom member title to give members with this role.",
 	'collab_template'			=> "Group Model",
 	'collab_no_template'			=> "None",
+	'collab_member_default_role'		=> "Default Member Role",
+	'collab_owner_default_role'		=> "Default Owner Role",
 	
 	// Collab View
 	'leave_comment'				=> "Leave Comment",
@@ -249,7 +253,8 @@ $lang = array(
 	'collab_role_members'			=> "All Active Members",
 	'collab_perm_action'			=> "perform that action",
 	'collab_perm_manageCollab'		=> "Manage Collab",
-	'collab_perm_viewDashboard'		=> "View Dashboard",
+	'collab_perm_editDescription'		=> "Edit Description",
+	'collab_perm_editSettings'		=> "Edit Settings",
 	'collab_perm_inviteMember'		=> "Invite Members",
 	'collab_perm_manageMembers'		=> "Manage Members",
 	'collab_perm_editMember'		=> "Edit Members",

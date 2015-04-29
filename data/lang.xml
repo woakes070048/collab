@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10102">
+ <app key="collab" version="10103">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -75,6 +75,8 @@
   <word key="category_max_collabs_joined" js="0">Maximum Collab Memberships Per User</word>
   <word key="category_max_collabs_joined_desc" js="0">This setting controls the maximum amount of collabs a user may hold an active membership to in this category.</word>
   <word key="category_max_collab_members" js="0">Maximum Members Per Collab</word>
+  <word key="collab_restrict_owner" js="0">Restrict Owner Permissions</word>
+  <word key="collab_restrict_owner_desc" js="0">By default, collab owners are not subject to role restrictions. If you enable this option, they will only have permissions based on their role inside the collab.</word>
   <word key="category_max_collab_members_desc" js="0">This setting controls the maximum amount of allowed active members per collab in this category.</word>
   <word key="collab_node_maxnodes" js="0">Maximum %s Per %s</word>
   <word key="collab_node_maxnodes_desc" js="0">This setting controls the maximum amount of %s which can be created per %s.</word>
@@ -126,6 +128,8 @@
   <word key="collab_role_custom_title_desc" js="0">You can choose a custom member title to give members with this role.</word>
   <word key="collab_template" js="0">Group Model</word>
   <word key="collab_no_template" js="0">None</word>
+  <word key="collab_member_default_role" js="0">Default Member Role</word>
+  <word key="collab_owner_default_role" js="0">Default Owner Role</word>
   <word key="leave_comment" js="0">Leave Comment</word>
   <word key="collab_collab__comment_placeholder" js="0">Type here to leave a comment...</word>
   <word key="collab_comment_count" js="0">{# [1:Comment][?:Comments]}</word>
@@ -212,7 +216,8 @@
   <word key="collab_role_members" js="0">All Active Members</word>
   <word key="collab_perm_action" js="0">perform that action</word>
   <word key="collab_perm_manageCollab" js="0">Manage Collab</word>
-  <word key="collab_perm_viewDashboard" js="0">View Dashboard</word>
+  <word key="collab_perm_editDescription" js="0">Edit Description</word>
+  <word key="collab_perm_editSettings" js="0">Edit Settings</word>
   <word key="collab_perm_inviteMember" js="0">Invite Members</word>
   <word key="collab_perm_manageMembers" js="0">Manage Members</word>
   <word key="collab_perm_editMember" js="0">Edit Members</word>
