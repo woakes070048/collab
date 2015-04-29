@@ -66,7 +66,8 @@ class _Collab extends \IPS\Content\Item implements
 	/**
 	 * @brief	Database Column Map
 	 */
-	public static $databaseColumnMap = array(
+	public static $databaseColumnMap = array
+	(
 		'author'			=> 'owner_id',
 		'author_name'			=> 'owner_name',
 		'container'			=> 'category_id',
@@ -188,12 +189,18 @@ class _Collab extends \IPS\Content\Item implements
 		}
 		
 		$lang = \IPS\Member::loggedIn()->language();
-		$this->permissions = array_merge( $this->permissions, array(
+		$this->permissions = array_merge( $this->permissions, array
+		(
 			'inviteMember',
 			'moderateContent',
-			'manageCollab' => array(
-				'manageMembers' => array(
-					'editMember' => array( 
+			'manageCollab' => array
+			(
+				'editDescription',
+				'editSettings',
+				'manageMembers' => array
+				(
+					'editMember' => array
+					( 
 						'editMemberRoles',
 					),
 					'banMember',
@@ -201,7 +208,8 @@ class _Collab extends \IPS\Content\Item implements
 					'unbanMember',
 					'approveMember',
 				),
-				'manageRoles' => array(
+				'manageRoles' => array
+				(
 					'addRole',
 					'editRole',
 					'deleteRole',
@@ -432,10 +440,22 @@ class _Collab extends \IPS\Content\Item implements
 	{		
 		parent::processForm( $values );
 		
-		$this->short_description 	= $values[ 'collab_short_description' ];
-		$this->description 		= $values[ 'collab_description' ];
-		$this->default_member_title 	= $values[ 'collab_default_title' ];
-		$this->title_seo		= \IPS\Http\Url::seoTitle( $this->title );
+		$this->title_seo = \IPS\Http\Url::seoTitle( $this->title );
+		
+		if ( isset( $values[ 'collab_short_description' ] ) )
+		{
+			$this->short_description = $values[ 'collab_short_description' ];
+		}
+		
+		if ( isset( $values[ 'collab_short_description' ] ) )
+		{
+			$this->description = $values[ 'collab_description' ];
+		}
+		
+		if ( isset( $values[ 'collab_short_description' ] ) )
+		{
+			$this->default_member_title = $values[ 'collab_default_title' ];
+		}
 		
 		/* Moderator actions */
 		if ( isset( $values[ 'collab_create_state' ] ) )
@@ -670,17 +690,21 @@ class _Collab extends \IPS\Content\Item implements
 			$collabCan = TRUE;
 		}
 		
+		/**
+		 * Collab owners can bypass permissions if they have not been restricted
+		 */
+		if ( $member->member_id === $this->owner_id and ! $this->container()->bitoptions[ 'restrict_owner' ] )
+		{
+			$collabCan = TRUE;
+		}
+		
 		/* Check permissions based on membership roles ( collab owners are also super ) */
-		if ( $membership = $this->getMembership( $member ) or $member->member_id === $this->owner_id )
+		if ( $membership = $this->getMembership( $member ) )
 		{	
 			/* Basic Membership Permission Test */
 			$collabCan = $membershipCan = 
 			(
-				$collabCan or
-				(
-					( $member->member_id === $this->owner_id ) ? TRUE : 
-					( $membership->can( $perm ) and $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
-				)
+				$collabCan or $membership->can( $perm ) and $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE
 			);
 			
 			/* More Advanced Permission Tests */
@@ -832,8 +856,10 @@ class _Collab extends \IPS\Content\Item implements
 		$roles = array();
 		try
 		{
-			$roles = iterator_to_array( 
-				new \IPS\Patterns\ActiveRecordIterator( 
+			$roles = iterator_to_array
+			( 
+				new \IPS\Patterns\ActiveRecordIterator
+				( 
 					\IPS\Db::i()->select( '*', 'collab_roles', array( 'collab_id=?', $this->collab_id ), 'weight ASC' )->setKeyField( 'id' ),
 					'IPS\collab\Collab\Role'
 				)
@@ -1107,15 +1133,16 @@ class _Collab extends \IPS\Content\Item implements
 	{
 		$lang 						= \IPS\Member::loggedIn()->language();
 		$lang->words[ 'copy' ] 				= "";
+		$lang->words[ 'copy_noun' ]			= "";
 		\IPS\collab\Application::$affectiveCollab 	= $collab;
 		
 		/* Copy Roles */
 		$_role_map = array();
 		foreach ( $collab->roles() as $role )
 		{
+			$role->collab_id = $this->collab_id;
 			$copy = clone $role;
-			$copy->collab_id = $this->collab_id;
-			$copy->save();
+			$role->collab_id = $collab->collab_id;
 			$_role_map[ $role->id ] = $copy->id;
 		}
 		
