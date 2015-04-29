@@ -42,7 +42,8 @@ class _Application extends \IPS\Application
 	 */
 	public static function iconMap()
 	{
-		return array(
+		return array
+		(
 			'forums' 	=> 'comments',
 			'downloads' 	=> 'download',
 			'calendar' 	=> 'calendar',
@@ -64,7 +65,8 @@ class _Application extends \IPS\Application
 	 */
 	public static function controllerMap()
 	{
-		return array(
+		return array
+		(
 		
 			/* IPS Downloads */ 
 			

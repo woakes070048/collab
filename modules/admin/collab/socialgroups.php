@@ -135,10 +135,11 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						'counts'	=> array
 						(
 							'social_groups'		=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups', 		array( 'imported_id=0' ) )->first(),
-							'social_groups_cat'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_cat', 	array( 'imported_id=0' ) )->first(),
+							'social_groups_cat'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_cat', 	array( 'imported_id=0 AND cat_parent=0' ) )->first(),
 							'social_groups_news'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_news', 	array( 'imported_id=0' ) )->first(),
 							'social_groups_pages'	=> \IPS\Db::i()->select( 'COUNT(*)', 'social_groups_pages', 	array( 'imported_id=0' ) )->first(),
 						),
+						'collabs'	=> array(),
 					);
 					
 					$data[ 'counts' ][ 'total' ] = 
@@ -265,6 +266,8 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 								}
 								catch ( \UnderflowException $e ) {}
 								
+								$role_weight = 2;
+								
 								foreach ( $ranks as $rank )
 								{
 									/**
@@ -276,6 +279,26 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 										$role->collab_id 	= $collab->collab_id;
 										$role->name 		= $rank[ 'rank_name' ];
 										$role->member_title	= $rank[ 'rank_name' ];
+										$role->weight 		= $role_weight++;
+										
+										switch ( $rank[ 'type' ] )
+										{
+											case 'owner':
+												
+												$role->weight = 1;
+												$role->owner_default = 1;
+												break;
+											
+											case 'default':
+											
+												$role->weight = 99;
+												$role->member_default = 1;
+												break;
+											
+											default:
+											
+												$role->weight = $role_weight++;
+										}
 										
 										$role_perms 	= array();
 										$mod_perms 	= array();
@@ -465,6 +488,11 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 									}
 								}
 								
+								/**
+								 * Recount content for group members
+								 */
+								$data[ 'collabs' ][] = $collab->collab_id;
+								
 								\IPS\Db::i()->update( 'social_groups', array( 'imported_id' => $collab->collab_id ), array( 'g_id=?', $group[ 'g_id' ] ) );
 								$data[ 'progress' ]++;
 								
@@ -477,7 +505,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 						}
 						
 						if ( ( $groups_left = \IPS\Db::i()->select( 'COUNT(*)', 'social_groups', array( 'imported_id=0' ) )->first() ) == 0 )
-						{
+						{							
 							$data[ 'step' ] = 'news';
 							$message	= "Updating News Topics (" . $data[ 'counts' ][ 'social_groups_news' ] . " total)";
 						}
@@ -530,6 +558,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 					default:
 					
 						/* Steps Complete */
+						\IPS\Task::queue( 'collab', 'recountCollabContent', $data[ 'collabs' ] );
 						sleep( 2 );
 						return NULL;
 				}

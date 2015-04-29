@@ -218,14 +218,34 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 			$memberOrGuest->posts = 0;
 			foreach ( \IPS\Content::routedClasses( $this, TRUE, TRUE, FALSE ) as $class )
 			{
+				$itemClass = NULL;
+				
+				if ( isset ( $class::$itemClass ) )
+				{
+					$itemClass = $class::$itemClass;
+					if ( isset ( $itemClass::$containerNodeClass ) )
+					{
+						$nodeClass = $itemClass::$containerNodeClass;
+					}
+				}
+				else
+				{		
+					if ( isset ( $class::$containerNodeClass ) )
+					{
+						$nodeClass = $class::$containerNodeClass;
+					}
+				}
+				
 				if 
 				( 	/* Check if container node is provisioned for collab usage */
-					isset ( $class::$containerNodeClass ) and 
-					$nodeClass = $class::$containerNodeClass and 
+					isset ( $nodeClass ) and 
 					\IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) 
 				)
 				{
-					$where = array( array( $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['author'] . '=? AND ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=?', $this->member_id, $collab->collab_id ) );
+					$_is_author		= $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap[ 'author' ] . '=?';
+					$_is_collab		= $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=' . $collab->collab_id;
+					
+					$where 	= array( array( "{$_is_author} AND {$_is_collab}", $this->member_id ) );
 					
 					/**
 					 * Special Cases
@@ -238,16 +258,27 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 							break;
 					
 					}
-				
-					$memberOrGuest->posts += \IPS\Db::i()
-						->select( 'COUNT(*)', $class::$databaseTable, $where )
-						->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=?', $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap[ 'container' ] ) )
-						->first();
+					
+					$select = \IPS\Db::i()->select( 'COUNT(*)', $class::$databaseTable, $where );
+					
+					if ( isset ( $itemClass ) )
+					{
+						$select->join( $itemClass::$databaseTable, array( $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnId . '=' . $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap[ 'item' ] ) );
+						$select->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=' . $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnMap[ 'container' ] ) );
+					}
+					else
+					{
+						$select->join( $nodeClass::$databaseTable, array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=' . $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap[ 'container' ] ) );
+					}
+									
+					$memberOrGuest->posts += $select->first();
 				}
 			}
+			
+			$memberOrGuest->save();
+			
 		}
 		
-		$memberOrGuest->save();
 	}
 
 	/*
