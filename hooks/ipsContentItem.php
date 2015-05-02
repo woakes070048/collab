@@ -97,9 +97,6 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	{
 		$where = array();
 		
-		/**
-		 * Disabled until bugs are fixed in core
-		 */
 		if ( isset( static::$containerNodeClass ) )
 		{
 			$nodeClass = static::$containerNodeClass;

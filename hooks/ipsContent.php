@@ -15,11 +15,21 @@ abstract class collab_hook_ipsContent extends _HOOK_CLASS_
 	{
 		$member = $member ?: \IPS\Member::loggedIn();
 		$modCan = FALSE;
-		if ( isset ( $container ) and $container->collab_id )
+		
+		if ( isset ( $container ) )
+		{
+			$collab_id = $container->collab_id;
+		}
+		else
+		{
+			$collab_id = \IPS\rules\Application::affectiveCollab();
+		}
+		
+		if ( $collab_id )
 		{
 			try
 			{
-				$collab 	= \IPS\collab\Collab::load( $container->collab_id );
+				$collab 	= \IPS\collab\Collab::load( $collab_id );
 				$collabModPerms = $collab->container()->_mod_perms;
 				$title 		= static::$title;
 				
