@@ -57,11 +57,13 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 			switch ( $key )
 			{
 				case 'view':
+				
 					$exploded = explode( '\\', get_called_class() );
 					$collabCan = $collab->collabCan( 'appManage-' . $exploded[1] );
 					break;
 					
 				case 'add':
+				
 					if ( $collab->container()->_options[ 'node_' . $nid ][ 'enable_add' ] and $collab->collabCan( 'nodeAdd-' . $nid ) )
 					{
 						/* Check if we're at maximum capacity already */
@@ -90,14 +92,17 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 					break;
 					
 				case 'edit':
+				
 					$collabCan = $collab->container()->_options[ 'node_' . $nid ][ 'enable_edit' ] and $collab->collabCan( 'nodeEdit-' . $nid );
 					break;
 					
 				case 'delete':
+				
 					$collabCan = $collab->container()->_options[ 'node_' . $nid ][ 'enable_delete' ] and $collab->collabCan( 'nodeDelete-' . $nid );
 					break;
 					
 				case 'permissions':
+				
 					$collabCan = (
 						( $collab->container()->_options[ 'node_' . $nid ][ 'enable_add' ] and $collab->collabCan( 'nodeAdd-' . $nid ) ) or 
 						( $collab->container()->_options[ 'node_' . $nid ][ 'enable_edit' ] and $collab->collabCan( 'nodeEdit-' . $nid ) )
@@ -197,10 +202,12 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 
 					if( $membership = $collab->getMembership( $member ) )
 					{
+						$roles = array_map( function( $role ) { return $role->id; }, $membership->roles() );
+					
 						if ( $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
 						{
 							/* Give permission based on assigned roles */
-							$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and count( array_intersect( array_merge( array( 0 ), explode( ',', $membership->roles ) ), explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) ) );
+							$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and count( array_intersect( array_merge( array( 0 ), $roles ), explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) ) );
 						}
 						else if ( $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED )
 						{
@@ -209,13 +216,13 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 						}
 						else
 						{
-							/* Give the same permission that a guest would get */
+							/* Invited or pending members get the same permission that a guest would get */
 							$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and in_array( '-1', explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) );					
 						}
 					}
 					else
 					{
-						/* Give guest permission */
+						/* Collab Guest */
 						$collabCan = ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] === '*' or ( $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] != "" and in_array( '-1', explode( ',', $permissions[ 'perm_' . static::$permissionMap[ $permission ] ] ) ) ) );
 					}
 				}
@@ -270,10 +277,10 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 							$permissions[ 'perm_type_id' ] 	= $this->_id;
 							$this->setPermissions( $permissions, new \IPS\Helpers\Form\Matrix );
 						}
-						catch ( \UnderflowException $e ) {}
+						catch ( \UnderflowException $e ) { }
 					}
 				}
-				catch ( \OutOfRangeException $e ) {}
+				catch ( \OutOfRangeException $e ) { }
 			}
 		}
 		

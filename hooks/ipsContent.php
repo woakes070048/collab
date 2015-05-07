@@ -13,18 +13,25 @@ abstract class collab_hook_ipsContent extends _HOOK_CLASS_
 	 */
 	static public function modPermission( $type, \IPS\Member $member=NULL, \IPS\Node\Model $container=NULL )
 	{
-		$member = $member ?: \IPS\Member::loggedIn();
-		$modCan = FALSE;
+		$member 	= $member ?: \IPS\Member::loggedIn();
+		$modCan 	= FALSE;
+		$collab_id 	= NULL;
 		
-		if ( isset ( $container ) )
+		/**
+		 * Extrapolate if this modPermission is for collab content
+		 */
+		if ( isset( $container ) )
 		{
 			$collab_id = $container->collab_id;
 		}
-		else
+		else if ( $affectiveCollab = \IPS\collab\Application::affectiveCollab() )
 		{
-			$collab_id = \IPS\rules\Application::affectiveCollab();
+			$collab_id = $affectiveCollab->collab_id;
 		}
 		
+		/**
+		 * If this modPermission applies to collab content, check collab moderation permissions also
+		 */
 		if ( $collab_id )
 		{
 			try
@@ -37,36 +44,31 @@ abstract class collab_hook_ipsContent extends _HOOK_CLASS_
 				if ( $collabModPerms and $collabModPerms[ "can_{$type}_{$title}" ] )
 				{
 					/* Collab owners are super! */
-					if ( $member->member_id === $collab->owner_id )
+					if ( $member->member_id === $collab->owner_id and ! $collab->container()->bitoptions[ 'restrict_owner' ] )
 					{
 						$modCan = TRUE;
 					}
 					
 					/* Check everybody else's membership abilities */
-					else if ( $membership = \IPS\collab\Application::collabMembership( $collab, $member ) )
+					else if ( $membership = $collab->getMembership( $member ) )
 					{
-						foreach ( explode( ',', $membership->roles ) as $id )
+						foreach ( $membership->roles() as $role )
 						{
-							try
+							if ( $role->roleCan( 'moderateContent' ) and $rolePerms = \unserialize( $role->mod_perms ) )
 							{
-								$role = \IPS\collab\Collab\Role::load( $id );
-								if ( $role->roleCan( 'moderateContent' ) and $rolePerms = \unserialize( $role->mod_perms ) )
+								if ( $rolePerms[ "can_{$type}_{$title}" ] )
 								{
-									if ( $rolePerms[ "can_{$type}_{$title}" ] )
-									{
-										$modCan = TRUE;
-										break;
-									}
+									$modCan = TRUE;
+									break;
 								}
 							}
-							catch ( \OutOfRangeException $e ) {}
 						}
 					}
 				}
 			}
-			catch ( \OutOfRangeException $e ) {}
+			catch ( \OutOfRangeException $e ) { }
 		}
-		
+
 		return $modCan or call_user_func_array( 'parent::modPermission', func_get_args() );
 	}
 	
