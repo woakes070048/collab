@@ -60,7 +60,7 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	 * @param	array|null	$joins				Additional arbitrary joins for the query
 	 * @return	\IPS\Patterns\ActiveRecordIterator|int
 	 */
-	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL )
+	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL, $skipPermission=FALSE )
 	{		
 		if ( isset( static::$containerNodeClass ) )
 		{
@@ -201,12 +201,10 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 				 * Compile a list of all roles for member
 				 */
 				$all_roles = array( 0 );
-				foreach ( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ) as $membership )
+				foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ), '\IPS\collab\Collab\Membership' ) as $membership )
 				{
-					if ( mb_strlen( $membership[ 'roles' ] ) )
-					{
-						$all_roles = array_merge( $all_roles, explode( ',', $membership[ 'roles' ] ) );
-					}
+					$roles = array_map( function( $role ) { return $role->id; }, $membership->roles() );
+					$all_roles = array_merge( $all_roles, $roles );
 				}
 				
 				$rolesregexp = implode( '|', $all_roles );
