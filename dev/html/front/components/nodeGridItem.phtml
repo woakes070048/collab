@@ -5,7 +5,7 @@
 		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix'>
 			<span class='ipsPos_left'>
 					{{if $node->icon}}
-						<img src="{$node->icon}" class='ipsImage cForumGrid_icon'>
+						<img src="{file="$node->icon" extension="forums_Icons"}" class='ipsImage cForumGrid_icon'>
 					{{else}}
 						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal'>
 							<i class="fa fa-comments"></i>
