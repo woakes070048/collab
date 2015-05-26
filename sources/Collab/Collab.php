@@ -665,6 +665,52 @@ class _Collab extends \IPS\Content\Item implements
 	}
 	
 	/**
+	 * Invite Member to Collab
+	 *
+	 * @param 	$member 	\IPS\Member		The member to invite
+	 * @param	$sponsor	\IPS\Member|NULL	The member responsible for the invite
+	 * @param	$notes		string			Collab notes to attach to invitation
+	 * @param	$skipNotification	bool		Skip sending a notification to invited member
+	 */
+	public function inviteMember( \IPS\Member $member, \IPS\Member $sponsor=NULL, $notes=NULL, $skipNotification=FALSE )
+	{
+		if ( $this->canJoin( $member ) )
+		{
+			$membership 			= new \IPS\collab\Collab\Membership;
+			$membership->member_id 		= $member->member_id;
+			$membership->collab_id 		= $this->collab_id;
+			$membership->status 		= \IPS\collab\COLLAB_MEMBER_INVITED;
+			$membership->collab_notes 	= $notes ?: '';
+			$membership->sponsor_id		= $sponsor ? $sponsor->member_id : NULL;
+			$membership->save();
+			
+			/**
+			 * Rules Event: Member Invited
+			 */
+			if ( \IPS\Application::appIsEnabled( 'rules' ) )
+			{
+				\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_invited' )->trigger( $member, $sponsor, $collab, $membership );
+			}
+			
+			if ( ! $skipNotification )
+			{
+				// Send "Invited" Notification
+				$notification = new \IPS\Notification( \IPS\Application::load( 'collab' ), 'collab_invitation_received', $membership, array( $membership->sponsor(), $collab, $membership ) );
+				$notification->recipients->attach( $membership->member() );
+				$notification->send();
+			}
+			
+			return $membership;
+		}
+		
+		return NULL;
+	}
+	
+	/**
+	 * Approve Member to Collab
+	 */
+	
+	/**
 	 * Collab member permission check
 	 *
 	 * @param	string			$perm		A string representing a permission to check for
@@ -1202,8 +1248,8 @@ class _Collab extends \IPS\Content\Item implements
 				$_new_permissions[ $perm ] = implode( ',', array_filter( $_new_roles, 'mb_strlen' ) );
 			}
 			
-			/* Apply Permissions */
-			$copy->collabPermissions( $_new_permissions );
+			/* Apply Collab Permissions */
+			$copy->setCollabPermissions( $_new_permissions );			
 		}
 		
 		if ( $node->hasChildren( NULL ) )

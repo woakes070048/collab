@@ -217,9 +217,9 @@ class _Membership extends \IPS\Patterns\ActiveRecord
 			return $this->roleStack;
 		}
 		
-		$default_roles = 'FALSE';
-		$this->roleStack = array();
-		$roles = explode( ',', $this->roles ) ?: array();
+		$default_roles 		= 'FALSE';
+		$this->roleStack 	= array();
+		$roles 			= explode( ',', $this->roles ) ?: array();
 		
 		if ( $this->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
 		{

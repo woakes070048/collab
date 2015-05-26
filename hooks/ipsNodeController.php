@@ -101,12 +101,14 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		$matrix = new \IPS\Helpers\Form\Matrix;
 		$matrix->manageable = FALSE;
 		$matrix->langPrefix = $nodeClass::$permissionLangPrefix . 'perm__';
-		$matrix->columns = array(
-			'label'		=> function( $key, $value, $data )
+		$matrix->columns = array
+		(
+			'label'	=> function( $key, $value, $data )
 			{
 				return $value;
 			},
 		);
+		
 		foreach ( $node->permissionTypes() as $k => $v )
 		{
 			$matrix->columns[ $k ] = function( $key, $value, $data ) use ( $current, $k, $v )
@@ -116,12 +118,15 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 			};
 			$matrix->checkAlls[ $k ] = ( $current[ "perm_{$v}" ] === '*' );
 		}
+		
 		$matrix->checkAllRows = TRUE;
 		
-		$rows = array(
+		$rows = array
+		(
 			'-1' => array( 'label' => 'collab_role_guests', 'view' => TRUE ),
 			'0' => array( 'label' => 'collab_role_members', 'view' => TRUE ),
 		);
+		
 		foreach ( $collab->roles() as $role )
 		{
 			$rows[ $role->id ] = array(
@@ -129,6 +134,7 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 				'view'	=> TRUE,
 			);
 		}
+		
 		$matrix->rows = $rows;
 		
 		/* Handle submissions */
@@ -174,11 +180,10 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 				$insert[ "perm_{$k}" ] = is_array( $v ) ? implode( $v, ',' ) : $v;
 			}
 			
-			/* Set the permissions */
-			\IPS\Db::i()->delete( 'core_permission_index', array( 'app=? AND perm_type=? AND perm_type_id=?', $insert[ 'app' ], $insert[ 'perm_type' ], $insert[ 'perm_type_id' ] ) );
-			\IPS\Db::i()->insert( 'core_permission_index', $insert );
+			/* Set the collab permissions */
+			$node->setCollabPermissions( $insert );
 
-			unset(\IPS\Data\Store::i()->modules);
+			unset( \IPS\Data\Store::i()->modules );
 
 			/* Clear out member's cached "Create Menu" contents */
 			\IPS\Member::clearCreateMenu();
@@ -301,6 +306,9 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 				$node->collab_id = $collab->collab_id;
 				$node->save();
 				
+				/* Resave permissions */
+				$node->setPermissions( array_merge( array( 'app' => $node::$permApp, 'perm_type' => $node::$permType, 'perm_type_id' => $node->_id ), $node->permissions() ), new \IPS\Helpers\Form\Matrix );
+				
 				foreach ( $node->children() as $child )
 				{
 					$moveRecursive( $child );
@@ -360,6 +368,9 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		{
 			$node->collab_id = 0;
 			$node->save();
+			
+			/* Resave permissions */
+			$node->setPermissions( array_merge( array( 'app' => $node::$permApp, 'perm_type' => $node::$permType, 'perm_type_id' => $node->_id ), $node->permissions() ), new \IPS\Helpers\Form\Matrix );
 			
 			foreach ( $node->children() as $child )
 			{

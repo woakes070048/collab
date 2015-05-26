@@ -1710,11 +1710,7 @@ section.collabCategoryIndex {
  * Global CSS Styles
  */
 
-i.fa {
-	line-height: inherit;
-}
- 
- header.collabHeader {
+header.collabHeader {
 	margin-bottom:20px;
 }
 

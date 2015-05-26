@@ -113,7 +113,7 @@ class _ipsMemberSync
 	 */
 	public function onMerge( $member, $member2 )
 	{
-		foreach ( $member2->collab_memberships() as $membership )
+		foreach ( $member2->collabMemberships() as $membership )
 		{
 			if ( $collab = $membership->collab() )
 			{
@@ -164,7 +164,7 @@ class _ipsMemberSync
 	 */
 	public function onDelete( $member )
 	{
-		foreach ( $member->collab_memberships() as $membership )
+		foreach ( $member->collabMemberships() as $membership )
 		{
 			if ( $collab = $membership->collab() )
 			{

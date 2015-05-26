@@ -37,10 +37,55 @@ class _Collaboration
 	{
 		$events = array
 		(
-
+			'member_invited' => array
+			( 
+				'arguments' => array
+				( 
+					'member' 	=> array( 'argtype' => 'object', 'class' => '\IPS\Member' ),
+					'sponsor' 	=> array( 'argtype' => 'object', 'class' => '\IPS\Member', 'nullable' => TRUE ),
+					'collab' 	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab' ),
+					'membership'	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab\Membership' ),
+				),		
+			),
+			'member_pending' => array
+			( 
+				'arguments' => array
+				( 
+					'member' 	=> array( 'argtype' => 'object', 'class' => '\IPS\Member' ),
+					'collab' 	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab' ),
+					'membership'	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab\Membership' ),
+				),		
+			),
+			'member_joined' => array
+			( 
+				'arguments' => array
+				( 
+					'member' 	=> array( 'argtype' => 'object', 'class' => '\IPS\Member' ),
+					'collab' 	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab' ),
+					'membership'	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab\Membership' ),
+				),		
+			),
+			'member_banned' => array
+			( 
+				'arguments' => array
+				( 
+					'member' 	=> array( 'argtype' => 'object', 'class' => '\IPS\Member' ),
+					'collab' 	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab' ),
+					'membership'	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab\Membership' ),
+				),		
+			),
+			'member_removed' => array
+			( 
+				'arguments' => array
+				( 
+					'member' 	=> array( 'argtype' => 'object', 'class' => '\IPS\Member' ),
+					'collab' 	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab' ),
+					'membership'	=> array( 'argtype' => 'object', 'class' => '\IPS\collab\Collab\Membership' ),
+				),		
+			),
 		);
 		
-		return array(); // $events;
+		return $events;
 	}
 	
 	/**
@@ -58,7 +103,7 @@ class _Collaboration
 
 		);
 		
-		return array(); // $conditions;
+		return $conditions;
 	}
 
 	/**
@@ -73,33 +118,7 @@ class _Collaboration
 
 		);
 		
-		return array(); // $actions;
-	}
-	
-	/**
-	 * Example Operation Callback
-	 *
-	 * Your operation callback will recieve all of the arguments defined in your
-	 * action/condition definition. If an argument is not required, and not provided 
-	 * by the user, then it will be NULL.
-	 *
-	 * Your operation callback will also recieve three additional arguments at the end of
-	 * your regularly defined arguments.
-	 *
-	 * @extraArg1	array				$values		An array of the existing saved values from the configuration form
-	 * @extraArg2	array				$arg_map	A keyed array of the arguments from the event
-	 * @extraArg3	object	\IPS\rules\Action	$operation	The operation object (Action or Condition) which is invoking the callback
-	 *			\IPS\rules\Condition
-	 *
-	 * @return	mixed			If this is a condition callback, you should return either TRUE or FALSE depending on if the condition has passed.
-	 * 					If it is an action callback, you should return a short message to describe the result of the action for debug purposes.
-	 *
-	 * Note: Any value that you return from an operation callback is logged to the debug console when the rule is in debug mode. This way
-	 * it is possible to see what is happening with each operation as it is being evaluated.
-	 */
-	public function operationCallback( $arg1, $values, $arg_map, $operation )
-	{
-		return 'action taken';
+		return $actions;
 	}
 	
 }

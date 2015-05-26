@@ -3,6 +3,9 @@
 abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 {
 
+	/**
+	 * @brief	Collab permissions cache
+	 */
 	protected $collabPermissions = NULL;
 
 	/**
@@ -394,6 +397,113 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		
 		return $defaults;
 	}
+	
+	/**
+	 * Set Collab Related Permissions
+	 *
+	 * @param	array		$insert		Permission data to insert
+	 * @return  	void
+	 */
+	public function setCollabPermissions( $insert )
+	{
+		$insert[ 'app' ] 		= static::$permApp;
+		$insert[ 'perm_type' ] 		= 'collab_' . static::$permType;
+		$insert[ 'perm_type_id' ]	= $this->_id;
+		
+		/* Delete Existing Permissions */
+		\IPS\Db::i()->delete( 'core_permission_index', array( 'app=? AND perm_type=? AND perm_type_id=?', $insert[ 'app' ], $insert[ 'perm_type' ], $insert[ 'perm_type_id' ] ) );
+		
+		/* Recreate Permissions */
+		\IPS\Db::i()->insert( 'core_permission_index', $insert );
+		
+		/* Reload the collab permissions cache */
+		$this->collabPermissions = NULL;
+		$this->collabPermissions();
+		
+		/* Run core node permissions updates */
+		$this->setPermissions( array_merge( array( 'app' => static::$permApp, 'perm_type' => static::$permType, 'perm_type_id' => $this->_id ), $this->permissions() ), new \IPS\Helpers\Form\Matrix );
+	}
+
+	/**
+	 * Retrieve the computed permissions
+	 *
+	 * @param	\IPS\Node\Model	$node	Node
+	 * @return	string
+	 */
+	protected static function _getPermissions( $node )
+	{
+		$permissions = explode( ',', parent::_getPermissions( $node ) );
+		
+		/**
+		 * Add In Collab Permissions
+		 */
+		if( $node instanceof \IPS\Node\Permissions and $node->collab_id )
+		{
+			$collabPermissions 	= $node->collabPermissions();
+			$permissionTypes 	= $node->permissionTypes();
+			$perms			= array();
+			
+			/* Compare both read and view */
+
+			if( ! isset( $permissionTypes[ 'read' ] ) )
+			{
+				$perms = explode( ',', $collabPermissions[ 'perm_' . $permissionTypes[ 'view' ] ] );
+			}
+			else
+			{
+				if( $collabPermissions[ 'perm_' . $permissionTypes[ 'view' ] ] == '*' )
+				{
+					$perms = explode( ',', $collabPermissions[ 'perm_' . $permissionTypes[ 'read' ] ] );
+				}
+				else if( $collabPermissions[ 'perm_' . $permissionTypes[ 'read' ] ] == '*' )
+				{
+					$perms = explode( ',', $collabPermissions[ 'perm_' . $permissionTypes[ 'view' ] ] );
+				}
+				else
+				{
+					$perms = array_intersect( explode( ',', $collabPermissions[ 'perm_' . $permissionTypes[ 'view' ] ] ), explode( ',', $collabPermissions[ 'perm_' . $permissionTypes[ 'read' ] ] ) );
+				}
+			}
+
+			if ( ! /*not*/
+			( 
+				in_array( '*', $perms ) or 
+				( 
+					in_array( '0', $perms ) and 
+					in_array( '-1', $perms ) 
+				) 
+			) )
+			{
+				/* Indicates collab permissions are required */
+				$permissions[] = 'c';
+				
+				foreach( $perms as $role_id )
+				{
+					switch( $role_id )
+					{
+						case '-1':
+							
+							$permissions[] = 'cg' . $node->collab_id;
+							break;
+							
+						case '0':
+						
+							$permissions[] = 'cm' . $node->collab_id;
+							break;
+							
+						default:
+							
+							if ( $role_id )
+							{
+								$permissions[] = 'cr' . $role_id;
+							}
+					}
+				}
+			}
+		}
+		
+		return implode( ',', $permissions );
+	}	
 
 	/**
 	 * Get latest content item (if applicable) for a node.

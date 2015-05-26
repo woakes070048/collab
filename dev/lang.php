@@ -90,11 +90,11 @@ $lang = array(
 	'collabs_alias_plural'			=> "Alias (Plural)",
 	'collabs_alias_plural_desc'		=> "What do you want to call collaborations in this category (in plural form)?",
 	'collab_moderator_perms'		=> "Moderator Permissions",
-	'category_max_collabs_owned'		=> "Maximum Collabs Per Owner",
+	'category_max_collabs_owned'		=> "Max Collab Ownerships Per User",
 	'category_max_collabs_owned_desc'	=> "This setting controls how many collabs a user may own in this category.",
-	'category_max_collabs_joined'		=> "Maximum Collab Memberships Per User",
+	'category_max_collabs_joined'		=> "Max Collab Memberships Per User",
 	'category_max_collabs_joined_desc'	=> "This setting controls the maximum amount of collabs a user may hold an active membership to in this category.",
-	'category_max_collab_members'		=> "Maximum Members Per Collab",
+	'category_max_collab_members'		=> "Max Members Per Collab",
 	'collab_restrict_owner'			=> "Restrict Owner Permissions",
 	'collab_restrict_owner_desc'		=> "By default, collab owners are not subject to role restrictions. If you enable this option, they will only have permissions based on their role inside the collab.",
 	'category_max_collab_members_desc'	=> "This setting controls the maximum amount of allowed active members per collab in this category.",
@@ -431,5 +431,33 @@ $lang = array(
 	'created_date'				=> "Date Created",
 	'single'				=> "Only One",
 	'multiple'				=> "Multiple",
+	
+	// Rules Events
+	'collab_Collaboration_event_member_invited'		=> "Member is invited to collab",
+	'collab_Collaboration_event_member_invited_member' 	=> "Member that was invited",
+	'collab_Collaboration_event_member_invited_sponsor'	=> "Member responsible for the invite",
+	'collab_Collaboration_event_member_invited_collab'	=> "The collab",
+	'collab_Collaboration_event_member_invited_membership'	=> "The collab membership",
+	
+	'collab_Collaboration_event_member_pending'		=> "Member has requested to join collab",
+	'collab_Collaboration_event_member_pending_member' 	=> "Member that requested to join",
+	'collab_Collaboration_event_member_pending_collab'	=> "The collab",
+	'collab_Collaboration_event_member_pending_membership'	=> "The collab membership",
+
+	'collab_Collaboration_event_member_joined'		=> "Member has joined collab",
+	'collab_Collaboration_event_member_joined_member' 	=> "Member that joined the collab",
+	'collab_Collaboration_event_member_joined_collab'	=> "The collab",
+	'collab_Collaboration_event_member_joined_membership'	=> "The collab membership",
+
+	'collab_Collaboration_event_member_banned'		=> "Member is banned from collab",
+	'collab_Collaboration_event_member_banned_member' 	=> "Member that was banned",
+	'collab_Collaboration_event_member_banned_collab'	=> "The collab",
+	'collab_Collaboration_event_member_banned_membership'	=> "The collab membership",
+
+	'collab_Collaboration_event_member_removed'		=> "Member is removed from collab",
+	'collab_Collaboration_event_member_removed_member' 	=> "Member that was removed",
+	'collab_Collaboration_event_member_removed_collab'	=> "The collab",
+	'collab_Collaboration_event_member_removed_membership'	=> "The collab membership",
+	
 	
 );

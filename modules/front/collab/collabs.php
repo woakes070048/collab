@@ -363,7 +363,8 @@ class _collabs extends \IPS\Content\Controller
 					$this->_joinError();
 			}
 		}
-		else {
+		else 
+		{
 		
 			if ( $collab->join_mode == \IPS\collab\COLLAB_JOIN_INVITE )
 			{
@@ -388,7 +389,8 @@ class _collabs extends \IPS\Content\Controller
 		
 		$form = new \IPS\Helpers\Form( 'join_collab', 'submit' );
 		
-		$form->add( new \IPS\Helpers\Form\Editor( 'collab_join_message', $membership->member_notes, FALSE, array(
+		$form->add( new \IPS\Helpers\Form\Editor( 'collab_join_message', $membership->member_notes, FALSE, array
+			(
 				'app'			=> 'collab',
 				'key'			=> 'Generic',
 				'autoSaveKey'		=> "collab-join-{$collab->collab_id}-" . \IPS\Member::loggedIn()->member_id,
@@ -398,11 +400,20 @@ class _collabs extends \IPS\Content\Controller
 		if ( $values = $form->values() )
 		{
 			// Process Form Submission			
-			$membership->member_notes = $values['collab_join_message'];
+			$membership->member_notes = $values[ 'collab_join_message' ];
 			$membership->member_notes_updated = time();
+			
 			if ( ! $membership->id and $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING )
 			{
 				$membership->save();
+				
+				/**
+				 * Rules Event: Member Pending
+				 */
+				if ( \IPS\Application::appIsEnabled( 'rules' ) )
+				{
+					\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_pending' )->trigger( $membership->member(), $membership->collab(), $membership );
+				}
 				
 				// Create "New Join Request" Notification
 				$notification = new \IPS\Notification( \IPS\Application::load( 'collab' ), 'collab_join_requested', $membership, array( $membership->member(), $collab, $membership ) );
@@ -416,7 +427,7 @@ class _collabs extends \IPS\Content\Controller
 							$recipient = \IPS\Member::load( $approver->member_id );
 							$notification->recipients->attach( $recipient );
 						}
-						catch ( \OutOfRangeException $e ) {}
+						catch ( \OutOfRangeException $e ) { }
 					}
 				}
 				$notification->send();
@@ -425,6 +436,18 @@ class _collabs extends \IPS\Content\Controller
 			else
 			{
 				$membership->save();
+				
+				if ( $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE )
+				{
+					/**
+					 * Rules Event: Member Joined
+					 */
+					if ( \IPS\Application::appIsEnabled( 'rules' ) )
+					{
+						\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_joined' )->trigger( $membership->member(), $membership->collab(), $membership );
+					}
+				}				
+				
 				\IPS\Output::i()->redirect( $collab->url(), 'collab_message_join_request_updated' );
 			}
 		}
@@ -488,6 +511,14 @@ class _collabs extends \IPS\Content\Controller
 					$membership->joined = $membership->joined ?: time();
 					$membership->save();
 				
+					/**
+					 * Rules Event: Member Joined
+					 */
+					if ( \IPS\Application::appIsEnabled( 'rules' ) )
+					{
+						\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_joined' )->trigger( $membership->member(), $collab, $membership );
+					}
+					
 					// Send "Invitation Accepted" Notification
 					$notification = new \IPS\Notification( \IPS\Application::load( 'collab' ), 'collab_invitation_accepted', $membership, array( $membership->member(), $collab, $membership ) );
 					$notification->recipients->attach( $membership->sponsor_id ? $membership->sponsor() : $collab->author() );
@@ -499,6 +530,15 @@ class _collabs extends \IPS\Content\Controller
 				case 'deny':
 				
 					$membership->delete();
+					
+					/**
+					 * Rules Event: Member Removed
+					 */
+					if ( \IPS\Application::appIsEnabled( 'rules' ) )
+					{
+						\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_removed' )->trigger( $membership->member(), $collab, $membership );
+					}
+					
 					\IPS\Output::i()->redirect( $collab->url(), 'collab_message_invitation_denied' );
 					break;
 			}

@@ -122,6 +122,11 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	
 	/**
 	 * Build where clause that accounts for collab permissions
+	 *
+	 * @param	\IPS\Member	$member			Member to check permissions for
+	 * @param	string		$nodeClass		The classname of the item container
+	 * @param	string		$permissionKey		The permission to check
+	 * @return	array					An array containing new where clauses and required joins
 	 */
 	public static function collabPermissionWhere( $member, $nodeClass, $permissionKey='read' )
 	{
@@ -247,8 +252,9 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 			{
 				$collab = \IPS\collab\Collab::load( $this->container()->collab_id );
 				return \IPS\Db::i()->union( 
-					array( 
-						$collab->followers( 3, array( 'immediate' ), $collab->mapped( 'date' ), NULL, NULL, NULL ), 
+					array
+					( 
+						$collab->followers( 3, array( 'immediate' ), time(), NULL, NULL, NULL ), 
 						$this->author()->followers( 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, NULL ),
 						static::containerFollowers( $this->container(), 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, 0 )
 					), 

@@ -1,7 +1,7 @@
 <?php
 
 namespace IPS\collab\modules\front\collab;
- 
+
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
@@ -256,18 +256,7 @@ class _admin extends \IPS\Dispatcher\Controller
 				// invite members
 				foreach ( $_invitees as $invitee )
 				{
-					$membership 			= new \IPS\collab\Collab\Membership;
-					$membership->member_id 		= $invitee->member_id;
-					$membership->collab_id 		= $collab->collab_id;
-					$membership->status 		= \IPS\collab\COLLAB_MEMBER_INVITED;
-					$membership->collab_notes 	= $values[ 'collab_invite_message' ];
-					$membership->sponsor_id		= \IPS\Member::loggedIn()->member_id;
-					$membership->save();
-					
-					// Send "Invitation" Notifications
-					$notification = new \IPS\Notification( \IPS\Application::load( 'collab' ), 'collab_invitation_received', $membership, array( $membership->sponsor(), $collab, $membership ) );
-					$notification->recipients->attach( $membership->member() );
-					$notification->send();
+					$collab->inviteMember( $invitee, \IPS\Member::loggedIn(), $values[ 'collab_invite_message' ] );
 				}
 			}
 			
@@ -326,6 +315,14 @@ class _admin extends \IPS\Dispatcher\Controller
 			$notification->send();
 		}
 
+		/**
+		 * Rules Event: Member Joined
+		 */
+		if ( \IPS\Application::appIsEnabled( 'rules' ) )
+		{
+			\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_joined' )->trigger( $membership->member(), $membership->collab(), $membership );
+		}
+			
 		if ( \IPS\Request::i()->isAjax() )
 		{
 			\IPS\Output::i()->json( 'OK' );
@@ -351,6 +348,14 @@ class _admin extends \IPS\Dispatcher\Controller
 		$membership->status = \IPS\collab\COLLAB_MEMBER_BANNED;
 		$membership->save();
 
+		/**
+		 * Rules Event: Member Banned
+		 */
+		if ( \IPS\Application::appIsEnabled( 'rules' ) )
+		{
+			\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_banned' )->trigger( $membership->member(), $membership->collab(), $membership );
+		}
+			
 		if ( \IPS\Request::i()->isAjax() )
 		{
 			\IPS\Output::i()->json( 'OK' );
@@ -394,6 +399,14 @@ class _admin extends \IPS\Dispatcher\Controller
 		
 		$membership->delete();
 
+		/**
+		 * Rules Event: Member Removed
+		 */
+		if ( \IPS\Application::appIsEnabled( 'rules' ) )
+		{
+			\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_removed' )->trigger( $membership->member(), $membership->collab(), $membership );
+		}
+		
 		if ( \IPS\Request::i()->isAjax() )
 		{
 			\IPS\Output::i()->json( 'OK' );

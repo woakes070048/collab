@@ -1072,18 +1072,17 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		{
 			unset( $permissions[ 'perm_id' ], $permissions[ 'app' ], $permissions[ 'perm_type' ], $permissions[ 'perm_type_id' ] );
 			
-			\IPS\Db::i()->update( 'core_permission_index', $permissions, 
-				array
-				( 
-					'app=? AND perm_type=? AND collab_categories.category_id=?', $nodeClass::$permApp, $nodeClass::$permType, $this->_id 
-				),
-				array
-				( 
-					array( 'from' => $nodeClass::$databaseTable, 	'where' => array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . '=core_permission_index.perm_type_id' ) ),
-					array( 'from' => 'collab_collabs', 		'where' => array( 'collab_collabs.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) ),
-					array( 'from' => 'collab_categories', 		'where' => array( 'collab_categories.category_id=collab_collabs.category_id' ) )
-				)
-			);
+			foreach 
+			(  
+				new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', $nodeClass::$databaseTable, array( 'collab_categories.category_id=?', $this->_id ) )
+					->join( 'collab_collabs', array( 'collab_collabs.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) )
+					->join( 'collab_categories', array( 'collab_categories.category_id=collab_collabs.category_id' ) ), $nodeClass ) 
+				as $node 
+			)
+			{
+				$perms = $node->permissions();
+				$node->setPermissions( array_merge( array( 'perm_id' => $perms[ 'perm_id' ], 'app' => $nodeClass::$permApp, 'perm_type' => $nodeClass::$permType, 'perm_type_id' => $node->_id ), $permissions ), new \IPS\Helpers\Form\Matrix );
+			}
 		}
 	}
 
@@ -1175,7 +1174,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 					/* Check global group limit */
 					if ( $member->group['g_collabs_joined_limit'] > 0 )
 					{
-						$categoryCan = (
+						$categoryCan = 
+						(
 							$categoryCan and
 							( \IPS\Db::i()->select( 'COUNT(*)', 'collab_memberships', array( 'member_id=? AND status=?', $member->member_id, \IPS\collab\COLLAB_MEMBER_ACTIVE ) )->first() < $member->group['g_collabs_joined_limit'] )
 						);
@@ -1184,7 +1184,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 					/* Check category limit */
 					if ( $this->max_collabs_joined > 0 )
 					{
-						$categoryCan = (
+						$categoryCan = 
+						(
 							$categoryCan and
 							( \IPS\Db::i()->select( 'COUNT(*)', 'collab_memberships', array( 'collab_memberships.member_id=? AND collab_memberships.status=? AND collab_collabs.category_id=?', $member->member_id, \IPS\collab\COLLAB_MEMBER_ACTIVE, $this->id ) )->join( 'collab_collabs', 'collab_collabs.collab_id=collab_memberships.collab_id' )->first() < $this->max_collabs_joined )
 						);

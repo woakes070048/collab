@@ -18,7 +18,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 	 *
 	 * @return	array	Array of Membership Active Records [\IPS\collab\Collab\Membership]
 	 */
-	public function collab_memberships()
+	public function collabMemberships()
 	{
 
 		if ( isset( $this->memberships ) )
@@ -58,7 +58,8 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		}
 	      
 		$this->collabs[ $cache_key ] = array();
-		foreach ( $this->collab_memberships() as $membership )
+		
+		foreach ( $this->collabMemberships() as $membership )
 		{
 			if ( $status == 'all' or $membership->status == $status )
 			{
@@ -77,7 +78,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 					}
 					$this->collabs[ $cache_key ][] = $collab;		
 				}
-				catch( \OutOfRangeException $e ) {}
+				catch( \OutOfRangeException $e ) { }
 			}
 		}
 		return $this->collabs[ $cache_key ];
