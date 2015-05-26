@@ -58,5 +58,13 @@
     "ipsHttpUrl": {
         "type": "C",
         "class": "\\IPS\\Http\\Url"
+    },
+    "ipsContentSearchQuery": {
+        "type": "C",
+        "class": "\\IPS\\Content\\Search\\Query"
+    },
+    "ipsContentSearchIndex": {
+        "type": "C",
+        "class": "\\IPS\\Content\\Search\\Index"
     }
 }

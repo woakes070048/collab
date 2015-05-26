@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10104">
+ <app key="collab" version="10105">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -70,11 +70,11 @@
   <word key="collabs_alias_plural" js="0">Alias (Plural)</word>
   <word key="collabs_alias_plural_desc" js="0">What do you want to call collaborations in this category (in plural form)?</word>
   <word key="collab_moderator_perms" js="0">Moderator Permissions</word>
-  <word key="category_max_collabs_owned" js="0">Maximum Collabs Per Owner</word>
+  <word key="category_max_collabs_owned" js="0">Max Collab Ownerships Per User</word>
   <word key="category_max_collabs_owned_desc" js="0">This setting controls how many collabs a user may own in this category.</word>
-  <word key="category_max_collabs_joined" js="0">Maximum Collab Memberships Per User</word>
+  <word key="category_max_collabs_joined" js="0">Max Collab Memberships Per User</word>
   <word key="category_max_collabs_joined_desc" js="0">This setting controls the maximum amount of collabs a user may hold an active membership to in this category.</word>
-  <word key="category_max_collab_members" js="0">Maximum Members Per Collab</word>
+  <word key="category_max_collab_members" js="0">Max Members Per Collab</word>
   <word key="collab_restrict_owner" js="0">Restrict Owner Permissions</word>
   <word key="collab_restrict_owner_desc" js="0">By default, collab owners are not subject to role restrictions. If you enable this option, they will only have permissions based on their role inside the collab.</word>
   <word key="category_max_collab_members_desc" js="0">This setting controls the maximum amount of allowed active members per collab in this category.</word>
@@ -364,5 +364,26 @@
   <word key="created_date" js="0">Date Created</word>
   <word key="single" js="0">Only One</word>
   <word key="multiple" js="0">Multiple</word>
+  <word key="collab_Collaboration_event_member_invited" js="0">Member is invited to collab</word>
+  <word key="collab_Collaboration_event_member_invited_member" js="0">Member that was invited</word>
+  <word key="collab_Collaboration_event_member_invited_sponsor" js="0">Member responsible for the invite</word>
+  <word key="collab_Collaboration_event_member_invited_collab" js="0">The collab</word>
+  <word key="collab_Collaboration_event_member_invited_membership" js="0">The collab membership</word>
+  <word key="collab_Collaboration_event_member_pending" js="0">Member has requested to join collab</word>
+  <word key="collab_Collaboration_event_member_pending_member" js="0">Member that requested to join</word>
+  <word key="collab_Collaboration_event_member_pending_collab" js="0">The collab</word>
+  <word key="collab_Collaboration_event_member_pending_membership" js="0">The collab membership</word>
+  <word key="collab_Collaboration_event_member_joined" js="0">Member has joined collab</word>
+  <word key="collab_Collaboration_event_member_joined_member" js="0">Member that joined the collab</word>
+  <word key="collab_Collaboration_event_member_joined_collab" js="0">The collab</word>
+  <word key="collab_Collaboration_event_member_joined_membership" js="0">The collab membership</word>
+  <word key="collab_Collaboration_event_member_banned" js="0">Member is banned from collab</word>
+  <word key="collab_Collaboration_event_member_banned_member" js="0">Member that was banned</word>
+  <word key="collab_Collaboration_event_member_banned_collab" js="0">The collab</word>
+  <word key="collab_Collaboration_event_member_banned_membership" js="0">The collab membership</word>
+  <word key="collab_Collaboration_event_member_removed" js="0">Member is removed from collab</word>
+  <word key="collab_Collaboration_event_member_removed_member" js="0">Member that was removed</word>
+  <word key="collab_Collaboration_event_member_removed_collab" js="0">The collab</word>
+  <word key="collab_Collaboration_event_member_removed_membership" js="0">The collab membership</word>
  </app>
 </language>
