@@ -49,13 +49,13 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	 * @param	array		$where				Where clause
 	 * @param	string		$order				MySQL ORDER BY clause (NULL to order by date)
 	 * @param	int|array	$limit				Limit clause
-	 * @param	string|NULL	$permissionKey		A key which has a value in the permission map (either of the container or of this class) matching a column ID in core_permission_index or NULL to ignore permissions
-	 * @param	bool|NULL	$includeHiddenItems	Include hidden files? Boolean or NULL to detect if currently logged member has permission
-	 * @param	int			$queryFlags			Select bitwise flags
+	 * @param	string|NULL	$permissionKey			A key which has a value in the permission map (either of the container or of this class) matching a column ID in core_permission_index or NULL to ignore permissions
+	 * @param	bool|NULL	$includeHiddenItems		Include hidden files? Boolean or NULL to detect if currently logged member has permission
+	 * @param	int		$queryFlags			Select bitwise flags
 	 * @param	\IPS\Member	$member				The member (NULL to use currently logged in member)
-	 * @param	bool		$joinContainer		If true, will join container data (set to TRUE if your $where clause depends on this data)
-	 * @param	bool		$joinComments		If true, will join comment data (set to TRUE if your $where clause depends on this data)
-	 * @param	bool		$joinReviews		If true, will join review data (set to TRUE if your $where clause depends on this data)
+	 * @param	bool		$joinContainer			If true, will join container data (set to TRUE if your $where clause depends on this data)
+	 * @param	bool		$joinComments			If true, will join comment data (set to TRUE if your $where clause depends on this data)
+	 * @param	bool		$joinReviews			If true, will join review data (set to TRUE if your $where clause depends on this data)
 	 * @param	bool		$countOnly			If true will return the count
 	 * @param	array|null	$joins				Additional arbitrary joins for the query
 	 * @return	\IPS\Patterns\ActiveRecordIterator|int
@@ -84,6 +84,45 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 		}
 		
 		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins );
+	}
+	
+	/**
+	 * Custom Method: Get Collab Items
+	 *
+	 * @param	\IPS\collab\Collab|int		$collab		A collab object or collab id to get content from
+	 * @param	array		$where				Where clause
+	 * @param	string		$order				MySQL ORDER BY clause (NULL to order by date)
+	 * @param	int|array	$limit				Limit clause
+	 * @param	string|NULL	$permissionKey			A key which has a value in the permission map (either of the container or of this class) matching a column ID in core_permission_index or NULL to ignore permissions
+	 * @param	bool|NULL	$includeHiddenItems		Include hidden files? Boolean or NULL to detect if currently logged member has permission
+	 * @param	int		$queryFlags			Select bitwise flags
+	 * @param	\IPS\Member	$member				The member (NULL to use currently logged in member)
+	 * @param	bool		$joinContainer			If true, will join container data (set to TRUE if your $where clause depends on this data)
+	 * @param	bool		$joinComments			If true, will join comment data (set to TRUE if your $where clause depends on this data)
+	 * @param	bool		$joinReviews			If true, will join review data (set to TRUE if your $where clause depends on this data)
+	 * @param	bool		$countOnly			If true will return the count
+	 * @param	array|null	$joins				Additional arbitrary joins for the query
+	 * @return	\IPS\Patterns\ActiveRecordIterator|array|int
+	 */
+	public static function getCollabItems( $collab, $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL, $skipPermission=FALSE )
+	{
+		if ( ! ( $collab instanceof \IPS\collab\Collab ) )
+		{
+			try
+			{
+				$collab = \IPS\collab\Collab::load( $collab );
+			}
+			catch( \OutOfRangeException $e )
+			{
+				return array();
+			}
+		}
+		
+		\IPS\collab\Application::$affectiveCollab = $collab;
+		$items = static::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins );
+		\IPS\collab\Application::$affectiveCollab = NULL;
+		
+		return $items;
 	}
 	
 	/**
