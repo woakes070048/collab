@@ -8,7 +8,7 @@
  * @since		10 Dec 2014
  * @version		
  */
- 
+
 namespace IPS\collab;
 
 const COLLAB_MEMBER_BANNED 	= 'banned';
@@ -606,6 +606,7 @@ class _Application extends \IPS\Application
 				}
 			}
 		}
+		
 		return FALSE;
 	}	
 
