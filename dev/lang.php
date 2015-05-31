@@ -182,6 +182,7 @@ $lang = array(
 	'collab_no_content'			=> "No content here yet",
 	'collab_marked_model'			=> "Designated as a model",
 	'collab_collab_submit_comment'		=> "Submit Comment",
+	'view_this_collab'			=> "View the %s: %s",
 	
 	// Collab Custom Filters
 	'collab_status'				=> "Status",
@@ -432,6 +433,9 @@ $lang = array(
 	'single'				=> "Only One",
 	'multiple'				=> "Multiple",
 	
+	// Rules Conversions
+	'__global_active_collab'				=> "Page: Associated Collaboration",
+	
 	// Rules Events
 	'collab_Collaboration_event_member_invited'		=> "Member is invited to collab",
 	'collab_Collaboration_event_member_invited_member' 	=> "Member that was invited",
@@ -459,5 +463,35 @@ $lang = array(
 	'collab_Collaboration_event_member_removed_collab'	=> "The collab",
 	'collab_Collaboration_event_member_removed_membership'	=> "The collab membership",
 	
+	// Rules Conditions
+	'collab_Collaboration_conditions_membership_status'		=> "Member has collab membership status",
+	'collab_Collaboration_conditions_membership_status_collab'	=> "The Collaboration to Check",
+	'collab_Collaboration_conditions_membership_status_member'	=> "Member to Check",
+	'collab_Collaboration_conditions_membership_status_status'	=> "Status to Check",
+	'collab_rules_statuses'						=> "Check for any of these statuses",
+	
+	'collab_Collaboration_conditions_collab_owned'			=> "Check container or content for collab ownership",
+	'collab_Collaboration_conditions_collab_owned_entity'		=> "Container or Content to Check",
+	
+	'collab_Collaboration_conditions_join_mode'			=> "Collaboration has a particular join mode",
+	'collab_Collaboration_conditions_join_mode_collab'		=> "The Collaboration to Check",
+	'collab_Collaboration_conditions_join_mode_mode'		=> "Join Mode to Check",
+	'collab_rules_modes'						=> "Check for any of these join modes",
+	
+	// Rules Actions
+	'collab_Collaboration_actions_set_membership_status'		=> "Create/modify a collaboration membership status",
+	'collab_Collaboration_actions_set_membership_status_collab'	=> "Associated Collaboration",
+	'collab_Collaboration_actions_set_membership_status_member'	=> "Member To Modify Membership Status For",
+	'collab_Collaboration_actions_set_membership_status_status'	=> "Membership Status To Set",
+	'collab_rules_set_status'					=> "Set member to the following membership status",
+	
+	'collab_Collaboration_actions_delete_membership'		=> "Delete a collaboration membership",
+	'collab_Collaboration_actions_delete_membership_member'		=> "Member To Delete Membership For",
+	'collab_Collaboration_actions_delete_membership_collab'		=> "Associated Collaboration",
+	
+	'collab_Collaboration_actions_set_join_mode'			=> "Change the join mode of a collaboration",
+	'collab_Collaboration_actions_set_join_mode_mode'		=> "Join Mode to Set",
+	'collab_Collaboration_actions_set_join_mode_collab'		=> "Associated Collaboration",
+	'collab_rules_set_mode'						=> "Set collaboration join mode to",
 	
 );

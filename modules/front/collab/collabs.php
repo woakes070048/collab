@@ -365,7 +365,6 @@ class _collabs extends \IPS\Content\Controller
 		}
 		else 
 		{
-		
 			if ( $collab->join_mode == \IPS\collab\COLLAB_JOIN_INVITE )
 			{
 				$this->_joinError( 'invite_only' );

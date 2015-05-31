@@ -259,4 +259,20 @@ class _Membership extends \IPS\Patterns\ActiveRecord
 		parent::save();
 	}
 	
+	/**
+	 * Delete Membership
+	 */
+	public function delete()
+	{
+		parent::delete();
+		
+		/**
+		 * Rules Event: Member Removed
+		 */
+		if ( \IPS\Application::appIsEnabled( 'rules' ) )
+		{
+			\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_removed' )->trigger( $this->member(), $this->collab(), $this );
+		}
+	}
+	
 }

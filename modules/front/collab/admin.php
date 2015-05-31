@@ -399,14 +399,6 @@ class _admin extends \IPS\Dispatcher\Controller
 		
 		$membership->delete();
 
-		/**
-		 * Rules Event: Member Removed
-		 */
-		if ( \IPS\Application::appIsEnabled( 'rules' ) )
-		{
-			\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_removed' )->trigger( $membership->member(), $membership->collab(), $membership );
-		}
-		
 		if ( \IPS\Request::i()->isAjax() )
 		{
 			\IPS\Output::i()->json( 'OK' );
