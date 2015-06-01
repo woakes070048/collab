@@ -540,8 +540,19 @@
 			<h4 class='ipsType_minorHeading'>{lang="collab_owned_by" sprintf="$collab->collab_singular"}</h4>
 			{$collab->author()->link()|raw}
 		</li>
+		{{foreach $collab->collabStatItems() as $statItem}}
+		<li>
+			{$statItem|raw}
+		</li>
+		{{endforeach}}
 	</ul>
 </div>]]></template>
+ <template template_group="components" template_name="collabStatItem" template_data="$collab, $title, $value, $options=array()" template_location="front" template_app="collab"><![CDATA[
+<li>
+	<h4 class='ipsType_minorHeading'>{$title}</h4>
+	{$value}
+</li>
+]]></template>
  <template template_group="components" template_name="membersList" template_data="$url, $pagination, $memberships" template_location="front" template_app="collab"><![CDATA[<div>
 	<div class="ipsPad">{$pagination|raw}</div>
 	<div class='{{if \IPS\Request::i()->isAjax()}}ipsFollowerList {{endif}}ipsPad ipsScrollbar'>
@@ -564,18 +575,26 @@
 		</div>
 	</li>
 {{endforeach}}]]></template>
- <template template_group="components" template_name="menuCollab" template_data="$collab" template_location="front" template_app="collab"><![CDATA[<li>
+ <template template_group="components" template_name="menuCollab" template_data="$collab" template_location="front" template_app="collab"><![CDATA[{{if $collab->collabMenuItems()}}
+<li>
 	<a class='ipsButton ipsButton_important ipsButton_verySmall' id='elCollabMenu' href='#elCollabMenu_menu' data-ipsMenu>
 		<i class='fa fa-bars'></i>&nbsp;<span class='ipsResponsive_hidePhone ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_menu" sprintf="$collab->collab_singular"} <i class='fa fa-caret-down'></i></span>
 	</a>
-	<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCollabMenu_menu'>
-		<li class='ipsMenu_item'>
-			<a href='{$collab->url()}'>
-				<i class='fa fa-home'></i>&nbsp;<span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_homepage" sprintf="$collab->collab_singular"}</span>
-			</a>
-		</li>
-	</ul>
+	{template="menuItems" group="components" app="collab" params="$collab, $collab->collabMenuItems()"}
 </li>
+{{endif}}
+]]></template>
+ <template template_group="components" template_name="menuItems" template_data="$collab, $menuItems" template_location="front" template_app="collab"><![CDATA[
+<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCollabMenu_menu'>
+	{{foreach $menuItems as $menuItem}}
+	<li class='ipsMenu_item'>
+		<a href="{$menuItem[ 'url' ]}">
+			{{if $menuItem[ 'icon' ]}}<i class="fa fa-{$menuItem['icon']}"></i>&nbsp;{{endif}}<span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_homepage" sprintf="$collab->collab_singular"}</span>
+		</a>
+	</li>
+	{{endforeach}}
+</ul>
+
 ]]></template>
  <template template_group="components" template_name="menuModerators" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
 {{if $collab->hidden() === 1 and $collab->canUnhide()}}
@@ -1117,6 +1136,39 @@
 	{$form|raw}
 </div>
 ]]></template>
+ <template template_group="global" template_name="embedCollab" template_data="$collab, $post" template_location="front" template_app="collab"><![CDATA[<div class='ipsEmbedded'>
+	<div class='ipsEmbedded_headerArea'>
+		<h4 class='ipsType_reset ipsType_normal ipsTruncate ipsTruncate_line'><i class='fa fa-comments' data-ipsTooltip title='{lang="embed_topic"}'></i> &nbsp;<a href='{{if $post}}{$post->url()->setQueryString( 'do', ( \IPS\Request::i()->embedDo != 'findComment' ) ? \IPS\Request::i()->embedDo : null )}{{else}}{{if isset( \IPS\Request::i()->page ) AND \IPS\Request::i()->page > 1}}{$collab->url()->setQueryString( 'page', intval( \IPS\Request::i()->page ) )->setQueryString( 'do', ( \IPS\Request::i()->embedDo != 'findComment' ) ? \IPS\Request::i()->embedDo : null )}{{else}}{$collab->url()->setQueryString( 'do', ( \IPS\Request::i()->embedDo != 'findComment' ) ? \IPS\Request::i()->embedDo : null )}{{endif}}{{endif}}' title='{lang="view_this_collab" sprintf="$collab->collab_singular, $collab->title"}' target='_top'>{$collab->title}</a></h4>
+	</div>
+
+	<div class='ipsEmbedded_content'>
+		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix ipsType_medium'>
+			{{if $post}}
+			{template="userPhoto" group="global" app="core" params="$post->author(), 'mini', NULL, '', FALSE"}
+			<div>
+				<span class='ipsType_light ipsType_small'>{lang="byline" sprintf="$post->author()->name"} {datetime="$post->mapped('date')"}</span>
+				<div data-ipsTruncate data-ipsTruncate-size='1 lines' data-ipsTruncate-type='remove' class='cTopicEmbeddedPreview'>
+					{$post->truncated( TRUE )|raw}
+				</div>
+			</div>
+			{{else}}
+			{template="userPhoto" group="global" app="core" params="$collab->author(), 'mini', NULL, '', FALSE"}
+			<div>
+				<span class='ipsType_light ipsType_small'>{lang="byline" sprintf="$collab->author()->name"} {datetime="$collab->mapped('date')"}</span>
+				<div data-ipsTruncate data-ipsTruncate-size='1 lines' data-ipsTruncate-type='remove' class='cTopicEmbeddedPreview'>
+					{$collab->truncated( TRUE )|raw}
+				</div>
+				<ul class='ipsList_inline ipsType_small ipsEmbedded_stats'>
+					{{if $collab->container()->allow_rating}}
+						<li>{template="rating" app="core" params="'small', $collab->averageRating()" group="global"}</li>
+					{{endif}}
+					<li><i class='fa fa-users'></i> {lang="collab_active_members_count" pluralize="$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )"}</li>
+				</ul>
+			</div>
+			{{endif}}
+		</div>
+	</div>
+</div>]]></template>
  <template template_group="global" template_name="row" template_data="$table, $headers, $collab, $showReadMarkers=TRUE" template_location="front" template_app="collab"><![CDATA[{{$idField = $collab::$databaseColumnId;}}
 <li class="ipsDataItem ipsDataItem_responsivePhoto {{if $collab->unread()}}ipsDataItem_unread{{endif}} {{if method_exists( $collab, 'tableClass' ) && $collab->tableClass()}}ipsDataItem_{$collab->tableClass()}{{endif}} {{if $collab->hidden()}}ipsModerated{{endif}}">
 	{{if $showReadMarkers}}

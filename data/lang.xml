@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10105">
+ <app key="collab" version="10106">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -153,6 +153,7 @@
   <word key="collab_no_content" js="0">No content here yet</word>
   <word key="collab_marked_model" js="0">Designated as a model</word>
   <word key="collab_collab_submit_comment" js="0">Submit Comment</word>
+  <word key="view_this_collab" js="0">View the %s: %s</word>
   <word key="collab_status" js="0">Status</word>
   <word key="collabs_all" js="0">All</word>
   <word key="collabs_join_closed" js="0">Closed Membership</word>
@@ -364,6 +365,7 @@
   <word key="created_date" js="0">Date Created</word>
   <word key="single" js="0">Only One</word>
   <word key="multiple" js="0">Multiple</word>
+  <word key="__global_active_collab" js="0">Page: Associated Collaboration</word>
   <word key="collab_Collaboration_event_member_invited" js="0">Member is invited to collab</word>
   <word key="collab_Collaboration_event_member_invited_member" js="0">Member that was invited</word>
   <word key="collab_Collaboration_event_member_invited_sponsor" js="0">Member responsible for the invite</word>
@@ -385,5 +387,28 @@
   <word key="collab_Collaboration_event_member_removed_member" js="0">Member that was removed</word>
   <word key="collab_Collaboration_event_member_removed_collab" js="0">The collab</word>
   <word key="collab_Collaboration_event_member_removed_membership" js="0">The collab membership</word>
+  <word key="collab_Collaboration_conditions_membership_status" js="0">Member has collab membership status</word>
+  <word key="collab_Collaboration_conditions_membership_status_collab" js="0">The Collaboration to Check</word>
+  <word key="collab_Collaboration_conditions_membership_status_member" js="0">Member to Check</word>
+  <word key="collab_Collaboration_conditions_membership_status_status" js="0">Status to Check</word>
+  <word key="collab_rules_statuses" js="0">Check for any of these statuses</word>
+  <word key="collab_Collaboration_conditions_collab_owned" js="0">Check container or content for collab ownership</word>
+  <word key="collab_Collaboration_conditions_collab_owned_entity" js="0">Container or Content to Check</word>
+  <word key="collab_Collaboration_conditions_join_mode" js="0">Collaboration has a particular join mode</word>
+  <word key="collab_Collaboration_conditions_join_mode_collab" js="0">The Collaboration to Check</word>
+  <word key="collab_Collaboration_conditions_join_mode_mode" js="0">Join Mode to Check</word>
+  <word key="collab_rules_modes" js="0">Check for any of these join modes</word>
+  <word key="collab_Collaboration_actions_set_membership_status" js="0">Create/modify a collaboration membership status</word>
+  <word key="collab_Collaboration_actions_set_membership_status_collab" js="0">Associated Collaboration</word>
+  <word key="collab_Collaboration_actions_set_membership_status_member" js="0">Member To Modify Membership Status For</word>
+  <word key="collab_Collaboration_actions_set_membership_status_status" js="0">Membership Status To Set</word>
+  <word key="collab_rules_set_status" js="0">Set member to the following membership status</word>
+  <word key="collab_Collaboration_actions_delete_membership" js="0">Delete a collaboration membership</word>
+  <word key="collab_Collaboration_actions_delete_membership_member" js="0">Member To Delete Membership For</word>
+  <word key="collab_Collaboration_actions_delete_membership_collab" js="0">Associated Collaboration</word>
+  <word key="collab_Collaboration_actions_set_join_mode" js="0">Change the join mode of a collaboration</word>
+  <word key="collab_Collaboration_actions_set_join_mode_mode" js="0">Join Mode to Set</word>
+  <word key="collab_Collaboration_actions_set_join_mode_collab" js="0">Associated Collaboration</word>
+  <word key="collab_rules_set_mode" js="0">Set collaboration join mode to</word>
  </app>
 </language>
