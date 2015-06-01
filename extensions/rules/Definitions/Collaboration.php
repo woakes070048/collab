@@ -404,7 +404,7 @@ class _Collaboration
 			throw new \UnexpectedValueException( 'Entity must be a node or content' );
 		}
 		
-		return (bool) \IPS\collab\Application::getCollab( $entity );
+		return (bool) ( $entity instanceof \IPS\collab\Collab or \IPS\collab\Application::getCollab( $entity ) );
 	}
 	
 	/**

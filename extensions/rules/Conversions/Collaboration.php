@@ -43,7 +43,7 @@ class _Collaboration
 				'class' => '\IPS\collab\Collab',
 				'getArg' => function()
 				{
-					return \IPS\collab\Application::affectiveCollab();
+					return \IPS\collab\Application::affectiveCollab() ?: NULL;
 				},
 			),
 		);
@@ -76,7 +76,7 @@ class _Collaboration
 					'nullable' => TRUE,
 					'converter' => function( $object )
 					{
-						return \IPS\collab\Application::getCollab( $object );
+						return \IPS\collab\Application::getCollab( $object ) ?: NULL;
 					},
 				),
 			),
@@ -96,7 +96,7 @@ class _Collaboration
 							return $object;
 						}
 						
-						return \IPS\collab\Application::getCollab( $object );
+						return \IPS\collab\Application::getCollab( $object ) ?: NULL;
 					},
 				),
 			),
