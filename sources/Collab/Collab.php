@@ -513,6 +513,34 @@ class _Collab extends \IPS\Content\Item implements
 	}
 	
 	/**
+	 * Get stats to display in the collab header
+	 */
+	public function collabStatItems()
+	{
+		$stats = array();
+		
+		/**
+		 * Add Rules Data To Stats
+		 */
+		if ( \IPS\Application::appIsEnabled( 'rules' ) )
+		{
+			foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', 'rules_data', array( 'data_class=? AND data_use_mode IN ( \'public\' ) AND data_type IN ( \'string\', \'int\', \'float\' )', static::rulesDataClass() ) ), 'IPS\rules\Data' ) as $data_field )
+			{
+				if ( $data_field->can( 'view' ) )
+				{
+					$statValue = $this->getRulesData( $data_field->column_name );					
+					if ( $statValue !== NULL )
+					{
+						$stats[ 'rules_' . $data_field->column_name ] = \IPS\Theme::i()->getTemplate( 'components', 'collab', 'front' )->collabStatItem( $this, $data_field->name, $statValue );
+					}
+				}
+			}
+		}
+		
+		return $stats;
+	}
+	
+	/**
 	 * Cover Photo
 	 *
 	 * @return	\IPS\Helpers\CoverPhoto
