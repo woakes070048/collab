@@ -513,6 +513,24 @@ class _Collab extends \IPS\Content\Item implements
 	}
 	
 	/**
+	 * Get collab menu items
+	 */
+	public function collabMenuItems()
+	{
+		$menuItems = array
+		(
+			'home' => array
+			(
+				'url' => $this->url(),
+				'icon' => 'home',
+				'text' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_homepage', FALSE, array( 'sprintf' => array( $this->collab_singular ) ) ),
+			),
+		);
+		
+		return $menuItems;
+	}
+	
+	/**
 	 * Get stats to display in the collab header
 	 */
 	public function collabStatItems()

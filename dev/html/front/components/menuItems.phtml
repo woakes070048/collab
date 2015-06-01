@@ -1,0 +1,12 @@
+<ips:template parameters="$collab, $menuItems" />
+
+<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCollabMenu_menu'>
+	{{foreach $menuItems as $menuItem}}
+	<li class='ipsMenu_item'>
+		<a href="{$menuItem[ 'url' ]}">
+			{{if $menuItem[ 'icon' ]}}<i class="fa fa-{$menuItem['icon']}"></i>&nbsp;{{endif}}<span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_homepage" sprintf="$collab->collab_singular"}</span>
+		</a>
+	</li>
+	{{endforeach}}
+</ul>
+
