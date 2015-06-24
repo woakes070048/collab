@@ -771,6 +771,19 @@ class _Menu extends \IPS\Node\Model implements \IPS\Node\Permissions
 	}
 	
 	/**
+	 * Set the permission index permissions
+	 *
+	 * @param	array	$insert	Permission data to insert
+	 * @param	object	\IPS\Helpers\Form\Matrix
+	 * @return  void
+	 */
+	public function setPermissions( $insert, \IPS\Helpers\Form\Matrix $matrix )
+	{
+		$insert[ 'perm_view' ] = '*';
+		return parent::setPermissions( $insert, $matrix );
+	}
+
+	/**
 	 * Get Collab
 	 *
 	 * @return	\IPS\Member
