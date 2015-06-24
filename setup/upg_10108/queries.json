@@ -109,7 +109,7 @@
                         "type": "primary",
                         "name": "PRIMARY",
                         "columns": [
-                            "id"
+                            "menu_id"
                         ],
                         "length": [
                             null
