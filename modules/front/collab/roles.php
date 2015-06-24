@@ -57,7 +57,6 @@ class _roles extends \IPS\Node\Controller
 		
 		if ( ! $collab->collabCan( 'manageRoles' ) )
 		{
-			$nodeClass = $this->nodeClass;
 			\IPS\collab\Application::authError( 'manageRoles' );
 		}
 	

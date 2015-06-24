@@ -17,7 +17,7 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 
 /**
- *  Collab collab
+ *  Collab role
  */
 class _Role extends \IPS\Node\Model
 {

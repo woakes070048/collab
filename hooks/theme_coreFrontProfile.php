@@ -12,16 +12,7 @@ public static function hookData() {
     array (
       'selector' => '.cUserHovercard_data ul',
       'type' => 'add_inside_end',
-      'content' => '{{if $collabCount = count( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ) )}}
-	<li>
-		<span class="ipsDataItem_generic ipsDataItem_size3"><strong>{lang="__app_collab"}</strong></span>
-		<span class="ipsDataItem_main">
-		{{foreach $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ) as $i => $collab}}
-		<a href="{$collab->url()}">{$collab->title}</a>{{if $i < $collabCount - 1}}, {{endif}}
-	    {{endforeach}}
-		</span>
-	</li>
-{{endif}}',
+      'content' => '{template="memberCollabCardList" app="collab" group="components" params="$member"}',
     ),
     1 => 
     array (
