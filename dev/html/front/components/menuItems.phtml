@@ -4,7 +4,7 @@
 	{{foreach $menuItems as $menuItem}}
 	<li class='ipsMenu_item'>
 		<a href="{$menuItem[ 'url' ]}">
-			{{if $menuItem[ 'icon' ]}}<i class="fa fa-{$menuItem['icon']}"></i>&nbsp;{{endif}}<span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_homepage" sprintf="$collab->collab_singular"}</span>
+			{{if $menuItem[ 'icon' ]}}<i class="fa fa-{$menuItem['icon']}"></i>&nbsp;{{endif}}<span class='ipsResponsive_inline'>&nbsp;&nbsp;{$menuItem[ 'title' ]}</span>
 		</a>
 	</li>
 	{{endforeach}}

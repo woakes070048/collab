@@ -51,14 +51,18 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		try
 		{
 			$collab = \IPS\collab\Collab::loadAndCheckPerms( $node->collab_id );
-			if ( ! ( $settings = $collab->enabledNodes( md5( $nodeClass ) ) ) )
+			if 
+			( 
+				! $collab->enabledNodes( md5( $nodeClass ) ) and
+				! in_array( get_class( $node ), \IPS\collab\Application::$internalNodes )
+			)
 			{
-				\IPS\IPS\Output::i()->error( 'collab_node_unavailable', '2CP01/B', 404, '' );
+				\IPS\Output::i()->error( 'collab_node_unavailable', '2CP01/B', 404, '' );
 			}
 		}
 		catch ( \OutOfRangeException $e ) 
 		{
-			\IPS\IPS\Output::i()->error( 'collab_not_found', '2CP01/B', 404, '' );
+			\IPS\Output::i()->error( 'collab_not_found', '2CP01/B', 404, '' );
 		}
 		
 		/* Check permission */

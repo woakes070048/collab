@@ -24,6 +24,13 @@
 					</a>
 				</li>
 				{{endif}}
+				{{if $collab->collabCan( 'editMenu' )}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=menu&collab={$collab->collab_id}"}'>
+						<i class='fa fa-users'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_editMenu"}</span>
+					</a>
+				</li>
+				{{endif}}
 				{{if $collab->collabCan( 'manageMembers' )}}
 				<li class='ipsMenu_item'>
 					<a href='{url="app=collab&module=collab&controller=admin&collab={$collab->collab_id}&do=manageMembers"}'>

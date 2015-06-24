@@ -197,6 +197,7 @@ class _Collab extends \IPS\Content\Item implements
 			(
 				'editDescription',
 				'editSettings',
+				'editMenu',
 				'manageMembers' => array
 				(
 					'editMember' => array
@@ -521,11 +522,24 @@ class _Collab extends \IPS\Content\Item implements
 		(
 			'home' => array
 			(
+				'title' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_homepage', FALSE, array( 'sprintf' => array( $this->collab_singular ) ) ),
 				'url' => $this->url(),
 				'icon' => 'home',
-				'text' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_homepage', FALSE, array( 'sprintf' => array( $this->collab_singular ) ) ),
 			),
 		);
+		
+		foreach( \IPS\collab\Menu::roots( NULL ) as $item )
+		{
+			if ( $item->can( 'view' ) )
+			{
+				$menuItems[ $item->id ] = array
+				(
+					'title' => $item->title,
+					'url' => new \IPS\Http\Url( $item->link ),
+					'icon' => $item->icon,
+				);
+			}
+		}
 		
 		return $menuItems;
 	}

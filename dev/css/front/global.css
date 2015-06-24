@@ -114,3 +114,14 @@ html[dir="rtl"] #elCollabStats > ul:last-child > li {
 	color: #888;
 	height: auto;
 }
+
+#elSelect_collab_menu_icon {
+	font-family: fontawesome;
+	font-size:1.4em !important;
+	height:40px;
+	width:60px;
+}
+
+#elSelect_collab_menu_icon option {
+	padding: 10px 0 10px 10px;
+}
