@@ -1,0 +1,15 @@
+<ips:template parameters="$member" />
+
+{{if $collabCount = count( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ) )}}
+	<li>
+		<span class="ipsDataItem_generic ipsDataItem_size3"><strong>{lang="__app_collab"}</strong></span>
+		<span class="ipsDataItem_main">
+		{{foreach array_slice( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 0, 5 ) as $i => $collab}}
+			<a href="{$collab->url()}">{$collab->title}</a>{{if $i < $collabCount - 1 and $i < 4}}, {{endif}}
+		{{endforeach}}
+		{{if $collabCount - 5 > 0}}
+			<br>+ {expression="$collabCount - 5"} more
+		{{endif}}
+		</span>
+	</li>
+{{endif}}
