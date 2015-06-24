@@ -38,6 +38,15 @@ class _Application extends \IPS\Application
 	static $activeCollab = NULL;
 	
 	/**
+	 * @brief	Collab internal nodes
+	 */
+	static $internalNodes = array
+	(
+		'IPS\collab\Collab\Role',
+		'IPS\collab\Menu',
+	);
+	
+	/**
 	 * @brief 	Custom icons for supported apps
 	 */
 	public static function iconMap()

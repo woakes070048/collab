@@ -24,7 +24,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 			{
 				if 
 				(
-					in_array( get_called_class(), array( 'IPS\collab\Collab\Role' ) ) or
+					in_array( get_called_class(), \IPS\collab\Application::$internalNodes ) or
 					$collab->enabledNodes( md5( get_called_class() ) ) 
 				)
 				{
@@ -125,6 +125,19 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 * @throws	\OutOfBoundsException	If $permission does not exist in static::$permissionMap
 	 */
 	public function can( $permission, $member=NULL )
+	{	
+		return $this->canCollab( $permission, $member ) and parent::can( $permission, $member );
+	}
+	
+	/**
+	 * Check permissions
+	 *
+	 * @param	mixed								$permission		A key which has a value in static::$permissionMap['view'] matching a column ID in core_permission_index
+	 * @param	\IPS\Member|\IPS\Member\Group|NULL	$member			The member or group to check (NULL for currently logged in member)
+	 * @return	bool
+	 * @throws	\OutOfBoundsException	If $permission does not exist in static::$permissionMap
+	 */
+	public function canCollab( $permission, $member=NULL )
 	{
 		$member 	= $member ?: \IPS\Member::loggedIn();
 		$collabCan 	= TRUE;
@@ -148,7 +161,11 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 			try
 			{
 				$collab = \IPS\collab\Collab::load( $this->collab_id );
-				if ( ! ( $settings = $collab->enabledNodes( md5( get_called_class() ) ) ) )
+				if 
+				( 
+					! $collab->enabledNodes( md5( get_called_class() ) ) and
+					! in_array( get_called_class(), \IPS\collab\Application::$internalNodes )
+				)
 				{
 					return FALSE;
 				}
@@ -232,9 +249,9 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 			}
 		}
 		
-		return $collabCan and parent::can( $permission, $member );
+		return $collabCan;
 	}
-	
+
 	/**
 	 * Reset Permissions
 	 */
@@ -308,7 +325,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		if 
 		( 
 			\IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) and
-			! ( $this instanceof \IPS\collab\Collab\Role )
+			! in_array( get_class( $this ), \IPS\collab\Application::$internalNodes )
 		)
 		{
 			if ( $this->collab_id )
