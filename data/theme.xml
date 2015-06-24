@@ -553,6 +553,20 @@
 	{$value}
 </li>
 ]]></template>
+ <template template_group="components" template_name="memberCollabCardList" template_data="$member" template_location="front" template_app="collab"><![CDATA[
+{{if $collabCount = count( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ) )}}
+	<li>
+		<span class="ipsDataItem_generic ipsDataItem_size3"><strong>{lang="__app_collab"}</strong></span>
+		<span class="ipsDataItem_main">
+		{{foreach array_slice( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 0, 5 ) as $i => $collab}}
+			<a href="{$collab->url()}">{$collab->title}</a>{{if $i < $collabCount - 1 and $i < 4}}, {{endif}}
+		{{endforeach}}
+		{{if $collabCount - 5 > 0}}
+			<br>+ {expression="$collabCount - 5"} more
+		{{endif}}
+		</span>
+	</li>
+{{endif}}]]></template>
  <template template_group="components" template_name="membersList" template_data="$url, $pagination, $memberships" template_location="front" template_app="collab"><![CDATA[<div>
 	<div class="ipsPad">{$pagination|raw}</div>
 	<div class='{{if \IPS\Request::i()->isAjax()}}ipsFollowerList {{endif}}ipsPad ipsScrollbar'>
@@ -589,7 +603,7 @@
 	{{foreach $menuItems as $menuItem}}
 	<li class='ipsMenu_item'>
 		<a href="{$menuItem[ 'url' ]}">
-			{{if $menuItem[ 'icon' ]}}<i class="fa fa-{$menuItem['icon']}"></i>&nbsp;{{endif}}<span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_homepage" sprintf="$collab->collab_singular"}</span>
+			{{if $menuItem[ 'icon' ]}}<i class="fa fa-{$menuItem['icon']}"></i>&nbsp;{{endif}}<span class='ipsResponsive_inline'>&nbsp;&nbsp;{$menuItem[ 'title' ]}</span>
 		</a>
 	</li>
 	{{endforeach}}
@@ -618,6 +632,13 @@
 				<li class='ipsMenu_item'>
 					<a href='{url="app=collab&module=collab&controller=collabs&id={$collab->collab_id}&do=edit"}'>
 						<i class='fa fa-cogs'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_settings" sprintf="$collab->collab_singular"}</span>
+					</a>
+				</li>
+				{{endif}}
+				{{if $collab->collabCan( 'editMenu' )}}
+				<li class='ipsMenu_item'>
+					<a href='{url="app=collab&module=collab&controller=menu&collab={$collab->collab_id}"}'>
+						<i class='fa fa-users'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_editMenu"}</span>
 					</a>
 				</li>
 				{{endif}}
@@ -1873,6 +1894,17 @@ html[dir="rtl"] #elCollabStats > ul:last-child > li {
 .ipsBadge.ipsBadge_collab {
 	color: #888;
 	height: auto;
+}
+
+#elSelect_collab_menu_icon {
+	font-family: fontawesome;
+	font-size:1.4em !important;
+	height:40px;
+	width:60px;
+}
+
+#elSelect_collab_menu_icon option {
+	padding: 10px 0 10px 10px;
 }]]></css>
  <css css_location="front" css_app="collab" css_attributes="" css_path="nodes" css_name="controlstrip.css">.ipsControlStrip {
 	border: 1px solid rgba(0,0,0,0.1);
