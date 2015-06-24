@@ -341,6 +341,22 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	{
 		$this->options = \serialize( $val );
 	}
+	
+	/**
+	 * Get configuration settings
+	 */
+	protected function get__configuration()
+	{
+		return json_decode( $this->configuration, TRUE ) ?: array();
+	}
+	
+	/**
+	 * Set configuration settings
+	 */
+	protected function set__configuration( $val )
+	{
+		$this->configuration = json_encode( $val );
+	}
 
 	/**
 	 * [Node] Set category moderator permissions
@@ -527,6 +543,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$iconMap		= \IPS\collab\Application::iconMap();
 		
 		$modoptions = \IPS\collab\Application::modOptions();
+		$configuration = $this->_configuration;
 		
 		/**
 		 * @DEMO: Restrict amount of categories available in demo version
@@ -548,6 +565,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			array( 'togglesOn' => array( 
 				$form_id . 'header_tab_collab_collabs_settings',
 				$form_id . 'collab_category_privacy_mode',
+				$form_id . 'collab_category_per_page',
 				$form_id . 'collabs_alias_singular', 
 				$form_id . 'collabs_alias_plural', 
 				$form_id . 'category_max_collabs_owned',
@@ -568,6 +586,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		);
 		
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_category_privacy_mode', $this->privacy_mode ?: 'public', TRUE, array( 'options' => $privacy_options ) ) );
+		$form->add( new \IPS\Helpers\Form\Number( 'collab_category_per_page', isset( $configuration[ 'per_page' ] ) ? $configuration[ 'per_page' ] : 25, TRUE, array( 'min' => 1 ) ) );
 		
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_name', NULL, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? "collab_category_{$this->id}" : NULL ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_description', NULL, FALSE, array(
@@ -813,13 +832,15 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	public function saveForm( $values )
 	{		
-		$save_keys = array(
+		$save_keys = array
+		(
 			'category_parent_id',
 			'category_options',
 			'category_collabs_enable',
 			'category_max_collabs_owned',
 			'category_max_collabs_joined',
 			'category_max_collab_members',
+			'category_configuration',
 		);
 		
 		/* Claim attachments */
@@ -834,9 +855,10 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			\IPS\File::claimAttachments( 'collab-cat-' . $this->id, $this->id, NULL, 'description', TRUE );
 		}
 		
-		$options = $this->_options;
-		$modperms = $this->_mod_perms;
-		$t_groups = count( \IPS\Member\Group::groups() );
+		$options 	= $this->_options;
+		$configuration 	= $this->_configuration;
+		$modperms 	= $this->_mod_perms;
+		$t_groups 	= count( \IPS\Member\Group::groups() );
 				
 		foreach ( $values as $key => $val )
 		{
@@ -926,6 +948,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			}
 			
 		}
+		
 		$this->_options = $options;
 		$this->_mod_perms = $modperms;
 		
@@ -946,7 +969,10 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		
 		$this->name_seo	= \IPS\Http\Url::seoTitle( $values[ 'category_name' ][ \IPS\Lang::defaultLanguage() ] );
 		$this->privacy_mode = $values[ 'collab_category_privacy_mode' ];
-
+		
+		$configuration[ 'per_page' ] = $values[ 'collab_category_per_page' ];
+		$this->_configuration = $configuration;
+		
 		/* Custom language fields */
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values[ 'category_name' ] );
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_desc", $values[ 'category_description' ] );

@@ -81,6 +81,8 @@ $lang = array(
 	'collab_app_title_desc'			=> "You can change the name of the collaboration app to reflect the way you use it.",
 	'tab_collab_category_settings'		=> "Category Details",
 	'tab_collab_collabs_settings'		=> "Collab Settings",
+	'collab_category_per_page'		=> "Collabs Per Page",
+	'collab_category_per_page_desc'		=> "Number of collabs to show per page in this category",
 	'collab_permissions'			=> "%s %s Permissions",
 	'collab_moderation_settings'		=> "%s Moderation Abilities For %s Owners",
 	'category_collabs_enable'		=> "Enable Collabs?",
@@ -254,6 +256,7 @@ $lang = array(
 	'collab_role_members'			=> "All Active Members",
 	'collab_perm_action'			=> "perform that action",
 	'collab_perm_manageCollab'		=> "Manage Collab",
+	'collab_perm_editMenu'			=> "Edit Collab Menu",
 	'collab_perm_editDescription'		=> "Edit Description",
 	'collab_perm_editSettings'		=> "Edit Settings",
 	'collab_perm_inviteMember'		=> "Invite Members",
@@ -286,6 +289,10 @@ $lang = array(
 	'collab_increase_mainposts_desc'	=> "Posts are only added to collab totals by default. Do you want posts to also add to the users overall site count?",
 	'collab_make_model'			=> "Flag as %s Model",
 	'collab_unmake_model'			=> "Unflag as %s Model",
+	'collab_menu_items'			=> "Menu Items",
+	'collab_menu_title'			=> "Menu Title",
+	'collab_menu_link'			=> "Menu Link",
+	'collab_menu_icon'			=> "Menu Icon",
 	
 	// User Membership Management
 	'collab_membership_collab_id'		=> "Title",
@@ -319,6 +326,8 @@ $lang = array(
 	'collab_perm__rate'			=> "Rate Collabs",
 	'collab_perm__join'			=> "Join Collabs",
 	'collab_perm__review'			=> "Write Reviews",
+	'collab_menu_perm__label'		=> "Menu Permissions",
+	'collab_menu_perm__view'		=> "View Menu Item",
 		
 	// ACP Logging
 	'collab_acplog_settings'		=> "Updated collaboration application settings",

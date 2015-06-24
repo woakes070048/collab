@@ -75,6 +75,7 @@ class _categories extends \IPS\Helpers\CoverPhoto\Controller
 	protected function _category( \IPS\collab\Category $category )
 	{
 		$where = NULL;
+		$configuration = $category->_configuration;
 		
 		if ( $category->privacy_mode == 'private' )
 		{
@@ -96,6 +97,11 @@ class _categories extends \IPS\Helpers\CoverPhoto\Controller
 		$table->rowsTemplate 	= array( \IPS\Theme::i()->getTemplate( 'components', 'collab', 'front' ), 'collabRow' );
 		$table->classes 	= array();
 		$table->hover 		= TRUE;
+		
+		if ( isset( $configuration[ 'per_page' ] ) and $configuration[ 'per_page' ] > 0 )
+		{
+			$table->limit = $configuration[ 'per_page' ];
+		}
 
 		/* Custom Search */
 		$filterOptions = array(
