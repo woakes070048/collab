@@ -257,8 +257,8 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 				
 				if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
 				{
-					$joins[] = array( 'from' => 'core_permission_index', 'where' => array( "core_permission_index.app='" . $nodeClass::$permApp . "' AND core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );
-					$collabWhere = "core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
+					$joins[] = array( 'from' => array( 'core_permission_index', 'collab_core_permission_index' ), 'where' => array( "collab_core_permission_index.app='" . $nodeClass::$permApp . "' AND collab_core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND collab_core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );
+					$collabWhere = "collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", collab_core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
 				}
 				else
 				{
