@@ -1,4 +1,4 @@
-<ips:template parameters="$collab" />
+<ips:template parameters="$collab, $minified=FALSE" />
 
 {{$parents = array();}}
 {{foreach $collab->container()->parents() as $parent}}
@@ -58,16 +58,20 @@
 					{{endif}}
 				</span>
 			</h1>
-			<p>{$collab->collab_singular} &nbsp;( {expression="implode(' / ', $parents)"} )</p>
-			{{if count( $collab->tags() )}}
-				<div style="padding-bottom:10px" class="ipsResponsive_hidePhone">
-					{template="tags" group="global" app="core" params="$collab->tags()"}
+			{{if \IPS\collab\Application::urlMatch( $collab )}}
+				<p>{$collab->collab_singular} &nbsp;( {expression="implode(' / ', $parents)"} )</p>
+				{{if count( $collab->tags() )}}
+					<div style="padding-bottom:10px" class="ipsResponsive_hidePhone">
+						{template="tags" group="global" app="core" params="$collab->tags()"}
+					</div>
+				{{endif}}
+				{{if $collab->container()->bitoptions[ 'allow_ratings' ]}}
+				<div class='ipsType_light ipsResponsive_hidePhone'>
+					{$collab->rating()|raw}
 				</div>
-			{{endif}}
-			{{if $collab->container()->bitoptions[ 'allow_ratings' ]}}
-			<div class='ipsType_light ipsResponsive_hidePhone'>
-				{$collab->rating()|raw}
-			</div>
+				{{endif}}
+			{{else}}
+				<div class='ipsPad'></div>
 			{{endif}}
 		</div>
 	</div>
