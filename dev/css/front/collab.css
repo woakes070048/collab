@@ -88,7 +88,12 @@ section.collabCategoryIndex {
 }
 
 .collabCategoryCoverLayout .collab-count {
-	margin-bottom: 20px;
+	margin-bottom:20px;
+}
+
+.collabCategoryCoverLayout_index .collab-count {
+	margin-top:20px;
+	font-size:1.2em;
 }
 
 .collabCategoryCoverLayout h1 a:hover {

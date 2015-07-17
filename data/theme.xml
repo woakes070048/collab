@@ -5,10 +5,15 @@
 	<div class='ipsColumn ipsColumn_fluid ipsClearfix'>
 		<div class='ipsPad coverContent'>
 			<h1 class='ipsType_reset'>
-				{{if $layout != 'standard'}}<a href='{$category->url()}'>{{endif}}
-				{$category->_title}
-				{{if $layout != 'standard'}}</a>{{endif}}
+				{{if $layout != 'standard'}}
+					<a href='{$category->url()}'>{$category->_title}</a>
+				{{else}}
+					{$category->_title}
+				{{endif}}
 			</h1>
+			{{if $category->collabs_enable}}
+				<div class='collab-count'>{expression="$category->getContentItemCount()"} {$category->collab_plural}</div>
+			{{endif}}
 			{{if $layout == 'subview'}}
 				<a href='{$category->url()}' class='ipsButton ipsButton_verySmall ipsButton_light'>{lang="browse"}</a>
 			{{else}}
@@ -30,6 +35,29 @@
 	</div>
 </div>
 ]]></template>
+ <template template_group="components" template_name="categoryRowData" template_data="$category" template_location="front" template_app="collab"><![CDATA[
+{{if $category->collabs_enable and $category->can( 'view' )}}
+<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+	<dl>
+		<dt class="ipsDataItem_stats_number">{$category->getContentItemCount()}</dt>
+		<dd class="ipsDataItem_stats_type ipsType_light">{$category->collab_plural}</dd>
+	</dl>
+</div>
+<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+{{foreach \IPS\collab\Collab::getItemsWithPermission( array( array( 'category_id=?', $category->_id ) ), 'last_post DESC', 1 ) as $collab}}
+		<li>{template="userPhoto" app="core" group="global" params="$collab->author(), 'tiny'"}	</li>
+		<li><a href="{$collab->url()}" class='ipsType_break ipsContained' title="{$collab->mapped( 'title' )}">{truncate="$collab->mapped( 'title' )" length="30"}</a></li>	
+		{{if $latestContentItems = $collab->getLatestContent( 1 )}}
+			{{$latestContent = array_shift( $latestContentItems );}}
+			<li>{lang="byline_nodate" htmlsprintf="$latestContent->author()->link()"}</li>
+			<li class="ipsType_light">{datetime="$latestContent->mapped( 'date' )"}</li>
+		{{else}}
+			<li>{lang="byline_nodate" htmlsprintf="$collab->author()->link()"}</li>
+			<li class="ipsType_light">{datetime="$collab->last_post"}</li>
+		{{endif}}
+{{endforeach}}
+</ul>
+{{endif}}]]></template>
  <template template_group="components" template_name="categoryTable" template_data="$table, $headers, $rows" template_location="front" template_app="collab"><![CDATA[<div data-baseurl='{$table->baseUrl}' data-resort='{$table->resortKey}' data-tableID='topics' data-controller='core.global.core.table{{if $table->canModerate()}},core.front.core.moderation{{endif}}'>
 
 	<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
@@ -326,7 +354,7 @@
 	</div>
 
 </div>]]></template>
- <template template_group="components" template_name="collabCoverOverlay" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
+ <template template_group="components" template_name="collabCoverOverlay" template_data="$collab, $minified=FALSE" template_location="front" template_app="collab"><![CDATA[
 {{$parents = array();}}
 {{foreach $collab->container()->parents() as $parent}}
   {{$parents[] = $parent->_title;}}
@@ -385,16 +413,20 @@
 					{{endif}}
 				</span>
 			</h1>
-			<p>{$collab->collab_singular} &nbsp;( {expression="implode(' / ', $parents)"} )</p>
-			{{if count( $collab->tags() )}}
-				<div style="padding-bottom:10px" class="ipsResponsive_hidePhone">
-					{template="tags" group="global" app="core" params="$collab->tags()"}
+			{{if \IPS\collab\Application::urlMatch( $collab )}}
+				<p>{$collab->collab_singular} &nbsp;( {expression="implode(' / ', $parents)"} )</p>
+				{{if count( $collab->tags() )}}
+					<div style="padding-bottom:10px" class="ipsResponsive_hidePhone">
+						{template="tags" group="global" app="core" params="$collab->tags()"}
+					</div>
+				{{endif}}
+				{{if $collab->container()->bitoptions[ 'allow_ratings' ]}}
+				<div class='ipsType_light ipsResponsive_hidePhone'>
+					{$collab->rating()|raw}
 				</div>
-			{{endif}}
-			{{if $collab->container()->bitoptions[ 'allow_ratings' ]}}
-			<div class='ipsType_light ipsResponsive_hidePhone'>
-				{$collab->rating()|raw}
-			</div>
+				{{endif}}
+			{{else}}
+				<div class='ipsPad'></div>
 			{{endif}}
 		</div>
 	</div>
@@ -418,16 +450,16 @@
 	{{foreach $rows as $row}}
 		{{$rowCount++;}}
 		{{$idField = $row::$databaseColumnId;}}
-		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
+		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{else}}ipsDataItem_read{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
 			<div class='ipsDataItem_icon ipsPos_top'>
 				{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
-				<span class='ipsItemStatus ipsItemStatus_large collabStatusIcon'>
+				<span style="opacity:1" class='ipsItemStatus ipsItemStatus_large collabStatusIcon {{if ! $row->unread()}}ipsItemStatus_read{{endif}} '>
 					{{if $row->isFull()}}
 						<i class="fa fa-circle"></i>
 					{{else}}
 					  	<i class="fa fa-circle-o"></i>
 					{{endif}}
-					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style1 membershipCount" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
+					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style3 membershipCount" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
 						{$member_count}
 					</span>
 					{{if $membership = $row->getMembership()}}
@@ -480,35 +512,56 @@
 						{template="tags" group="global" app="core" params="$row->tags(), true, true"}
 					{{endif}}
 				</span>
+				{{$collabData = $row->collab_data;}}
+				{{if $row->enabledNodes() and $collabData[ '_items' ][ 'grand_total' ]}}
+					<ul class="ipsDataItem_subList ipsList_inline" style="margin-top:3px">
+						{{foreach $row->enabledNodes() as $app => $configured}}
+							{{foreach $configured[ 'nodes' ] as $node}}
+								{{if $total_items = $collabData[ '_items' ][ 'node_totals' ][ $node[ 'nid' ] ]}}
+									<li class="">
+										{$node[ 'content_name' ]} ({$total_items})
+									</li>
+								{{endif}}
+							{{endforeach}}
+						{{endforeach}}
+					</ul>
+				{{endif}}
 				<div class='ipsDataItem_meta ipsType_reset ipsType_light ipsType_blendLinks'>
 					{truncate="$row->short_description" length="256"}
 				</div>
 			</div>
-			<ul class='ipsDataItem_stats'>
-				{{foreach $row->stats(TRUE) as $k => $v}}
-					<li {{if $k == 'num_views'}}class='ipsType_light'{{elseif in_array( $k, $row->hotStats )}}class="ipsDataItem_stats_hot" data-text='{lang="hot_item"}' data-ipsTooltip title='{lang="hot_item_desc"}'{{endif}}>
-						<span class='ipsDataItem_stats_number'>{$v}</span>
-						<span class='ipsDataItem_stats_type'>{lang="forums_{$k}" pluralize="$v"}</span>
-						{{if $k == 'comments' && \IPS\collab\Collab::modPermission( 'unhide', NULL, $row->container() ) AND $row->queuedposts}}
-							&nbsp;<a href='{$row->url()->setQueryString( 'queued_posts', 1 )}' class='ipsType_warning ipsType_small ipsPos_right ipsResponsive_noFloat' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$row->topic_queuedposts"}'><i class='fa fa-warning'></i> <strong>{$row->topic_queuedposts}</strong></a>
+			{{foreach $row->stats(TRUE) as $k => $v}}
+				{{if $k == 'items'}}
+					<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+						<dl>
+							<dt class="ipsDataItem_stats_number">{$v}</dt>
+							<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_contributions" pluralize="$v"}</dd>
+						</dl>
+					</div>
+				{{endif}}
+			{{endforeach}}
+			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+				{{if $latestContentItems = $row->getLatestContent( 1 )}}
+					{{$latestContent = array_shift( $latestContentItems );}}
+					<li>{template="userPhoto" app="core" group="global" params="$latestContent->author(), 'tiny'"}</li>
+					<li><a href="{$latestContent->url()->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+					<li>{lang="byline_nodate" htmlsprintf="$latestContent->author()->link()"}</li>
+					<li class="ipsType_light"><a href='{$latestContent->url()->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$latestContent->mapped( 'date' )"}</a></li>
+				{{else}}
+					<li>
+						{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
+					</li>
+					<li>
+						{$row->author()->link()|raw}
+					</li>
+					<li class="ipsType_light ipsResponsive_hidePhone">
+						{{if $membership = $row->getMembership( $row->author() )}}
+							{$membership->title()}
+						{{else}}
+							{$row->guestTitle()}
 						{{endif}}
 					</li>
-				{{endforeach}}
-			</ul>
-			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
-				<li>
-					{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
-				</li>
-				<li>
-					{$row->author()->link()|raw}
-				</li>
-				<li class="ipsType_light ipsResponsive_hidePhone">
-					{{if $membership = $row->getMembership( $row->author() )}}
-						{$membership->title()}
-					{{else}}
-						{$row->guestTitle()}
-					{{endif}}
-				</li>
+				{{endif}}
 			</ul>
 			{{if $table->canModerate()}}
 				<div class='ipsDataItem_modCheck'>
@@ -518,6 +571,31 @@
 		</li>
 	{{endforeach}}
 {{endif}}]]></template>
+ <template template_group="components" template_name="collabRowData" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
+<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+	<dl>
+		{{$count = $collab->getTotal( '_items' );}}
+		<dt class="ipsDataItem_stats_number">{$count}</dt>
+		<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
+	</dl>
+</div>
+<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
+	{{if $latestContentItems = $collab->getLatestContent( 1 )}}
+		{{$latestContent = $lastPost = array_shift( $latestContentItems );}}
+		{{$itemUrl = $itemDateLink = $latestContent->url();}}
+		{{if isset( $latestContent::$commentClass ) and $_lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+		  {{$lastPost = $_lastPost;}}
+		  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
+		  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
+		{{endif}}
+		<li>{template="userPhoto" app="core" group="global" params="$latestContent->author(), 'tiny'"}</li>
+		<li><a href="{$itemUrl}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+		<li>{lang="byline_nodate" htmlsprintf="$lastPost->author()->link()"}</li>
+		<li class="ipsType_light"><a href='{$itemDateLink}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped( 'date' )"}</a></li>
+	{{else}}
+		<li class='ipsType_light ipsResponsive_showDesktop'>{lang="collab_active_members_count" pluralize="$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )"}</li>
+	{{endif}}
+</ul>]]></template>
  <template template_group="components" template_name="collabStatBar" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
 <div id='elCollabStats' class='ipsClearfix'>
 	<div data-role='switchView' class='ipsResponsive_hidePhone ipsResponsive_block'>
@@ -550,7 +628,7 @@
  <template template_group="components" template_name="collabStatItem" template_data="$collab, $title, $value, $options=array()" template_location="front" template_app="collab"><![CDATA[
 <li>
 	<h4 class='ipsType_minorHeading'>{$title}</h4>
-	{$value}
+	<span>{{if $value}}{$value}{{else}}&nbsp;{{endif}}</span>
 </li>
 ]]></template>
  <template template_group="components" template_name="memberCollabCardList" template_data="$member" template_location="front" template_app="collab"><![CDATA[
@@ -638,7 +716,7 @@
 				{{if $collab->collabCan( 'editMenu' )}}
 				<li class='ipsMenu_item'>
 					<a href='{url="app=collab&module=collab&controller=menu&collab={$collab->collab_id}"}'>
-						<i class='fa fa-users'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_editMenu"}</span>
+						<i class='fa fa-list'></i><span class='ipsResponsive_inline'>&nbsp;&nbsp;{lang="collab_perm_editMenu"}</span>
 					</a>
 				</li>
 				{{endif}}
@@ -724,52 +802,64 @@
 		</li>
 	{{endif}}
 </ul>]]></template>
- <template template_group="components" template_name="nodeGridItem" template_data="$node" template_location="front" template_app="collab"><![CDATA[{{if $node->can('view')}}
-	<div data-role='patchworkItem' class="ipsAreaBackground_reset ipsPad cForumGrid ipsClearfix" data-nodeID="{$node->_id}">
+ <template template_group="components" template_name="nodeGridItem" template_data="$node" template_location="front" template_app="collab"><![CDATA[
+{{$contentClass = $node::$contentItemClass;}}
+{{$unread = $contentClass::containerUnread( $node );}}
 
-		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix'>
+{{if $node->can('view')}}
+	<div data-role='patchworkItem' class="ipsAreaBackground_reset cForumGrid ipsClearfix" data-nodeID="{$node->_id}">
+
+		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix ipsPad ipsAreaBackground_light cForumGrid_forumInfo'>
 			<span class='ipsPos_left'>
 					{{if $node->icon}}
 						<img src="{file="$node->icon" extension="forums_Icons"}" class='ipsImage cForumGrid_icon'>
 					{{else}}
-						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal'>
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {{if !$unread}}ipsItemStatus_read{{endif}}'>
 							<i class="fa fa-comments"></i>
 						</span>
 					{{endif}}
 			</span>
-			<div>
-				<h3 class='ipsType_reset ipsType_large'>
+			<div class='{{if $unread}}ipsDataItem_unread{{endif}}'>
+				<h3  class='ipsDataItem_title ipsType_reset ipsType_large'>
 					{{if $node->password && !$node->loggedInMemberHasPasswordAccess()}}
-						<a href="{$node->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$node->_title}</a>
+						<ahref="{$node->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$node->_title}</a>
 					{{else}}
 						<a href="{$node->url()}">{$node->_title}</a>
 					{{endif}}
 				</h3>
+				{{if !$node->redirect_on and isset( $node::$contentItemClass ) and $contentClass = $node::$contentItemClass}}
+					{{$count = $contentClass::contentCount( $node, TRUE );}}
+					<p class='ipsType_reset'>{lang="posts_number" pluralize="$count"}</p>
+				{{endif}}
 			</div>
 		</div>
 		
 		{{if $node->hasChildren()}}
-			<br>
+		<div class="ipsPad">
 			<ul class="ipsList_inline">
 				<li><strong>{lang="collab_cat_sub"}</strong></li>
 				{{foreach $node->children() as $subnode}}
-					<li class="">
-						<a href="{$subnode->url()}">{$subnode->_title}</a>
+					<li class="{{if $contentClass::containerUnread( $subnode )}}ipsDataItem_unread{{endif}}">
+						<span class="ipsDataItem_title" style="margin:0">
+							<a href="{$subnode->url()}">{$subnode->_title}</a>
+						</span>
 					</li>
 				{{endforeach}}
 			</ul>
+		</div>
 		{{endif}}
 
 		{{if $node->description}}
-			<br>
+		<div class="ipsPad">
 			<div class='ipsType_richText ipsType_medium'>{$node->description|raw}</div>
+		</div>
 		{{endif}}
 		
-		<hr class='ipsHr'>
 
 		{{if !$node->redirect_on}}
 			{{if method_exists( $node, 'lastPost' ) and $lastPost = $node->lastPost()}}
-				<div class='ipsPhotoPanel ipsPhotoPanel_tiny'>
+				<div class='ipsPhotoPanel ipsPhotoPanel_tiny ipsPad'>
+					<hr class='ipsHr'>
 					{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}
 					<div>
 						<ul class='ipsList_reset'>
@@ -779,7 +869,7 @@
 					</div>
 				</div>
 			{{else}}
-				<p class='ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
+				<p class='ipsPad ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
 			{{endif}}
 		{{endif}}
 		
@@ -818,7 +908,7 @@
 						<a href='{$category->url()}'>{$category->_title}</a>
 					</h2>
 					{{if $category->childrenCount() >= $grid}}
-						<div class='ipsAreaBackground ipsPad' data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+						<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 							<div data-role='patchworkList'>
 								{{foreach $category->children() as $subnode}}
 									{template="nodeGridItem" group="components" app="collab" params="$subnode"}
@@ -843,7 +933,7 @@
 				{lang="$title_lang"}
 			</h2>
 			{{if $layout === 'grid'}}
-				<div class='ipsAreaBackground ipsPad' data-role="forums" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+				<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 					<div data-role='patchworkList'>
 						{{foreach $nodeClass::roots() as $node}}
 							{{if $node->can('view')}}
@@ -870,12 +960,13 @@
 {{$content_read_class = "";}}
 {{$nodeClass = get_class( $node );}}
 {{$contentClass = $nodeClass::$contentItemClass;}}
-{{if !$contentClass::containerUnread( $node ) && !$node->redirect_on}}
+{{$unread = $contentClass::containerUnread( $node );}}
+{{if !$unread && !$node->redirect_on}}
   {{$content_read_class = "ipsItemStatus_read";}}
 {{endif}}
 
 {{if $node->can('view')}}
-	<li class="ipsDataItem ipsDataItem_responsivePhoto ipsClearfix" data-forumID="{$node->_id}">
+	<li class="ipsDataItem ipsDataItem_responsivePhoto ipsClearfix {{if $unread}}ipsDataItem_unread{{endif}}" data-forumID="{$node->_id}">
 		<div class="ipsDataItem_icon ipsDataItem_category">
 			{{if $node->icon}}
 				<img src="{file="$node->icon" extension="forums_Icons"}" class='ipsItemStatus ipsItemStatus_custom {$content_read_class}'>
@@ -1351,6 +1442,55 @@
 	{template="collabHeader" app="collab" group="components" params="$collab"}
 	{$output|raw}
 </div>]]></template>
+ <template template_group="layouts" template_name="forumIndex" template_data="" template_location="front" template_app="collab"><![CDATA[
+{{$categories = array();}}
+{{foreach \IPS\collab\Category::roots() as $category}}
+  {{$configuration = $category->_configuration;}}
+  {{if $category->can( 'view' ) and $configuration[ 'show_forum_index' ] == TRUE}}
+    {{$categories[] = $category;}}
+  {{endif}}
+{{endforeach}}
+
+{{if $categories}}
+	<li data-categoryID='collab_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
+		<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks cForumTitle">
+			<a href='#' class='ipsPos_right ipsJS_show cForumToggle' data-action='toggleCategory' data-ipsTooltip title='{lang="toggle_this_category"}'></a>
+			{lang="__app_collab"}
+		</h2>
+		<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset" data-role="forums">
+			{{foreach $categories as $category}}
+				<li class="ipsDataItem ipsDataItem_responsivePhoto {{if \IPS\collab\Collab::containerUnread( $category )}}ipsDataItem_unread{{endif}} ipsClearfix" data-forumID="collab_{$category->_id}">
+					<div class="ipsDataItem_icon ipsDataItem_category">
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {{if !\IPS\collab\Collab::containerUnread( $category )}}ipsItemStatus_read{{endif}}'>
+							<i class="fa fa-users"></i>
+						</span>
+					</div>
+					<div class="ipsDataItem_main">
+						<h4 class="ipsDataItem_title ipsType_large">
+							<a href="{$category->url()}">{$category->_title}</a>
+						</h4>
+						{{if $category->hasChildren()}}
+							<ul class="ipsDataItem_subList ipsList_inline">
+								{{foreach $category->children() as $child}}
+									{{$childconfig = $child->_configuration;}}
+									{{if $child->can( 'view' ) and $childconfig[ 'show_forum_index' ]}}
+										{{$unread = \IPS\collab\Collab::containerUnread( $child );}}
+										<li class="{{if $unread}}ipsDataItem_unread{{endif}}">
+											<a href="{$child->url()}">{{if $unread}}<span class='ipsItemStatus ipsItemStatus_tiny {{if !$unread}}ipsItemStatus_read{{endif}}'><i class="fa fa-circle"></i></span>&nbsp;{{endif}}{$child->_title}</a>
+										</li>
+									{{endif}}
+								{{endforeach}}
+							</ul>
+						{{endif}}
+						{{if $category->description}}
+							<div class="ipsDataItem_meta ipsType_richText">{$category->description|raw}</div>
+						{{endif}}
+					</div>
+					{template="categoryRowData" app="collab" group="components" params="$category"}
+				</li>				
+			{{endforeach}}
+		</ol>
+{{endif}}]]></template>
  <template template_group="tabs" template_name="comments" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
 <div data-controller='core.front.core.commentFeed' data-commentsType='comments' data-baseURL='{$collab->url()}' {{if $collab->isLastPage()}}data-lastPage{{endif}} data-feedID='file-{$collab->id}'>
 	<br>
@@ -1550,6 +1690,52 @@
 		</div>
 	{{endif}}
 {{endif}}]]></template>
+ <template template_group="widgets" template_name="myCollabs" template_data="$collabs, $orientation='vertical'" template_location="front" template_app="collab"><![CDATA[{{if !empty( $collabs ) }}
+	<h3 class='ipsWidget_title ipsType_reset'>{lang="block_myCollabs"}</h3>
+
+	{{if $orientation == 'vertical'}}
+		<div class='ipsPad_half ipsWidget_inner'>
+			<ul class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $collabs as $collab}}
+					<li class='ipsDataItem{{if $collab->unread()}} ipsDataItem_unread{{endif}}{{if $collab->hidden()}} ipsModerated{{endif}}'>
+						<div class='ipsDataItem_icon ipsPos_top'>
+							{template="userPhoto" group="global" app="core" params="$collab->author(), 'tiny'"}
+						</div>
+						<div class='ipsDataItem_main'>
+							<a href="{$collab->url()->setQueryString( 'do', 'getLastComment' )}" title='{lang="view_this_topic" sprintf="$collab->title"}' class='ipsDataItem_title ipsType_break'>{wordbreak="$collab->title"}</a>
+							{{if $collab->mapped('featured') || $collab->hidden() === -1 || $collab->hidden() === 1}}
+								<span>
+									{{if $collab->hidden() === -1}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$collab->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+									{{elseif $collab->hidden() === 1}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+									{{endif}}
+									{{if $collab->mapped('featured')}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+									{{endif}}
+								</span>
+							{{endif}}
+							<br>
+							<span class='ipsType_light ipsType_small'>{lang="byline_nodate" htmlsprintf="$collab->author()->link()"}</span>
+						</div>
+					</li>
+				{{endforeach}}
+			</ul>
+		</div>
+	{{else}}
+		<div class='ipsWidget_inner'>
+			<ul class='ipsDataList'>
+				{{foreach $collabs as $collab}}
+					{template="row" group="global" app="collab" params="NULL, NULL, $collab, FALSE"}
+				{{endforeach}}
+			</ul>
+		</div>
+	{{endif}}
+	
+	<div class='ipsPad' style='text-align:center'>
+		<a class='ipsButton ipsButton_positive ipsButton_verySmall' href='{url="app=collab&module=collab&controller=settings"}'><i class='fa fa-users'></i> &nbsp;{lang="collab_manage_memberships" sprintf="\IPS\Member::loggedIn()->language()->addToStack('__app_collab')"}</a>
+	</div>
+{{endif}}]]></template>
  <css css_location="front" css_app="collab" css_attributes="" css_path="." css_name="collab.css"><![CDATA[/* Formatting Styles */
 
 .marg0 {
@@ -1639,9 +1825,27 @@ section.collabCategoryIndex {
 	text-decoration:none;
 }
 
+.collabCategoryCoverLayout .collab-count {
+	margin-bottom:20px;
+}
+
+.collabCategoryCoverLayout_index .collab-count {
+	margin-top:20px;
+	font-size:1.2em;
+}
+
 .collabCategoryCoverLayout h1 a:hover {
 	color:inherit;
 	text-decoration:none;
+}
+
+.collabCategoryCoverLayout_standard h1 {
+	display: inline-block;
+	margin-right:25px;
+}
+
+.collabCategoryCoverLayout_standard .collab-count {
+	display: inline-block;
 }
 
 .collabCategoryCoverLayout_index .collabCategoryDescription {
@@ -1669,7 +1873,7 @@ section.collabCategoryIndex {
 .collabCategoryCoverLayout_subview .coverContent h1 {
 	font-size: 1.5em;
 	line-height: 2em;
-	margin-bottom: 25px;
+	margin-bottom: 0px;
 }
 
 .collabCategoryCoverLayout_index .categoryCoverBrowseButton {

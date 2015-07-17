@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10108">
+ <app key="collab" version="10109">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -23,6 +23,8 @@
   <word key="block_featuredCollabs_desc" js="0">Show collabs that are currently featured</word>
   <word key="block_latestCollabs" js="0">Latest Collabs</word>
   <word key="block_latestCollabs_desc" js="0">Show the most recently started collabs</word>
+  <word key="block_myCollabs" js="0">My Collabs</word>
+  <word key="block_myCollabs_desc" js="0">List of collabs the currently logged in member is an active member of</word>
   <word key="group__collab_groupForm" js="0">Collaboration</word>
   <word key="g_collabs_owned_limit" js="0">Maximum collabs a member of this group can own</word>
   <word key="g_collabs_joined_limit" js="0">Maximum amount of collabs a member of this group can join</word>
@@ -61,6 +63,10 @@
   <word key="collab_app_title_desc" js="0">You can change the name of the collaboration app to reflect the way you use it.</word>
   <word key="tab_collab_category_settings" js="0">Category Details</word>
   <word key="tab_collab_collabs_settings" js="0">Collab Settings</word>
+  <word key="collab_category_show_forum_index" js="0">Show On Forum Index</word>
+  <word key="collab_category_show_forum_index_desc" js="0">If enabled, this category will be visible in the main forums index</word>
+  <word key="collab_category_require_approval" js="0">Require Approval</word>
+  <word key="collab_category_require_approval_desc" js="0">If enabled, new collabs created in this category will require moderator approval.</word>
   <word key="collab_category_per_page" js="0">Collabs Per Page</word>
   <word key="collab_category_per_page_desc" js="0">Number of collabs to show per page in this category</word>
   <word key="collab_permissions" js="0">%s %s Permissions</word>
@@ -156,6 +162,12 @@
   <word key="collab_marked_model" js="0">Designated as a model</word>
   <word key="collab_collab_submit_comment" js="0">Submit Comment</word>
   <word key="view_this_collab" js="0">View the %s: %s</word>
+  <word key="collab_items" js="0">{!# [1:item][?:items]}</word>
+  <word key="collab_num_views" js="0">{!# [1:view][?:views]}</word>
+  <word key="collab_comments" js="0">{!# [1:comment][?:comments]}</word>
+  <word key="collab_reviews" js="0">{!# [1:review][?:reviews]}</word>
+  <word key="collab_posts" js="0">{!# [1:post][?:posts]}</word>
+  <word key="collab_contributions" js="0">{!# [1:contribution][?:contributions]}</word>
   <word key="collab_status" js="0">Status</word>
   <word key="collabs_all" js="0">All</word>
   <word key="collabs_join_closed" js="0">Closed Membership</word>

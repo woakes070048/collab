@@ -66,5 +66,13 @@
     "ipsContentSearchIndex": {
         "type": "C",
         "class": "\\IPS\\Content\\Search\\Index"
+    },
+    "ipsForumsTopic": {
+        "type": "C",
+        "class": "\\IPS\\forums\\Topic"
+    },
+    "themeForumsFrontIndex": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_forums_front_index"
     }
 }

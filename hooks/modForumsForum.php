@@ -21,6 +21,15 @@ class collab_hook_modForumsForum extends _HOOK_CLASS_
 			{
 				return NULL; 
 			}
+			
+			/* Also check if we have any collab categories set up to show on the forum index */
+			foreach( \IPS\collab\Category::roots() as $category )
+			{
+				if ( $category->can( 'view' ) and $configuration = $category->_configuration and $configuration[ 'show_forum_index' ] )
+				{
+					return NULL;
+				}
+			}
 		}
 		return $forum;
 	}
