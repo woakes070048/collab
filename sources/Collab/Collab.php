@@ -1772,7 +1772,12 @@ class _Collab extends \IPS\Content\Item implements
 			$url = new \IPS\Http\Url( $url );
 		}
 		
-		$qs = array_merge( $url->queryString, $url->getFriendlyUrlData() );
+		$qs = $url->queryString;
+		try
+		{
+			$qs = array_merge( $qs, $url->getFriendlyUrlData() );
+		}
+		catch( \Exception $e ) { }
 	
 		if 
 		(

@@ -1342,9 +1342,14 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		if ( ! ( $url instanceof \IPS\Http\Url ) )
 		{
 			$url = new \IPS\Http\Url( $url );
-		}
+		}	
 		
-		$qs = array_merge( $url->queryString, $url->getFriendlyUrlData() );
+		$qs = $url->queryString;
+		try
+		{
+			$qs = array_merge( $qs, $url->getFriendlyUrlData() );
+		}
+		catch( \Exception $e ) { }
 	
 		if 
 		(

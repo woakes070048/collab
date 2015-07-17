@@ -421,7 +421,7 @@ class _Application extends \IPS\Application
 					static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
 					static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
 				}
-				catch ( \OutOfRangeException $e ) {}
+				catch ( \Exception $e ) { }
 				
 				if ( ! static::$request )
 				{
