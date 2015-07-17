@@ -1,6 +1,6 @@
 <ips:template parameters="$category" />
 
-{{if $category->collabs_enable}}
+{{if $category->collabs_enable and $category->can( 'view' )}}
 <div class="ipsDataItem_stats ipsDataItem_statsLarge">
 	<dl>
 		<dt class="ipsDataItem_stats_number">{$category->getContentItemCount()}</dt>

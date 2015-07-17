@@ -1,9 +1,9 @@
 <ips:template parameters="" />
 
 {{$categories = array();}}
-{{foreach \IPS\collab\Category::roots( 'view' ) as $category}}
+{{foreach \IPS\collab\Category::roots() as $category}}
   {{$configuration = $category->_configuration;}}
-  {{if $configuration[ 'show_forum_index' ] == TRUE}}
+  {{if $category->can( 'view' ) and $configuration[ 'show_forum_index' ] == TRUE}}
     {{$categories[] = $category;}}
   {{endif}}
 {{endforeach}}
