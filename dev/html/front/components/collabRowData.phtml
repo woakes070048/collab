@@ -1,0 +1,25 @@
+<ips:template parameters="$collab" />
+
+<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+	<dl>
+		{{$count = $collab->getTotal( '_items' );}}
+		<dt class="ipsDataItem_stats_number">{$count}</dt>
+		<dd class="ipsDataItem_stats_type ipsType_light">{lang="posts_no_number" pluralize="$count"}</dd>
+	</dl>
+</div>
+<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
+	{{if $latestContentItems = $collab->getLatestContent( 1 )}}
+		{{$latestContent = $lastPost = array_shift( $latestContentItems );}}
+		{{$itemUrl = $itemDateLink = $latestContent->url();}}
+		{{if isset( $latestContent::$commentClass ) and $lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+		  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
+		  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
+		{{endif}}
+		<li>{template="userPhoto" app="core" group="global" params="$latestContent->author(), 'tiny'"}</li>
+		<li><a href="{$itemUrl}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+		<li>{lang="byline_nodate" htmlsprintf="$lastPost->author()->link()"}</li>
+		<li class="ipsType_light"><a href='{$itemDateLink}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped( 'date' )"}</a></li>
+	{{else}}
+		<li class='ipsType_light ipsResponsive_showDesktop'>{lang="collab_active_members_count" pluralize="$collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 'count' => TRUE ) )"}</li>
+	{{endif}}
+</ul>

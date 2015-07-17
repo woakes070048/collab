@@ -304,7 +304,6 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		{
 			$collab = \IPS\collab\Collab::load( $values[ 'collab_id_select' ] );
 			
-			$moveRecursive = NULL;
 			$moveRecursive = function( $node ) use ( $collab, &$moveRecursive )
 			{
 				$node->collab_id = $collab->collab_id;
@@ -329,7 +328,11 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 			/* Make sure collab permissions have been initialized */
 			$node->collabPermissions();
 			
+			/* Move node and all subnodes */
 			$moveRecursive( $node );
+			
+			/* Recount all collab totals */
+			$collab->recountAll();
 			
 			\IPS\Output::i()->redirect( $this->url, 'collab_node_moved_to_collab' );
 		}
@@ -367,7 +370,6 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 			}
 		}
 		
-		$extractRecursive = NULL;
 		$extractRecursive = function( $node ) use ( &$extractRecursive )
 		{
 			$node->collab_id = 0;
@@ -383,13 +385,21 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		};
 		
 		$parentColumn		= $node::$databaseColumnParent;
-		
 		if ( $parentColumn )
 		{
 			$node->$parentColumn 	= $node::$databaseColumnParentRootValue;
 		}
-			
+		
+		$collab_id = $node->collab_id;
 		$extractRecursive( $node );
+		
+		/* Recount all collab totals */
+		try
+		{
+			$collab = \IPS\collab\Collab::load( $collab_id );
+			$collab->recountAll();
+		}
+		catch( \OutOfRangeException $e ) { }
 		
 		\IPS\Output::i()->redirect( $this->url, 'collab_node_extracted_from_collab' );		
 	}

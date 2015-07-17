@@ -81,6 +81,10 @@ $lang = array(
 	'collab_app_title_desc'			=> "You can change the name of the collaboration app to reflect the way you use it.",
 	'tab_collab_category_settings'		=> "Category Details",
 	'tab_collab_collabs_settings'		=> "Collab Settings",
+	'collab_category_show_forum_index'	=> "Show On Forum Index",
+	'collab_category_show_forum_index_desc' => "If enabled, this category will be visible in the main forums index",
+	'collab_category_require_approval'	=> "Require Approval",
+	'collab_category_require_approval_desc'	=> "If enabled, new collabs created in this category will require moderator approval.",
 	'collab_category_per_page'		=> "Collabs Per Page",
 	'collab_category_per_page_desc'		=> "Number of collabs to show per page in this category",
 	'collab_permissions'			=> "%s %s Permissions",
@@ -185,6 +189,12 @@ $lang = array(
 	'collab_marked_model'			=> "Designated as a model",
 	'collab_collab_submit_comment'		=> "Submit Comment",
 	'view_this_collab'			=> "View the %s: %s",
+	'collab_items'				=> "{!# [1:item][?:items]}",
+	'collab_num_views'			=> "{!# [1:view][?:views]}",
+	'collab_comments'			=> "{!# [1:comment][?:comments]}",
+	'collab_reviews'			=> "{!# [1:review][?:reviews]}",
+	'collab_posts'				=> "{!# [1:post][?:posts]}",
+	'collab_contributions'			=> "{!# [1:contribution][?:contributions]}",
 	
 	// Collab Custom Filters
 	'collab_status'				=> "Status",

@@ -510,9 +510,10 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 						$this->config[ $app ][ 'app' ] 	= $application;
 						$this->config[ $app ][ 'icon' ]	= $iconMap[ $application->directory ] ?: $application->_icon;
 					}
+					
 					$option[ 'nid' ] 				= md5( $option[ 'node' ] );
-					$option[ 'content_name' ]			= ucwords( $lang->get( $option[ 'content' ]::$title ) );
-					$option[ 'container_name' ]			= ucwords( $lang->get( $option[ 'node' ]::$nodeTitle ) );
+					$option[ 'content_name' ]			= ucwords( $lang->checkKeyExists( $option[ 'content' ]::$title ) ? $lang->get( $option[ 'content' ]::$title ) : $option[ 'content' ]::$title );
+					$option[ 'container_name' ]			= ucwords( $lang->checkKeyExists( $option[ 'node' ]::$nodeTitle ) ? $lang->get( $option[ 'node' ]::$nodeTitle ) : $option[ 'node' ]::$nodeTitle );
 					$option[ 'content_container_name' ]		= $option[ 'content_name' ] . ' ' . $option[ 'container_name' ];
 					$this->config[ $app ][ 'nodes' ][ $node_id ] 	= $option;
 					$this->nodeConfig[ $node_id ] 			= $option;
@@ -576,6 +577,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$form_id . 'collab_allow_reviews',
 				$form_id . 'collab_increase_mainposts',
 				$form_id . 'collab_restrict_owner',
+				$form_id . 'collab_category_require_approval',
 			) ) 
 		) );
 		
@@ -585,6 +587,12 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			'private' => 'category_privacy_mode_private',
 		);
 		
+		if ( \IPS\Application::appIsEnabled( 'forums' ) )
+		{
+			$form->add( new \IPS\Helpers\Form\YesNo( 'collab_category_show_forum_index', isset( $configuration[ 'show_forum_index' ] ) ? $configuration[ 'show_forum_index' ] : FALSE, FALSE ) );
+		}
+		
+		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_category_require_approval', isset( $configuration[ 'require_approval' ] ) ? $configuration[ 'require_approval' ] : FALSE, FALSE ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_category_privacy_mode', $this->privacy_mode ?: 'public', TRUE, array( 'options' => $privacy_options ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'collab_category_per_page', isset( $configuration[ 'per_page' ] ) ? $configuration[ 'per_page' ] : 25, TRUE, array( 'min' => 1 ) ) );
 		
@@ -971,6 +979,13 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$this->privacy_mode = $values[ 'collab_category_privacy_mode' ];
 		
 		$configuration[ 'per_page' ] = $values[ 'collab_category_per_page' ];
+		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
+		
+		if ( isset( $values[ 'collab_category_show_forum_index' ] ) )
+		{
+			$configuration[ 'show_forum_index' ] = $values[ 'collab_category_show_forum_index' ];
+		}
+		
 		$this->_configuration = $configuration;
 		
 		/* Custom language fields */
@@ -1107,7 +1122,11 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			)
 			{
 				$perms = $node->permissions();
-				$node->setPermissions( array_merge( array( 'perm_id' => $perms[ 'perm_id' ], 'app' => $nodeClass::$permApp, 'perm_type' => $nodeClass::$permType, 'perm_type_id' => $node->_id ), $permissions ), new \IPS\Helpers\Form\Matrix );
+				try
+				{
+					$node->setPermissions( array_merge( array( 'perm_id' => $perms[ 'perm_id' ], 'app' => $nodeClass::$permApp, 'perm_type' => $nodeClass::$permType, 'perm_type_id' => $node->_id ), $permissions ), new \IPS\Helpers\Form\Matrix );
+				}
+				catch( \OutOfRangeException $e ) { }
 			}
 		}
 	}
@@ -1308,8 +1327,42 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				return static::load( $qs['category'] );
 			}
 		}
-		
+				
 		throw new \InvalidArgumentException;
+	}
+	
+	/**
+	 * Check if a url is a collab category url
+	 *
+	 * @param	\IPS\Http\Url|string	$url		A url object or string url
+	 * @return	bool
+	 */
+	public static function checkAndLoadUrl( $url )
+	{
+		if ( ! ( $url instanceof \IPS\Http\Url ) )
+		{
+			$url = new \IPS\Http\Url( $url );
+		}
+		
+		$qs = array_merge( $url->queryString, $url->getFriendlyUrlData() );
+	
+		if 
+		(
+			$qs[ 'app' ] == 'collab' and 
+			$qs[ 'module' ] == 'collab' and 
+			$qs[ 'controller' ] == 'categories' and 
+			$qs[ 'category' ] > 0
+		)
+		{
+			try
+			{
+				$category = static::loadFromUrl( $url );
+				return $category;
+			}
+			catch( \Exception $e ) { }
+		}
+		
+		return NULL;
 	}
 
 	/**

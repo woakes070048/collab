@@ -555,6 +555,61 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	}
 
 	/**
+	 * Cache counts for content items and posts inside collabs
+	 *
+	 * @param	string	$k	Key
+	 * @param	mixed	$v	Value
+	 * @return	mixed
+	 */
+	public function __set( $k, $v )
+	{
+		if( in_array( $k, array( '_items', '_comments' ) ) )
+		{
+			if ( $this->collab_id and ! ( $this instanceof \IPS\collab\Collab ) )
+			{
+				try
+				{
+					$collab	= \IPS\collab\Collab::load( $this->collab_id );
+					$nid 	= md5( get_called_class() );
+					
+					if ( $collab->enabledNodes( $nid ) )
+					{
+						$data = $collab->collab_data;
+						
+						/**
+						 * If no count has been recorded yet to the collab data, count it all
+						 */
+						if ( ! isset( $data[ $k ] ) )
+						{
+							$result = parent::__set( $k, $v );
+							$data[ $k ] = $collab->countTotals( $k );
+							$collab->collab_data = $data;
+							$collab->save();
+							return $result;
+						}
+						
+						/**
+						 * Otherwise, to save cpu cycles, just add the difference to the existing total
+						 */
+						else
+						{
+							$existing = $this->$k;
+							$difference = $v - $existing;
+							$data[ $k ][ 'node_totals' ][ $nid ] += $difference;
+							$data[ $k ][ 'grand_total' ] += $difference;
+							$collab->collab_data = $data;
+							$collab->save();
+						}
+					}
+				}
+				catch ( \OutOfRangeException $e ) { }
+			}			
+		}
+
+		return parent::__set( $k, $v );
+	}
+
+	/**
 	 * [ActiveRecord] Save Changed Columns
 	 *
 	 * @return	void
@@ -629,7 +684,11 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 */
 	public function delete()
 	{
-		\IPS\Db::i()->delete( 'core_permission_index', array( "app=? AND perm_type=? AND perm_type_id=?", static::$permApp, 'collab_' . static::$permType, $this->_id ) );	
+		/* Note: Content items are deleted before the node which should update item/comment totals, so they don't need to be recalculated here. */
+		 
+		/* Delete collab permissions */
+		\IPS\Db::i()->delete( 'core_permission_index', array( "app=? AND perm_type=? AND perm_type_id=?", static::$permApp, 'collab_' . static::$permType, $this->_id ) );
+		
 		return parent::delete();
 	}	
 

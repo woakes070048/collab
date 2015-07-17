@@ -1,0 +1,50 @@
+<ips:template parameters="" />
+
+{{$categories = array();}}
+{{foreach \IPS\collab\Category::roots( 'view' ) as $category}}
+  {{$configuration = $category->_configuration;}}
+  {{if $configuration[ 'show_forum_index' ] == TRUE}}
+    {{$categories[] = $category;}}
+  {{endif}}
+{{endforeach}}
+
+{{if $categories}}
+	<li data-categoryID='collab_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
+		<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks cForumTitle">
+			<a href='#' class='ipsPos_right ipsJS_show cForumToggle' data-action='toggleCategory' data-ipsTooltip title='{lang="toggle_this_category"}'></a>
+			{lang="__app_collab"}
+		</h2>
+		<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset" data-role="forums">
+			{{foreach $categories as $category}}
+				<li class="ipsDataItem ipsDataItem_responsivePhoto {{if \IPS\collab\Collab::containerUnread( $category )}}ipsDataItem_unread{{endif}} ipsClearfix" data-forumID="collab_{$category->_id}">
+					<div class="ipsDataItem_icon ipsDataItem_category">
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {{if !\IPS\collab\Collab::containerUnread( $category )}}ipsItemStatus_read{{endif}}'>
+							<i class="fa fa-users"></i>
+						</span>
+					</div>
+					<div class="ipsDataItem_main">
+						<h4 class="ipsDataItem_title ipsType_large">
+							<a href="{$category->url()}">{$category->_title}</a>
+						</h4>
+						{{if $category->hasChildren()}}
+							<ul class="ipsDataItem_subList ipsList_inline">
+								{{foreach $category->children() as $child}}
+									{{$childconfig = $child->_configuration;}}
+									{{if $child->can( 'view' ) and $childconfig[ 'show_forum_index' ]}}
+										{{$unread = \IPS\collab\Collab::containerUnread( $child );}}
+										<li class="{{if $unread}}ipsDataItem_unread{{endif}}">
+											<a href="{$child->url()}">{{if $unread}}<span class='ipsItemStatus ipsItemStatus_tiny {{if !$unread}}ipsItemStatus_read{{endif}}'><i class="fa fa-circle"></i></span>&nbsp;{{endif}}{$child->_title}</a>
+										</li>
+									{{endif}}
+								{{endforeach}}
+							</ul>
+						{{endif}}
+						{{if $category->description}}
+							<div class="ipsDataItem_meta ipsType_richText">{$category->description|raw}</div>
+						{{endif}}
+					</div>
+					{template="categoryRowData" app="collab" group="components" params="$category"}
+				</li>				
+			{{endforeach}}
+		</ol>
+{{endif}}

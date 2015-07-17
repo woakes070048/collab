@@ -4,10 +4,15 @@
 	<div class='ipsColumn ipsColumn_fluid ipsClearfix'>
 		<div class='ipsPad coverContent'>
 			<h1 class='ipsType_reset'>
-				{{if $layout != 'standard'}}<a href='{$category->url()}'>{{endif}}
-				{$category->_title}
-				{{if $layout != 'standard'}}</a>{{endif}}
+				{{if $layout != 'standard'}}
+					<a href='{$category->url()}'>{$category->_title}</a>
+				{{else}}
+					{$category->_title}
+				{{endif}}
 			</h1>
+			{{if $category->collabs_enable}}
+				<div class='collab-count'>{expression="$category->getContentItemCount()"} {$category->collab_plural}</div>
+			{{endif}}
 			{{if $layout == 'subview'}}
 				<a href='{$category->url()}' class='ipsButton ipsButton_verySmall ipsButton_light'>{lang="browse"}</a>
 			{{else}}

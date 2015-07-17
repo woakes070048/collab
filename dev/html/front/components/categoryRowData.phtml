@@ -1,0 +1,13 @@
+<ips:template parameters="$category" />
+
+{{if $category->collabs_enable}}
+<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+	<dl>
+		<dt class="ipsDataItem_stats_number">{$category->getContentItemCount()}</dt>
+		<dd class="ipsDataItem_stats_type ipsType_light">{$category->collab_plural}</dd>
+	</dl>
+</div>
+<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
+	<li class='ipsType_light ipsResponsive_showDesktop'>{$category->getContentItemCount()} {$category->collab_plural}</li>
+</ul>
+{{endif}}

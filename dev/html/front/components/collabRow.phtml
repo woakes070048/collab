@@ -10,16 +10,16 @@
 	{{foreach $rows as $row}}
 		{{$rowCount++;}}
 		{{$idField = $row::$databaseColumnId;}}
-		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
+		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{else}}ipsDataItem_read{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
 			<div class='ipsDataItem_icon ipsPos_top'>
 				{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
-				<span class='ipsItemStatus ipsItemStatus_large collabStatusIcon'>
+				<span style="opacity:1" class='ipsItemStatus ipsItemStatus_large collabStatusIcon {{if ! $row->unread()}}ipsItemStatus_read{{endif}} '>
 					{{if $row->isFull()}}
 						<i class="fa fa-circle"></i>
 					{{else}}
 					  	<i class="fa fa-circle-o"></i>
 					{{endif}}
-					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style1 membershipCount" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
+					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style3 membershipCount" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
 						{$member_count}
 					</span>
 					{{if $membership = $row->getMembership()}}
@@ -72,35 +72,56 @@
 						{template="tags" group="global" app="core" params="$row->tags(), true, true"}
 					{{endif}}
 				</span>
+				{{$collabData = $row->collab_data;}}
+				{{if $row->enabledNodes() and $collabData[ '_items' ][ 'grand_total' ]}}
+					<ul class="ipsDataItem_subList ipsList_inline" style="margin-top:3px">
+						{{foreach $row->enabledNodes() as $app => $configured}}
+							{{foreach $configured[ 'nodes' ] as $node}}
+								{{if $total_items = $collabData[ '_items' ][ 'node_totals' ][ $node[ 'nid' ] ]}}
+									<li class="">
+										{$node[ 'content_name' ]} ({$total_items})
+									</li>
+								{{endif}}
+							{{endforeach}}
+						{{endforeach}}
+					</ul>
+				{{endif}}
 				<div class='ipsDataItem_meta ipsType_reset ipsType_light ipsType_blendLinks'>
 					{truncate="$row->short_description" length="256"}
 				</div>
 			</div>
-			<ul class='ipsDataItem_stats'>
-				{{foreach $row->stats(TRUE) as $k => $v}}
-					<li {{if $k == 'num_views'}}class='ipsType_light'{{elseif in_array( $k, $row->hotStats )}}class="ipsDataItem_stats_hot" data-text='{lang="hot_item"}' data-ipsTooltip title='{lang="hot_item_desc"}'{{endif}}>
-						<span class='ipsDataItem_stats_number'>{$v}</span>
-						<span class='ipsDataItem_stats_type'>{lang="forums_{$k}" pluralize="$v"}</span>
-						{{if $k == 'comments' && \IPS\collab\Collab::modPermission( 'unhide', NULL, $row->container() ) AND $row->queuedposts}}
-							&nbsp;<a href='{$row->url()->setQueryString( 'queued_posts', 1 )}' class='ipsType_warning ipsType_small ipsPos_right ipsResponsive_noFloat' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$row->topic_queuedposts"}'><i class='fa fa-warning'></i> <strong>{$row->topic_queuedposts}</strong></a>
+			{{foreach $row->stats(TRUE) as $k => $v}}
+				{{if $k == 'items'}}
+					<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+						<dl>
+							<dt class="ipsDataItem_stats_number">{$v}</dt>
+							<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_contributions" pluralize="$v"}</dd>
+						</dl>
+					</div>
+				{{endif}}
+			{{endforeach}}
+			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+				{{if $latestContentItems = $row->getLatestContent( 1 )}}
+					{{$latestContent = array_shift( $latestContentItems );}}
+					<li>{template="userPhoto" app="core" group="global" params="$latestContent->author(), 'tiny'"}</li>
+					<li><a href="{$latestContent->url()->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+					<li>{lang="byline_nodate" htmlsprintf="$latestContent->author()->link()"}</li>
+					<li class="ipsType_light"><a href='{$latestContent->url()->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$latestContent->mapped( 'date' )"}</a></li>
+				{{else}}
+					<li>
+						{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
+					</li>
+					<li>
+						{$row->author()->link()|raw}
+					</li>
+					<li class="ipsType_light ipsResponsive_hidePhone">
+						{{if $membership = $row->getMembership( $row->author() )}}
+							{$membership->title()}
+						{{else}}
+							{$row->guestTitle()}
 						{{endif}}
 					</li>
-				{{endforeach}}
-			</ul>
-			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
-				<li>
-					{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
-				</li>
-				<li>
-					{$row->author()->link()|raw}
-				</li>
-				<li class="ipsType_light ipsResponsive_hidePhone">
-					{{if $membership = $row->getMembership( $row->author() )}}
-						{$membership->title()}
-					{{else}}
-						{$row->guestTitle()}
-					{{endif}}
-				</li>
+				{{endif}}
 			</ul>
 			{{if $table->canModerate()}}
 				<div class='ipsDataItem_modCheck'>

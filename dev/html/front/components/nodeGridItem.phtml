@@ -1,8 +1,8 @@
 <ips:template parameters="$node" />
 {{if $node->can('view')}}
-	<div data-role='patchworkItem' class="ipsAreaBackground_reset ipsPad cForumGrid ipsClearfix" data-nodeID="{$node->_id}">
+	<div data-role='patchworkItem' class="ipsAreaBackground_reset cForumGrid ipsClearfix" data-nodeID="{$node->_id}">
 
-		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix'>
+		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix ipsPad ipsAreaBackground_light cForumGrid_forumInfo'>
 			<span class='ipsPos_left'>
 					{{if $node->icon}}
 						<img src="{file="$node->icon" extension="forums_Icons"}" class='ipsImage cForumGrid_icon'>
@@ -20,11 +20,15 @@
 						<a href="{$node->url()}">{$node->_title}</a>
 					{{endif}}
 				</h3>
+				{{if !$node->redirect_on and isset( $node::$contentItemClass ) and $contentClass = $node::$contentItemClass}}
+					{{$count = $contentClass::contentCount( $node, TRUE );}}
+					<p class='ipsType_reset'>{lang="posts_number" pluralize="$count"}</p>
+				{{endif}}
 			</div>
 		</div>
 		
 		{{if $node->hasChildren()}}
-			<br>
+		<div class="ipsPad">
 			<ul class="ipsList_inline">
 				<li><strong>{lang="collab_cat_sub"}</strong></li>
 				{{foreach $node->children() as $subnode}}
@@ -33,18 +37,20 @@
 					</li>
 				{{endforeach}}
 			</ul>
+		</div>
 		{{endif}}
 
 		{{if $node->description}}
-			<br>
+		<div class="ipsPad">
 			<div class='ipsType_richText ipsType_medium'>{$node->description|raw}</div>
+		</div>
 		{{endif}}
 		
-		<hr class='ipsHr'>
 
 		{{if !$node->redirect_on}}
 			{{if method_exists( $node, 'lastPost' ) and $lastPost = $node->lastPost()}}
-				<div class='ipsPhotoPanel ipsPhotoPanel_tiny'>
+				<div class='ipsPhotoPanel ipsPhotoPanel_tiny ipsPad'>
+					<hr class='ipsHr'>
 					{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}
 					<div>
 						<ul class='ipsList_reset'>

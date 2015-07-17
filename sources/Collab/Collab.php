@@ -290,7 +290,26 @@ class _Collab extends \IPS\Content\Item implements
 
 		return $this->_data[ 'title_seo' ];
 	}
-
+	
+	/**
+	 * Get Arbitrary Collab Data
+	 *
+	 * @return 	array
+	 */
+	public function get_collab_data()
+	{
+		return json_decode( $this->data, TRUE ) ?: array();
+	}
+	
+	/**
+	 * Set Arbitrary Collab Data
+	 */
+	public function set_collab_data( $val )
+	{
+		$this->data = json_encode( $val );
+		return $val;
+	}
+	
 	/**
 	 * Get Available Collab Options
 	 *
@@ -432,13 +451,30 @@ class _Collab extends \IPS\Content\Item implements
 	}
 	
 	/**
+	 * Should new items be moderated?
+	 *
+	 * @param	\IPS\Member		$member		The member posting
+	 * @param	\IPS\Node\Model	$container	The container
+	 * @return	bool
+	 */
+	public static function moderateNewItems( \IPS\Member $member, \IPS\Node\Model $container = NULL )
+	{
+		if ( $container and $configuration = $container->_configuration and $configuration[ 'require_approval' ] and ! $member->group['g_avoid_q'] )
+		{
+			return TRUE;
+		}
+
+		return parent::moderateNewItems( $member, $container );
+	}
+
+	/**
 	 * Process create/edit form
 	 *
 	 * @param	array				$values	Values from form
 	 * @return	void
 	 */
 	public function processForm( $values )
-	{		
+	{
 		parent::processForm( $values );
 		
 		$this->title_seo = \IPS\Http\Url::seoTitle( $this->title );
@@ -481,6 +517,8 @@ class _Collab extends \IPS\Content\Item implements
 				$this->featured = 1;
 			}
 		}
+		
+		
 
 	}
 	
@@ -546,6 +584,8 @@ class _Collab extends \IPS\Content\Item implements
 	
 	/**
 	 * Get stats to display in the collab header
+	 *
+	 * @return  array		An array of stat items
 	 */
 	public function collabStatItems()
 	{
@@ -569,6 +609,349 @@ class _Collab extends \IPS\Content\Item implements
 		return $stats;
 	}
 	
+	/**
+	 * Does a container contain unread items?
+	 *
+	 * @param	\IPS\Node\Model		$container	The container
+	 * @param	\IPS\Member|NULL	$member	The member (NULL for currently logged in member)
+	 * @return	bool|NULL
+	 */
+	public static function containerUnread( \IPS\Node\Model $container, \IPS\Member $member = NULL )
+	{
+		$member = $member ?: \IPS\Member::loggedIn();
+		$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
+
+		/**
+		 * @TODO: This is WAY inefficient. There has got to be a better way to do this.
+		 */
+		foreach( $container->getContentItems( NULL, NULL ) as $collab )
+		{
+			\IPS\collab\Application::$affectiveCollab = $collab;
+
+			/* See if any container from any app inside the collab has unread content */
+			foreach( $collab->enabledNodes() as $app => $config )
+			{
+				foreach ( $config[ 'nodes' ] as $node )
+				{				
+					foreach ( $node[ 'node' ]::roots( 'view' ) as $root )
+					{
+						if ( $node[ 'content' ]::containerUnread( $root, $member ) )
+						{
+							\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+							return TRUE;
+						}
+					}
+				}
+			}
+		}
+
+		\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+		return FALSE;
+	}
+	
+	/**
+	 * Get latest collab content with permission
+	 * 
+	 * @param 	int				$limit		The number of items to get
+	 * @return	array
+	 */
+	public function getLatestContent( $limit=1 )
+	{
+		/* Get types */
+		$types = array();
+		foreach( $this->enabledNodes() as $app => $config )
+		{
+			foreach ( $config[ 'nodes' ] as $node )
+			{
+				$types[] = $node[ 'content' ];
+			}
+		}
+		
+		/* Build the selects */
+		$selects = array();
+		foreach ( $types as $key => $class )
+		{
+			$containerClass = $class::$containerNodeClass;
+			$dateColumnExpression = $this->_getDateExpression( $class );
+			
+			/* Limit content to this collab */
+			$contentWhere = array( array( $containerClass::$databaseTable . "." . $containerClass::$databasePrefix . 'collab_id=' . $this->collab_id ) );
+
+			$columns = array
+			(
+				$class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnId				=> 'id',
+				$dateColumnExpression											=> 'date',
+				$class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap['author']	=> 'author'
+			);
+			
+			if ( in_array( 'IPS\Content\Hideable', class_implements( $class ) ) and !\IPS\Member::loggedIn()->modPermission( "can_view_hidden_content" ) )
+			{
+				if ( $class::$databaseColumnMap['approved'] )
+				{
+					$columns[ $class::$databaseTable . "." .  $class::$databasePrefix.$class::$databaseColumnMap[ 'approved' ] . '-1' ] = 'hidden';
+					$contentWhere[] = array( $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap['approved'] . '-1=0' );
+				}
+				else
+				{
+					$columns[ $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap[ 'hidden' ] ] = 'hidden';
+					$contentWhere[] = array( $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap[ 'hidden' ] . '=0' );
+				}
+			}
+			
+			$select = array( "'".str_replace( '\\', '\\\\' , $class ) ."' AS class" );
+			foreach ( $columns as $local => $normalized )
+			{
+				$select[] = "{$local} AS {$normalized}";
+			}
+			
+			$select = implode( ', ', $select );
+			
+			/* Permissions */
+			if ( in_array( 'IPS\Content\Permissions', class_implements( $class ) ) )
+			{
+				$categories = array();
+				foreach( \IPS\Db::i()->select( 'perm_type_id', 'core_permission_index', array( "core_permission_index.app='" . $containerClass::$permApp . "' AND core_permission_index.perm_type='" . $containerClass::$permType . "' AND (" . \IPS\Db::i()->findInSet( 'perm_' . $containerClass::$permissionMap['read'], \IPS\Member::loggedIn()->groups ) . ' OR ' . 'perm_' . $containerClass::$permissionMap['read'] . "='*' )" ) ) as $result )
+				{
+					$categories[] = $result;
+				}
+
+				if( count( $categories ) )
+				{
+					$contentWhere[] = array( $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['container'] . ' IN(' . implode( ',', $categories ) . ')' );
+				}
+				else
+				{
+					$contentWhere[]	= array( $class::$databaseTable . "." . $class::$databasePrefix . $class::$databaseColumnMap['container'] . '=0' );
+				}
+			}
+			
+			/* App-specific wheres */
+			$joinContainer	= TRUE;
+			$joins		= array();
+			$vncWhere	= $class::vncWhere( $joinContainer, $joins );
+
+			if( isset( $vncWhere['item'] ) )
+			{
+				$contentWhere	= array_merge( $contentWhere, $vncWhere['item'] );
+
+				if( isset( $vncWhere['container'] ) )
+				{
+					$contentWhere	= array_merge( $contentWhere, $vncWhere['container'] );
+				}
+			}
+			else
+			{
+				$contentWhere	= array_merge( $contentWhere, $vncWhere );
+			}
+			
+			if ( isset( $class::$databaseColumnMap['state'] ) )
+			{
+				$contentWhere[] = array( $class::$databaseTable . '.' . $class::$databasePrefix . $class::$databaseColumnMap['state'] . "!='link'" );
+			}
+
+			/* Add to the list */
+			$select = \IPS\Db::i()->select( $select, $class::$databaseTable, $contentWhere );
+			if ( $joinContainer )
+			{
+				$select->join( $containerClass::$databaseTable, $class::$databaseTable . "." . $class::$databasePrefix . $class::$databaseColumnMap['container'] . '=' . $containerClass::$databaseTable . "." . $containerClass::$databasePrefix . $containerClass::$databaseColumnId );
+			}
+			if ( count( $joins ) )
+			{
+				foreach ( $joins as $join )
+				{
+					$select->join( $join['from'], $join['where'] );
+				}
+			}
+			$selects[] = $select;
+		}
+		
+		/* Query content */
+		$results = \IPS\Db::i()->union( $selects, 'date DESC', array( 0, $limit ), ( $onlyFollowed ) ? '_app, _follow_area, id' : NULL, FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS, $where );
+
+		$contentItems = array();
+		foreach( $results as $result )
+		{
+			try
+			{
+				$contentItems[] = $result[ 'class' ]::load( $result[ 'id' ] );
+			}
+			catch( \OutOfRangeException $e ) { }
+		}
+		
+		return $contentItems;
+	}
+
+	/**
+	 * Get the date Column expression
+	 *
+	 * @param	string	$class 		Content class (\IPS\forums\Forum)
+	 * @return	string
+	 */
+	protected function _getDateExpression( $class )
+	{
+		/* What is the best date column? */
+		$dateColumns = array();
+		foreach ( array( 'updated', 'last_comment', 'last_review' ) as $k )
+		{
+			if ( isset( $class::$databaseColumnMap[ $k ] ) )
+			{
+				if ( is_array( $class::$databaseColumnMap[ $k ] ) )
+				{
+					foreach ( $class::$databaseColumnMap[ $k ] as $v )
+					{
+						$dateColumns[] = " IFNULL( " . $class::$databaseTable . '.'. $class::$databasePrefix . $v . ", 0 )";
+					}
+				}
+				else
+				{
+					$dateColumns[] = " IFNULL( " . $class::$databaseTable . '.'. $class::$databasePrefix . $class::$databaseColumnMap[ $k ] . ", 0 )";
+				}
+			}
+		}
+		
+		return count( $dateColumns ) > 1 ? ( 'GREATEST(' . implode( ',', $dateColumns ) . ')' ) : array_pop( $dateColumns );
+	}
+
+	/**
+	 * Is unread?
+	 *
+	 * @param	\IPS\Member|NULL	$member	The member (NULL for currently logged in member)
+	 * @return	int|NULL	0 = read. -1 = never read. 1 = updated since last read. NULL = unsupported
+	 * @note	When a node is marked read, we stop noting which individual content items have been read. Therefore, -1 vs 1 is not always accurate but rather goes on if the item was created
+	 */
+	public function unread( \IPS\Member $member = NULL )
+	{
+		if ( isset( $this->unread ) )
+		{
+			return $this->unread;
+		}
+		
+		$member = $member ?: \IPS\Member::loggedIn();
+		$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
+		\IPS\collab\Application::$affectiveCollab = $this;
+
+		/* See if any container from any app inside the collab has unread content */
+		foreach( $this->enabledNodes() as $app => $config )
+		{
+			foreach ( $config[ 'nodes' ] as $node )
+			{				
+				foreach ( $node[ 'node' ]::roots( 'view' ) as $root )
+				{
+					if ( $node[ 'content' ]::containerUnread( $root, $member ) )
+					{
+						\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+						return $this->unread = 1;
+					}
+				}
+			}
+		}
+
+		\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+		return $this->unread = 0;
+	}
+
+	/**
+	 * Count node aggregate totals inside collab
+	 *
+	 * @param 	string		$k		The property to recount ( '_items' or '_comments' )
+	 * @return 	array				An array of total count data
+	 */
+	public function countTotals( $k )
+	{
+		$savedAffectiveCollab				= \IPS\collab\Application::$affectiveCollab;
+		\IPS\collab\Application::$affectiveCollab 	= $this;
+		
+		$totals = array
+		(
+			'node_totals' => array(),
+			'grand_total' => 0,
+		);
+		
+		$countRecursive = function( $node ) use ( $k, &$countRecursive )
+		{
+			switch( $k )
+			{
+				case '_items' :
+				
+					$count = (int) $node->getContentItemCount();
+					break;
+					
+				default:
+				
+					$count = (int) $node->$k;
+			}
+			
+			foreach( $node->children() as $child )
+			{
+				$count += $countRecursive( $child );
+			}
+			
+			return $count;
+		};
+		
+		/* Tally Counts */
+		foreach( $this->enabledNodes() as $app => $config )
+		{
+			foreach ( $config[ 'nodes' ] as $node )
+			{
+				$node_type_total = 0;
+				foreach ( $node[ 'node' ]::roots( NULL ) as $root )
+				{
+					$node_type_total += $countRecursive( $root );
+				}
+				$totals[ 'node_totals' ][ $node[ 'nid' ] ] = $node_type_total;
+				$totals[ 'grand_total' ] += $node_type_total;
+			}
+		}
+		
+		\IPS\collab\Application::$affectiveCollab 	= $savedAffectiveCollab;
+		return $totals;
+	}
+	
+	/**
+	 * Get node aggregate totals inside collab, saving if they haven't been tallied yet
+	 *
+	 * @param 	string		$k		The property to recount ( '_items' or '_comments' )
+	 * @param	string		$nid		The node type to return totals for or NULL for grand total
+	 * @return 	int				The total count
+	 */
+	public function getTotal( $k, $nid=NULL )
+	{
+		$data = $this->collab_data;
+		
+		if ( isset( $data[ $k ] ) )
+		{
+			return $nid ? $data[ $k ][ 'node_totals' ][ $nid ] : $data[ $k ][ 'grand_total' ];
+		}
+		
+		/**
+		 * Save the totals the first time they are counted
+		 */
+		$data[ $k ] = $this->countTotals( $k );
+		$this->collab_data = $data;
+		$this->save();
+		
+		return $this->getTotal( $k, $nid );
+	}
+	
+	/**
+	 * Recount and save all totals
+	 *
+	 * @return void
+	 */
+	public function recountAll()
+	{
+		$data = $this->collab_data;
+		
+		foreach( array( '_items', '_comments' ) as $k )
+		{
+			$data[ $k ] = $this->countTotals( $k );
+		}
+		
+		$this->collab_data = $data;
+		$this->save();
+	}
+
 	/**
 	 * Cover Photo
 	 *
@@ -702,7 +1085,9 @@ class _Collab extends \IPS\Content\Item implements
 	 */
 	public function isFull()
 	{
-		$isFull = FALSE;
+		$isFull 	= FALSE;
+		$max_members 	= $this->rules_max_collab_members ?: $this->container()->max_collab_members;
+		
 		if ( $this->container()->max_collab_members > 0 )
 		{
 			$isFull = ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_memberships', array( 'collab_id=? AND status=?', $this->collab_id, \IPS\collab\COLLAB_MEMBER_ACTIVE ) )->first() >= $this->container()->max_collab_members );
@@ -1110,9 +1495,18 @@ class _Collab extends \IPS\Content\Item implements
 	 */
 	public function stats( $includeFirstCommentInCommentCount=TRUE )
 	{
-		$return = parent::stats( $includeFirstCommentInCommentCount );
-		unset( $return[ 'comments' ] );
-		return $return;
+		$stats = array
+		(
+			'items' => $this->getTotal( '_items' ),
+			'posts' => $this->getTotal( '_comments' ),
+		);
+
+		$stats = array_merge( $stats, parent::stats( $includeFirstCommentInCommentCount ) );
+
+		unset( $stats[ 'comments' ] );
+		unset( $stats[ 'num_views' ] );
+		
+		return $stats;
 	}
 
 	/**
@@ -1234,6 +1628,7 @@ class _Collab extends \IPS\Content\Item implements
 	 */
 	public function addModel( \IPS\collab\Collab $collab )
 	{
+		$savedAffectiveCollab				= \IPS\collab\Application::$affectiveCollab;
 		$lang 						= \IPS\Member::loggedIn()->language();
 		$lang->words[ 'copy' ] 				= "";
 		$lang->words[ 'copy_noun' ]			= "";
@@ -1267,7 +1662,8 @@ class _Collab extends \IPS\Content\Item implements
 		/* Copy Default Member Title */
 		$this->default_member_title = $collab->default_member_title;
 		
-		$this->save();	
+		$this->save();
+		\IPS\collab\Application::$affectiveCollab 	= $savedAffectiveCollab;
 	}
 
 	/**
@@ -1361,6 +1757,40 @@ class _Collab extends \IPS\Content\Item implements
 		
 		/* Merge Comments and Reviews */
 		parent::mergeIn( $items );
+	}
+
+	/**
+	 * Check if a url is a collab category url
+	 *
+	 * @param	\IPS\Http\Url|string	$url		A url object or string url
+	 * @return	bool
+	 */
+	public static function checkAndLoadUrl( $url )
+	{
+		if ( ! ( $url instanceof \IPS\Http\Url ) )
+		{
+			$url = new \IPS\Http\Url( $url );
+		}
+		
+		$qs = array_merge( $url->queryString, $url->getFriendlyUrlData() );
+	
+		if 
+		(
+			$qs[ 'app' ] == 'collab' and 
+			$qs[ 'module' ] == 'collab' and 
+			$qs[ 'controller' ] == 'collabs' and 
+			$qs[ 'id' ] > 0
+		)
+		{
+			try
+			{
+				$collab = static::loadFromUrl( $url );
+				return $collab;
+			}
+			catch( \Exception $e ) { }
+		}
+		
+		return NULL;
 	}
 
 	/**

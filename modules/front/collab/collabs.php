@@ -38,6 +38,12 @@ class _collabs extends \IPS\Content\Controller
 	protected function manage()
 	{
 		$collab = parent::manage();
+		
+		if ( $collab and $collab->hidden() and ! ( \IPS\collab\Collab::modPermission( 'view_hidden', NULL, $collab->container() ) or \IPS\Member::loggedIn()->member_id === $collab->owner_id ) )
+		{
+			\IPS\Output::i()->error( 'node_error', '2CV01/B', 404, '' );
+		}
+		
 		$this->viewCollab( $collab );
 	}
 	
@@ -121,11 +127,11 @@ class _collabs extends \IPS\Content\Controller
 		\IPS\Session::i()->setLocation( $collab->url(), explode( ",", $permissions['perm_view'] ), 'loc_collab_viewing_collab', array( $collab->title => FALSE ) );
 		
 		try {
-			// Load css from the forums app which we use
+			// Borrow some CSS from the forums app
 			\IPS\forums\Topic::contentTableTemplate();
 		}
 		catch ( \Exception $e) {}
-				
+						
 		\IPS\Output::i()->title = $collab->title;
 		\IPS\Output::i()->output = \IPS\Theme::i()->getTemplate( 'layouts' )->collab( $collab, $activity );		
 	

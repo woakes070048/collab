@@ -32,7 +32,7 @@
 						<a href='{$category->url()}'>{$category->_title}</a>
 					</h2>
 					{{if $category->childrenCount() >= $grid}}
-						<div class='ipsAreaBackground ipsPad' data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+						<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 							<div data-role='patchworkList'>
 								{{foreach $category->children() as $subnode}}
 									{template="nodeGridItem" group="components" app="collab" params="$subnode"}
@@ -57,7 +57,7 @@
 				{lang="$title_lang"}
 			</h2>
 			{{if $layout === 'grid'}}
-				<div class='ipsAreaBackground ipsPad' data-role="forums" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
+				<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 					<div data-role='patchworkList'>
 						{{foreach $nodeClass::roots() as $node}}
 							{{if $node->can('view')}}
