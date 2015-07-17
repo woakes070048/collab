@@ -7,7 +7,18 @@
 		<dd class="ipsDataItem_stats_type ipsType_light">{$category->collab_plural}</dd>
 	</dl>
 </div>
-<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
-	<li class='ipsType_light ipsResponsive_showDesktop'>{$category->getContentItemCount()} {$category->collab_plural}</li>
+<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+{{foreach \IPS\collab\Collab::getItemsWithPermission( array( array( 'category_id=?', $category->_id ) ), 'last_post DESC', 1 ) as $collab}}
+		<li>{template="userPhoto" app="core" group="global" params="$collab->author(), 'tiny'"}	</li>
+		<li><a href="{$collab->url()}" class='ipsType_break ipsContained' title="{$collab->mapped( 'title' )}">{truncate="$collab->mapped( 'title' )" length="30"}</a></li>	
+		{{if $latestContentItems = $collab->getLatestContent( 1 )}}
+			{{$latestContent = array_shift( $latestContentItems );}}
+			<li>{lang="byline_nodate" htmlsprintf="$latestContent->author()->link()"}</li>
+			<li class="ipsType_light">{datetime="$latestContent->mapped( 'date' )"}</li>
+		{{else}}
+			<li>{lang="byline_nodate" htmlsprintf="$collab->author()->link()"}</li>
+			<li class="ipsType_light">{datetime="$collab->last_post"}</li>
+		{{endif}}
+{{endforeach}}
 </ul>
 {{endif}}

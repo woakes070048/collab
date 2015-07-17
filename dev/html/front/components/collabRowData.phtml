@@ -4,14 +4,15 @@
 	<dl>
 		{{$count = $collab->getTotal( '_items' );}}
 		<dt class="ipsDataItem_stats_number">{$count}</dt>
-		<dd class="ipsDataItem_stats_type ipsType_light">{lang="posts_no_number" pluralize="$count"}</dd>
+		<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
 	</dl>
 </div>
 <ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
 	{{if $latestContentItems = $collab->getLatestContent( 1 )}}
 		{{$latestContent = $lastPost = array_shift( $latestContentItems );}}
 		{{$itemUrl = $itemDateLink = $latestContent->url();}}
-		{{if isset( $latestContent::$commentClass ) and $lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+		{{if isset( $latestContent::$commentClass ) and $_lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+		  {{$lastPost = $_lastPost;}}
 		  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
 		  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
 		{{endif}}

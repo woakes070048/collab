@@ -3,12 +3,13 @@
 {{$content_read_class = "";}}
 {{$nodeClass = get_class( $node );}}
 {{$contentClass = $nodeClass::$contentItemClass;}}
-{{if !$contentClass::containerUnread( $node ) && !$node->redirect_on}}
+{{$unread = $contentClass::containerUnread( $node );}}
+{{if !$unread && !$node->redirect_on}}
   {{$content_read_class = "ipsItemStatus_read";}}
 {{endif}}
 
 {{if $node->can('view')}}
-	<li class="ipsDataItem ipsDataItem_responsivePhoto ipsClearfix" data-forumID="{$node->_id}">
+	<li class="ipsDataItem ipsDataItem_responsivePhoto ipsClearfix {{if $unread}}ipsDataItem_unread{{endif}}" data-forumID="{$node->_id}">
 		<div class="ipsDataItem_icon ipsDataItem_category">
 			{{if $node->icon}}
 				<img src="{file="$node->icon" extension="forums_Icons"}" class='ipsItemStatus ipsItemStatus_custom {$content_read_class}'>

@@ -1,4 +1,8 @@
 <ips:template parameters="$node" />
+
+{{$contentClass = $node::$contentItemClass;}}
+{{$unread = $contentClass::containerUnread( $node );}}
+
 {{if $node->can('view')}}
 	<div data-role='patchworkItem' class="ipsAreaBackground_reset cForumGrid ipsClearfix" data-nodeID="{$node->_id}">
 
@@ -7,15 +11,15 @@
 					{{if $node->icon}}
 						<img src="{file="$node->icon" extension="forums_Icons"}" class='ipsImage cForumGrid_icon'>
 					{{else}}
-						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal'>
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {{if !$unread}}ipsItemStatus_read{{endif}}'>
 							<i class="fa fa-comments"></i>
 						</span>
 					{{endif}}
 			</span>
-			<div>
-				<h3 class='ipsType_reset ipsType_large'>
+			<div class='{{if $unread}}ipsDataItem_unread{{endif}}'>
+				<h3  class='ipsDataItem_title ipsType_reset ipsType_large'>
 					{{if $node->password && !$node->loggedInMemberHasPasswordAccess()}}
-						<a href="{$node->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$node->_title}</a>
+						<ahref="{$node->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$node->_title}</a>
 					{{else}}
 						<a href="{$node->url()}">{$node->_title}</a>
 					{{endif}}
@@ -32,8 +36,10 @@
 			<ul class="ipsList_inline">
 				<li><strong>{lang="collab_cat_sub"}</strong></li>
 				{{foreach $node->children() as $subnode}}
-					<li class="">
-						<a href="{$subnode->url()}">{$subnode->_title}</a>
+					<li class="{{if $contentClass::containerUnread( $subnode )}}ipsDataItem_unread{{endif}}">
+						<span class="ipsDataItem_title" style="margin:0">
+							<a href="{$subnode->url()}">{$subnode->_title}</a>
+						</span>
 					</li>
 				{{endforeach}}
 			</ul>
@@ -60,7 +66,7 @@
 					</div>
 				</div>
 			{{else}}
-				<p class='ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
+				<p class='ipsPad ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
 			{{endif}}
 		{{endif}}
 		
