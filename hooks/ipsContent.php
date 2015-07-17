@@ -72,4 +72,24 @@ abstract class collab_hook_ipsContent extends _HOOK_CLASS_
 		return $modCan or call_user_func_array( 'parent::modPermission', func_get_args() );
 	}
 	
+	/**
+	 * [ActiveRecord] Save
+	 *
+	 * Update the last post info on collab when new content is created inside a collab
+	 */
+	public function save()
+	{
+		$is_new = $this->_new;
+		
+		$result = parent::save();
+		
+		if ( $is_new and ( $this instanceof \IPS\Content\Item or $this instanceof \IPS\Content\Comment ) and $collab = \IPS\collab\Application::getCollab( $this ) )
+		{
+			$collab->last_post = time();
+			$collab->last_poster_id = $this->author()->member_id;
+			$collab->last_poster_name = $this->author()->name;
+			$collab->save();
+		}
+	}
+	
 }

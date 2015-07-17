@@ -32,6 +32,8 @@ $lang = array(
 	'block_featuredCollabs_desc'		=> "Show collabs that are currently featured",
 	'block_latestCollabs'			=> "Latest Collabs",
 	'block_latestCollabs_desc'		=> "Show the most recently started collabs",
+	'block_myCollabs'			=> "My Collabs",
+	'block_myCollabs_desc'			=> "List of collabs the currently logged in member is an active member of",
 	
 	// Group Settings
 	'group__collab_groupForm'		=> "Collaboration",

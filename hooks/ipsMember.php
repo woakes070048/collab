@@ -27,16 +27,12 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		}
 		
 		$memberships = array();
-		try
+		$select = \IPS\Db::i()->select( 'collab_memberships.*', 'collab_memberships', array( 'collab_memberships.member_id=?', $this->member_id ), 'collab_collabs.last_post DESC' )->join( 'collab_collabs', array( 'collab_memberships.collab_id=collab_collabs.collab_id' ) );
+		foreach ( $select as $row )
 		{
-			$rows = \IPS\Db::i()->select( '*', 'collab_memberships', array( 'member_id=?', $this->member_id ) );
-			foreach ( $rows as $row )
-			{
-				$memberships[ $row[ 'collab_id' ] ] = \IPS\collab\Collab\Membership::constructFromData( $row );
-			}
+			$memberships[ $row[ 'collab_id' ] ] = \IPS\collab\Collab\Membership::constructFromData( $row );
 		}
-		catch ( \UnderflowException $e ) {}
-			
+
 		return $this->memberships = $memberships;
 	}
 	
