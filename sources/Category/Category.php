@@ -688,7 +688,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				 */
 				$lang->words[ "options-node_{$nid}-enabled" ] 				= $lang->addToStack( 'collab_allow_node', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
 				$lang->words[ "options-node_{$nid}-enabled_desc" ] 			= $lang->addToStack( $option['content'] ? 'collab_allow_node_content_desc' : 'content_allow_node_desc', FALSE, array( 'sprintf' => array( $lang->addToStack( $collab_plural_lang ), $nodeTitle, $contentTitle ) ) );
-				$form->add( $enable_switch = new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-enabled", isset( $this->_options[ 'node_' . $nid ][ 'enabled' ] ) ? $this->_options[ 'node_' . $nid ][ 'enabled' ] : 0, TRUE, array( 'togglesOn' => array ( 'perms_' . $nid ) ) ) );
+				$form->add( $enable_switch = new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-enabled", isset( $this->_options[ 'node_' . $nid ][ 'enabled' ] ) ? $this->_options[ 'node_' . $nid ][ 'enabled' ] : 0, FALSE, array( 'togglesOn' => array ( 'perms_' . $nid ) ) ) );
 				
 				/**
 				 * Allow Setting Maximum Amount Of Nodes 
@@ -696,7 +696,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$lang->words[ "options-node_{$nid}-maxnodes" ] 				= $lang->addToStack( 'collab_node_maxnodes', FALSE, array( 'sprintf' => array( $nodeTitle, $lang->addToStack( $collab_singular_lang ) ) ) );
 				$lang->words[ "options-node_{$nid}-maxnodes_desc" ] 			= $lang->addToStack( 'collab_node_maxnodes_desc', FALSE, array( 'sprintf' => array( $nodeTitle, $lang->addToStack( $collab_singular_lang ) ) ) );				
 				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-maxnodes" ) );
-				$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-maxnodes", isset( $this->_options[ 'node_' . $nid ][ 'maxnodes' ] ) ? $this->_options[ 'node_' . $nid ][ 'maxnodes' ] : 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
+				$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-maxnodes", $this->_options[ 'node_' . $nid ][ 'maxnodes' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'maxnodes' ] : 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
 					
 				/**
 				 * Allow Adding, Editing, Deleting Nodes? 
@@ -705,10 +705,31 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				{
 					$lang->words[ "options-node_{$nid}-{$enable_action}" ] 		= $lang->addToStack( 'collab_node_' . $enable_action, FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
 					$lang->words[ "options-node_{$nid}-{$enable_action}_desc" ] 	= $lang->addToStack( 'collab_node_' . $enable_action . '_desc', FALSE, array( 'sprintf' => array( $lang->addToStack( $collab_singular_lang ), $nodeTitle, $contentTitle ) ) );
-					$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-{$enable_action}", isset( $this->_options[ 'node_' . $nid ][ $enable_action ] ) ? $this->_options[ 'node_' . $nid ][ $enable_action ] : 1 ) );
+					$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-{$enable_action}", $this->_options[ 'node_' . $nid ][ $enable_action ] !== NULL ? $this->_options[ 'node_' . $nid ][ $enable_action ] : 1 ) );
 					$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-{$enable_action}" ) );
 				}
 				
+				/* Display Options Header */
+				$lang->words[ 'collab_display_options_' . $nid ] = $lang->addToStack( 'collab_display_options', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
+				$form->addHeader( 'collab_display_options_' . $nid );
+				$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_display_options_' . $nid ) );
+				
+				/**
+				 * Enable Collab Homepage Gridview
+				 */
+				$lang->words[ "options-node_{$nid}-gridview" ] 				= $lang->addToStack( 'collab_node_gridview', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+				$lang->words[ "options-node_{$nid}-gridview_desc" ] 			= $lang->addToStack( 'collab_node_gridview_desc', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridview" ) );
+				$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-gridview", $this->_options[ 'node_' . $nid ][ 'gridview' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'gridview' ] : 0, FALSE, array( ) ) );
+
+				/**
+				 * Collab Gridview Threshold
+				 */
+				$lang->words[ "options-node_{$nid}-gridthreshold" ] 			= $lang->addToStack( 'collab_node_gridview_threshold', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+				$lang->words[ "options-node_{$nid}-gridthreshold_desc" ] 		= $lang->addToStack( 'collab_node_gridview_threshold_desc', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );				
+				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridthreshold" ) );
+				$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-gridthreshold", $this->_options[ 'node_' . $nid ][ 'gridthreshold' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'gridthreshold' ] : 3, FALSE, array( 'unlimited' => NULL, 'min' => 0 ) ) );
+
 				if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
 				{
 					/* Permissions Matrix */
