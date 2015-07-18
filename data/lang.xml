@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10109">
+ <app key="collab" version="10110">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -69,6 +69,7 @@
   <word key="collab_category_require_approval_desc" js="0">If enabled, new collabs created in this category will require moderator approval.</word>
   <word key="collab_category_per_page" js="0">Collabs Per Page</word>
   <word key="collab_category_per_page_desc" js="0">Number of collabs to show per page in this category</word>
+  <word key="collab_display_options" js="0">%s %s Display Options</word>
   <word key="collab_permissions" js="0">%s %s Permissions</word>
   <word key="collab_moderation_settings" js="0">%s Moderation Abilities For %s Owners</word>
   <word key="category_collabs_enable" js="0">Enable Collabs?</word>
@@ -102,6 +103,10 @@
   <word key="collab_allow_node" js="0">Enable %s %s?</word>
   <word key="collab_allow_node_desc" js="0">If enabled, %s in this category will be able to have their own %s.</word>
   <word key="collab_allow_node_content_desc" js="0">If enabled, %s in this category will be able to have their own %s. This will allow the group to maintain its own %s content.</word>
+  <word key="collab_node_gridview" js="0">Use Homepage Gridview</word>
+  <word key="collab_node_gridview_desc" js="0">When enabled, %s will display in grid format on the collaboration homepage</word>
+  <word key="collab_node_gridview_threshold" js="0">Gridview Threshold</word>
+  <word key="collab_node_gridview_threshold_desc" js="0">Don't display the grid view unless there are at least this many %s to display.</word>
   <word key="collab_model_settings" js="0">Collab Model Settings</word>
   <word key="collab_enable_model" js="0">Use Collab Models?</word>
   <word key="collab_enable_model_desc" js="0">If needed, you can create and designate one or more %s in this category to act as a model for newly created %s. Newly created %s will then be set up with a default configuration based on how the model is configured.</word>
@@ -113,6 +118,10 @@
   <word key="collab_category_privacy_mode_desc" js="0">In public listing mode, collabs are always visibly listed for any member with permissions to view this category. In private listing mode, collabs are only visibly listed when their join mode is open to all, or if a member is already an active member of that collab.</word>
   <word key="category_privacy_mode_public" js="0">Public Listing</word>
   <word key="category_privacy_mode_private" js="0">Private Listing</word>
+  <word key="collab_contribution_mode" js="0">Contribution Calculation</word>
+  <word key="collab_contribution_mode_desc" js="0">Which stat do you want to display for total contributions</word>
+  <word key="collab_contribution_mode_posts" js="0">Total Posts</word>
+  <word key="collab_contribution_mode_items" js="0">Items Only</word>
   <word key="no_collabs_in_category" js="0">This category does not contain any %s</word>
   <word key="collab_collab_tags" js="0">Tags</word>
   <word key="collab_collab_auto_follow" js="0">Follow Content</word>
@@ -386,6 +395,7 @@
   <word key="created_date" js="0">Date Created</word>
   <word key="single" js="0">Only One</word>
   <word key="multiple" js="0">Multiple</word>
+  <word key="mark_collab_read" js="0">Mark %s Read</word>
   <word key="__global_active_collab" js="0">Page: Associated Collaboration</word>
   <word key="collab_Collaboration_event_member_invited" js="0">Member is invited to collab</word>
   <word key="collab_Collaboration_event_member_invited_member" js="0">Member that was invited</word>

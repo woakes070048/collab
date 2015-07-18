@@ -453,6 +453,7 @@
 		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{else}}ipsDataItem_read{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
 			<div class='ipsDataItem_icon ipsPos_top'>
 				{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
+				{{if $row->unread() and \IPS\Member::loggedIn()->member_id}}<a href="{$row->url()->setQueryString( array( 'do' => 'markRead', 'return' => $row->container()->_id ) )->csrf()}" data-action='markAsRead' title='{lang="mark_collab_read" sprintf="$row->collab_singular"}' data-ipsTooltip>{{endif}}
 				<span style="opacity:1" class='ipsItemStatus ipsItemStatus_large collabStatusIcon {{if ! $row->unread()}}ipsItemStatus_read{{endif}} '>
 					{{if $row->isFull()}}
 						<i class="fa fa-circle"></i>
@@ -477,6 +478,7 @@
 						{{endif}}
 					{{endif}}
 				</span>
+				{{if $row->unread() and \IPS\Member::loggedIn()->member_id}}</a>{{endif}} 
 			</div>
 			<div class='ipsDataItem_main'>
 				<h4 class='ipsDataItem_title marg0 ipsType_break'>
@@ -530,23 +532,26 @@
 					{truncate="$row->short_description" length="256"}
 				</div>
 			</div>
-			{{foreach $row->stats(TRUE) as $k => $v}}
-				{{if $k == 'items'}}
-					<div class="ipsDataItem_stats ipsDataItem_statsLarge">
-						<dl>
-							<dt class="ipsDataItem_stats_number">{$v}</dt>
-							<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_contributions" pluralize="$v"}</dd>
-						</dl>
-					</div>
-				{{endif}}
-			{{endforeach}}
+			<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+				<dl>
+					{{$total = $row->getTotalContributions();}}
+					<dt class="ipsDataItem_stats_number">{$total}</dt>
+					<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_contributions" pluralize="$total"}</dd>
+				</dl>
+			</div>
 			<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
 				{{if $latestContentItems = $row->getLatestContent( 1 )}}
-					{{$latestContent = array_shift( $latestContentItems );}}
+					{{$latestContent = $lastPost = array_shift( $latestContentItems );}}
+					{{$itemUrl = $itemDateLink = $latestContent->url();}}
+					{{if isset( $latestContent::$commentClass ) and $_lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+					  {{$lastPost = $_lastPost;}}
+					  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
+					  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
+					{{endif}}
 					<li>{template="userPhoto" app="core" group="global" params="$latestContent->author(), 'tiny'"}</li>
-					<li><a href="{$latestContent->url()->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
-					<li>{lang="byline_nodate" htmlsprintf="$latestContent->author()->link()"}</li>
-					<li class="ipsType_light"><a href='{$latestContent->url()->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$latestContent->mapped( 'date' )"}</a></li>
+					<li><a href="{$itemUrl}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+					<li>{lang="byline_nodate" htmlsprintf="$lastPost->author()->link()"}</li>
+					<li class="ipsType_light"><a href='{$itemDateLink}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped( 'date' )"}</a></li>
 				{{else}}
 					<li>
 						{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
@@ -574,7 +579,7 @@
  <template template_group="components" template_name="collabRowData" template_data="$collab" template_location="front" template_app="collab"><![CDATA[
 <div class="ipsDataItem_stats ipsDataItem_statsLarge">
 	<dl>
-		{{$count = $collab->getTotal( '_items' );}}
+		{{$count = $collab->getTotalContributions();}}
 		<dt class="ipsDataItem_stats_number">{$count}</dt>
 		<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
 	</dl>
@@ -875,9 +880,11 @@
 		
 	</div>
 {{endif}}]]></template>
- <template template_group="components" template_name="nodeList" template_data="$app, $nodeClass, $title_lang, $grid=3" template_location="front" template_app="collab"><![CDATA[
+ <template template_group="components" template_name="nodeList" template_data="$app, $nodeClass, $title_lang" template_location="front" template_app="collab"><![CDATA[
 {{$roots_as_categories = TRUE;}}
 {{$not_empty = FALSE;}}
+{{$nid = md5($nodeClass);}}
+{{$options = \IPS\collab\Application::affectiveCollab()->container()->_options[ 'node_' . $nid ];}}
 
 {{if $nodeClass::$databaseColumnParent == NULL}}
   {{$roots_as_categories = FALSE;}}
@@ -903,11 +910,11 @@
 		{{foreach $nodeClass::roots() as $category}}
 			{{if $category->can('view')}}
 				{{if $category->hasChildren()}}
-				<li data-categoryID='{expression="md5($nodeClass)"}_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
+				<li data-categoryID='{$nid}_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
 					<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
 						<a href='{$category->url()}'>{$category->_title}</a>
 					</h2>
-					{{if $category->childrenCount() >= $grid}}
+					{{if $options[ 'gridview' ] and $category->childrenCount() >= $options[ 'gridthreshold' ]}}
 						<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 							<div data-role='patchworkList'>
 								{{foreach $category->children() as $subnode}}
@@ -932,7 +939,7 @@
 			<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
 				{lang="$title_lang"}
 			</h2>
-			{{if $layout === 'grid'}}
+			{{if $options[ 'gridview' ] and count( $nodeClass::roots() ) >= $options[ 'gridthreshold' ]}}
 				<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 					<div data-role='patchworkList'>
 						{{foreach $nodeClass::roots() as $node}}
@@ -1013,7 +1020,7 @@
 			{{if $contentClass and method_exists( $contentClass, 'contentCount' ) and $count = $contentClass::contentCount( $node, TRUE )}}
 				<dl>
 					<dt class="ipsDataItem_stats_number">{number="$count"}</dt>
-					<dd class="ipsDataItem_stats_type ipsType_light">{lang="posts_no_number" pluralize="$count"}</dd>
+					<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
 				</dl>
 			{{else}}
 				{{if $node->_items}}

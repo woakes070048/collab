@@ -89,6 +89,7 @@ $lang = array(
 	'collab_category_require_approval_desc'	=> "If enabled, new collabs created in this category will require moderator approval.",
 	'collab_category_per_page'		=> "Collabs Per Page",
 	'collab_category_per_page_desc'		=> "Number of collabs to show per page in this category",
+	'collab_display_options'		=> "%s %s Display Options",
 	'collab_permissions'			=> "%s %s Permissions",
 	'collab_moderation_settings'		=> "%s Moderation Abilities For %s Owners",
 	'category_collabs_enable'		=> "Enable Collabs?",
@@ -122,6 +123,10 @@ $lang = array(
 	'collab_allow_node'			=> "Enable %s %s?",
 	'collab_allow_node_desc'		=> "If enabled, %s in this category will be able to have their own %s.",
 	'collab_allow_node_content_desc'	=> "If enabled, %s in this category will be able to have their own %s. This will allow the group to maintain its own %s content.",
+	'collab_node_gridview'			=> "Use Homepage Gridview",
+	'collab_node_gridview_desc'		=> "When enabled, %s will display in grid format on the collaboration homepage",
+	'collab_node_gridview_threshold'	=> "Gridview Threshold",
+	'collab_node_gridview_threshold_desc'	=> "Don't display the grid view unless there are at least this many %s to display.",
 	'collab_model_settings'			=> "Collab Model Settings",
 	'collab_enable_model'			=> "Use Collab Models?",
 	'collab_enable_model_desc'		=> "If needed, you can create and designate one or more %s in this category to act as a model for newly created %s. Newly created %s will then be set up with a default configuration based on how the model is configured.",
@@ -134,6 +139,10 @@ $lang = array(
 	'collab_category_privacy_mode_desc'	=> "In public listing mode, collabs are always visibly listed for any member with permissions to view this category. In private listing mode, collabs are only visibly listed when their join mode is open to all, or if a member is already an active member of that collab.",
 	'category_privacy_mode_public'		=> "Public Listing",
 	'category_privacy_mode_private'		=> "Private Listing",
+	'collab_contribution_mode'		=> "Contribution Calculation",
+	'collab_contribution_mode_desc'		=> "Which stat do you want to display for total contributions",
+	'collab_contribution_mode_posts'	=> "Total Posts",
+	'collab_contribution_mode_items'	=> "Items Only",
 
 	
 	// Category View
@@ -453,6 +462,8 @@ $lang = array(
 	'created_date'				=> "Date Created",
 	'single'				=> "Only One",
 	'multiple'				=> "Multiple",
+	
+	'mark_collab_read'			=> "Mark %s Read",
 	
 	// Rules Conversions
 	'__global_active_collab'				=> "Page: Associated Collaboration",
