@@ -589,14 +589,15 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 						}
 						
 						/**
-						 * Otherwise, to save cpu cycles, just add the difference to the existing total
+						 * Otherwise, save some cpu cycles by just adjusting the existing counts
 						 */
 						else
 						{
-							$existing = $this->$k;
-							$difference = $v - $existing;
-							$data[ $k ][ 'node_totals' ][ $nid ] += $difference;
-							$data[ $k ][ 'grand_total' ] += $difference;
+							$existing = (int) $this->$k;
+							
+							$data[ $k ][ 'node_totals' ][ $nid ] = $data[ $k ][ 'node_totals' ][ $nid ] - $existing + $v;
+							$data[ $k ][ 'grand_total' ] = $data[ $k ][ 'grand_total' ] - $existing + $v;
+							
 							$collab->collab_data = $data;
 							$collab->save();
 						}
