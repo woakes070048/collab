@@ -578,13 +578,20 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$form_id . 'collab_increase_mainposts',
 				$form_id . 'collab_restrict_owner',
 				$form_id . 'collab_category_require_approval',
+				$form_id . 'collab_contribution_mode',
 			) ) 
 		) );
 		
 		$privacy_options = array
 		(
-			'public' => 'category_privacy_mode_public',
-			'private' => 'category_privacy_mode_private',
+			'public' 	=> 'category_privacy_mode_public',
+			'private' 	=> 'category_privacy_mode_private',
+		);
+		
+		$contribution_modes = array
+		(
+			'posts' 	=> 'collab_contribution_mode_posts',
+			'items' 	=> 'collab_contribution_mode_items',
 		);
 		
 		if ( \IPS\Application::appIsEnabled( 'forums' ) )
@@ -595,6 +602,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_category_require_approval', isset( $configuration[ 'require_approval' ] ) ? $configuration[ 'require_approval' ] : FALSE, FALSE ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_category_privacy_mode', $this->privacy_mode ?: 'public', TRUE, array( 'options' => $privacy_options ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'collab_category_per_page', isset( $configuration[ 'per_page' ] ) ? $configuration[ 'per_page' ] : 25, TRUE, array( 'min' => 1 ) ) );
+		$form->add( new \IPS\Helpers\Form\Radio( 'collab_contribution_mode', $configuration[ 'contribution_mode' ] ?: 'posts', TRUE, array( 'options' => $contribution_modes ) ) );
 		
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_name', NULL, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? "collab_category_{$this->id}" : NULL ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_description', NULL, FALSE, array(
@@ -1001,6 +1009,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		
 		$configuration[ 'per_page' ] = $values[ 'collab_category_per_page' ];
 		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
+		$configuration[ 'contribution_mode' ] = $values[ 'collab_contribution_mode' ];
 		
 		if ( isset( $values[ 'collab_category_show_forum_index' ] ) )
 		{

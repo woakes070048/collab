@@ -2,7 +2,7 @@
 
 <div class="ipsDataItem_stats ipsDataItem_statsLarge">
 	<dl>
-		{{$count = $collab->getTotal( '_items' );}}
+		{{$count = $collab->getTotalContributions();}}
 		<dt class="ipsDataItem_stats_number">{$count}</dt>
 		<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
 	</dl>

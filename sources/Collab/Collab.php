@@ -902,7 +902,7 @@ class _Collab extends \IPS\Content\Item implements
 			}
 			
 			$contentWhere = array( array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'container' ] . '=?', $node->_id ) );
-			
+						
 			if ( in_array( 'IPS\Content\Hideable', class_implements( $contentItemClass ) ) )
 			{
 				if ( isset( $contentItemClass::$databaseColumnMap['approved'] ) )
@@ -995,6 +995,27 @@ class _Collab extends \IPS\Content\Item implements
 		$this->save();
 		
 		return $this->getTotal( $k, $nid );
+	}
+	
+	/**
+	 * Get total collab contributions
+	 */
+	public function getTotalContributions()
+	{
+		$configuration = $this->container()->_configuration;
+		
+		switch( $configuration[ 'contribution_mode' ] )
+		{				
+			case 'items':
+			
+				return $this->getTotal( '_items' );
+			
+			default:
+			case 'posts':
+			
+				return $this->getTotal( '_comments' ) + $this->getTotal( '_reviews' );
+				
+		}
 	}
 	
 	/**

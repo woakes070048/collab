@@ -56,7 +56,7 @@
 			{{if $contentClass and method_exists( $contentClass, 'contentCount' ) and $count = $contentClass::contentCount( $node, TRUE )}}
 				<dl>
 					<dt class="ipsDataItem_stats_number">{number="$count"}</dt>
-					<dd class="ipsDataItem_stats_type ipsType_light">{lang="posts_no_number" pluralize="$count"}</dd>
+					<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
 				</dl>
 			{{else}}
 				{{if $node->_items}}

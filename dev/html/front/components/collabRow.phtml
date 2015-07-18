@@ -94,7 +94,7 @@
 			</div>
 			<div class="ipsDataItem_stats ipsDataItem_statsLarge">
 				<dl>
-					{{$total = $row->getTotal( '_items' );}}
+					{{$total = $row->getTotalContributions();}}
 					<dt class="ipsDataItem_stats_number">{$total}</dt>
 					<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_contributions" pluralize="$total"}</dd>
 				</dl>

@@ -1,4 +1,4 @@
-<ips:template parameters="$app, $nodeClass, $title_lang, $grid=3" />
+<ips:template parameters="$app, $nodeClass, $title_lang" />
 
 {{$roots_as_categories = TRUE;}}
 {{$not_empty = FALSE;}}
@@ -58,7 +58,7 @@
 			<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
 				{lang="$title_lang"}
 			</h2>
-			{{if $layout === 'grid'}}
+			{{if $options[ 'gridview' ] and count( $nodeClass::roots() ) >= $options[ 'gridthreshold' ]}}
 				<div class='ipsAreaBackground ipsPad' data-ipsgrid data-ipsgrid-equalheights="row" data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='400'>
 					<div data-role='patchworkList'>
 						{{foreach $nodeClass::roots() as $node}}
