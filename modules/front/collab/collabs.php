@@ -264,6 +264,35 @@ class _collabs extends \IPS\Content\Controller
 	}
 
 	/**
+	 * Mark Read
+	 *
+	 * @return	void
+	 */
+	protected function markRead()
+	{
+		\IPS\Session::i()->csrfCheck();
+		
+		try
+		{
+			$collab		= \IPS\collab\Collab::load( \IPS\Request::i()->id );
+			$returnTo	= $collab;
+
+			if( \IPS\Request::i()->return )
+			{
+				$returnTo	= \IPS\collab\Category::load( \IPS\Request::i()->return );
+			}
+			
+			$collab->markCollabRead();
+					
+			\IPS\Output::i()->redirect( $returnTo->url() );
+		}
+		catch ( \OutOfRangeException $e )
+		{
+			\IPS\Output::i()->error( 'no_module_permission', '2F173/3', 403, 'no_module_permission_guest' );
+		}
+	}
+
+	/**
 	 * Show Collab Members
 	 *
 	 * @return	void

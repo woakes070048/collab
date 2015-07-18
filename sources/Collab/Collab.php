@@ -851,6 +851,31 @@ class _Collab extends \IPS\Content\Item implements
 	}
 
 	/**
+	 * Mark entire collab as read
+	 *
+	 * @param	\IPS\Member|NULL	$member	The member (NULL for currently logged in member)
+	 * @param	int|NULL			$time	The timestamp to set (or NULL for current time)
+	 * @param	mixed				$extraContainerWhere	Additional where clause(s) (see \IPS\Db::build for details)
+	 * @return	void
+	 */
+	public function markCollabRead( \IPS\Member $member = NULL, $time = NULL, $extraContainerWhere = NULL )
+	{
+		$this->markRead( $member, $time, $extraContainerWhere );
+		
+		/* Mark all containers in enabled apps as read */
+		foreach( $this->enabledNodes() as $app => $config )
+		{
+			foreach ( $config[ 'nodes' ] as $node )
+			{				
+				foreach ( $node[ 'node' ]::roots( 'view' ) as $root )
+				{
+					$node[ 'content' ]::markContainerRead( $root );
+				}
+			}
+		}		
+	}
+	
+	/**
 	 * Count node aggregate totals inside collab
 	 *
 	 * @param 	string		$k		The property to recount ( '_items' or '_comments' )
@@ -869,16 +894,54 @@ class _Collab extends \IPS\Content\Item implements
 		
 		$countRecursive = function( $node ) use ( $k, &$countRecursive )
 		{
+			$count = 0;
+			
+			if ( ! ( $contentItemClass = $node::$contentItemClass ) )
+			{
+				return 0;
+			}
+			
+			$contentWhere = array( array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'container' ] . '=?', $node->_id ) );
+			
+			if ( in_array( 'IPS\Content\Hideable', class_implements( $contentItemClass ) ) )
+			{
+				if ( isset( $contentItemClass::$databaseColumnMap['approved'] ) )
+				{
+					$contentWhere[] = array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'approved' ] . '=?', 1 );
+				}
+				elseif ( isset( $contentItemClass::$databaseColumnMap['hidden'] ) )
+				{
+					$contentWhere[] = array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'hidden' ] . '=?', 0 );
+				}
+			}
+			
 			switch( $k )
 			{
 				case '_items' :
 				
-					$count = (int) $node->getContentItemCount();
+					$count = (int) \IPS\Db::i()->select( 'COUNT(*)', $contentItemClass::$databaseTable, $contentWhere )->first();
 					break;
 					
-				default:
+				case '_comments' :
+					
+					if ( $contentItemClass::$databaseColumnMap[ 'num_comments' ] )
+					{
+						$count = (int) \IPS\Db::i()->select( 'SUM(' . $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'num_comments' ] . ')', $contentItemClass::$databaseTable, $contentWhere )->first();
+					}
+					break;
+					
+				case '_reviews' :
+					
+					if ( $contentItemClass::$databaseColumnMap[ 'num_reviews' ] )
+					{
+						$count = (int) \IPS\Db::i()->select( 'SUM(' . $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'num_reviews' ] . ')', $contentItemClass::$databaseTable, $contentWhere )->first();
+					}
+					break;
+					
+				default : 
 				
 					$count = (int) $node->$k;
+
 			}
 			
 			foreach( $node->children() as $child )
