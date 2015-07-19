@@ -3,7 +3,7 @@
 {{if $category->collabs_enable and $category->can( 'view' )}}
 <div class="ipsDataItem_stats ipsDataItem_statsLarge">
 	<dl>
-		<dt class="ipsDataItem_stats_number">{$category->getContentItemCount()}</dt>
+		<dt class="ipsDataItem_stats_number">{$category->getCollabCount()}</dt>
 		<dd class="ipsDataItem_stats_type ipsType_light">{$category->collab_plural}</dd>
 	</dl>
 </div>

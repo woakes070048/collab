@@ -429,6 +429,24 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	protected $templates = NULL;
 	
 	/**
+	 * Retrieve collab count
+	 *
+	 * @return	int
+	 */
+	public function getCollabCount()
+	{
+		$contentItemClass = static::$contentItemClass;
+		
+		/**
+		 * getItemsWithPermission using $countOnly returns an array such as: array( 'cnt' => 10 )
+		 * I'm using a strategy here that will return the count value, even if the return value of 
+		 * the method is changed to return just an integer value at some point.
+		 */
+		$count = (array) \IPS\collab\Collab::getItemsWithPermission( array( array( $contentItemClass::$databaseTable . '.' . $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'container' ] . '=?', $this->_id ) ), NULL, NULL, 'view', NULL, 0, NULL, FALSE, FALSE, FALSE, TRUE );
+		return array_shift( $count );
+	}
+	
+	/**
 	 * [Node] Get collab templates
 	 *
 	 * @return	array
