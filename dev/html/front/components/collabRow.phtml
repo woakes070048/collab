@@ -74,8 +74,8 @@
 						{template="tags" group="global" app="core" params="$row->tags(), true, true"}
 					{{endif}}
 				</span>
-				{{$collabData = $row->collab_data;}}
-				{{if $row->enabledNodes() and $collabData[ '_items' ][ 'grand_total' ]}}
+				{{if $row->enabledNodes() and $row->getTotal( '_items' )}}
+					{{$collabData = $row->collab_data;}}
 					<ul class="ipsDataItem_subList ipsList_inline" style="margin-top:3px">
 						{{foreach $row->enabledNodes() as $app => $configured}}
 							{{foreach $configured[ 'nodes' ] as $node}}

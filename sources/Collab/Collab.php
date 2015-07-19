@@ -878,7 +878,7 @@ class _Collab extends \IPS\Content\Item implements
 	/**
 	 * Count node aggregate totals inside collab
 	 *
-	 * @param 	string		$k		The property to recount ( '_items' or '_comments' )
+	 * @param 	string		$k		The property to recount ( '_items', '_comments', '_reviews' )
 	 * @return 	array				An array of total count data
 	 */
 	public function countTotals( $k )
@@ -902,7 +902,7 @@ class _Collab extends \IPS\Content\Item implements
 			}
 			
 			$contentWhere = array( array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'container' ] . '=?', $node->_id ) );
-						
+			
 			if ( in_array( 'IPS\Content\Hideable', class_implements( $contentItemClass ) ) )
 			{
 				if ( isset( $contentItemClass::$databaseColumnMap['approved'] ) )
