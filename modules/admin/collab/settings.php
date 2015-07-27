@@ -59,18 +59,32 @@ class _settings extends \IPS\Dispatcher\Controller
 
 		$form->addHeader( 'settings' );
 
-		$form->add( new \IPS\Helpers\Form\Translatable( 'app_title', NULL, TRUE, array( 'app' => 'collab', 'key' => '__app_collab', 'placeholder' => \IPS\Member::loggedIn()->language()->get( '__app_collab' ) ) ) );
+		$form->add( new \IPS\Helpers\Form\Translatable( 'collab_app_title', NULL, TRUE, array( 'app' => 'collab', 'key' => '__app_collab', 'placeholder' => \IPS\Member::loggedIn()->language()->get( '__app_collab' ) ) ) );
+		$form->add( new \IPS\Helpers\Form\Translatable( 'collab_app_collab_singular', NULL, TRUE, array( 'app' => 'collab', 'key' => 'collab_cat__collab_singular', 'placeholder' => \IPS\Member::loggedIn()->language()->get( 'collab_cat__collab_singular' ) ) ) );
+		$form->add( new \IPS\Helpers\Form\Translatable( 'collab_app_collabs_plural', NULL, TRUE, array( 'app' => 'collab', 'key' => 'collab_cat__collabs_plural', 'placeholder' => \IPS\Member::loggedIn()->language()->get( 'collab_cat__collabs_plural' ) ) ) );
 		
 		if ( $values = $form->values() )
-		{
-			if ( $values[ 'app_title' ] )
+		{			
+			if ( $values[ 'collab_app_title' ] )
 			{
-				$this->langSave( array( '__app_collab', 'module__collab_collab', 'menu__collab_collab', 'collab_collab_pl' ), $values[ 'app_title' ] );		
-				\IPS\Session::i()->log( 'collab_acplog_settings' );
+				$this->langSave( array( '__app_collab', 'module__collab_collab', 'menu__collab_collab', 'collab_collab_pl' ), $values[ 'collab_app_title' ] );		
 			}
+			
+			if ( $values[ 'collab_app_collab_singular' ] )
+			{
+				$this->langSave( array( 'collab_cat__collab_singular' ), $values[ 'collab_app_collab_singular' ] );
+			}
+			
+			if ( $values[ 'collab_app_collabs_plural' ] )
+			{
+				$this->langSave( array( 'collab_cat__collabs_plural' ), $values[ 'collab_app_collabs_plural' ] );
+			}
+			
+			\IPS\Session::i()->log( 'collab_acplog_settings' );
+			\IPS\Output::i()->redirect( $this->url, 'collab_settings_saved' );
 		}
 		
-		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('settings');
+		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack( 'settings' );
 		\IPS\Output::i()->output = $form;
 	}
 	

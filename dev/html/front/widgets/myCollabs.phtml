@@ -1,6 +1,6 @@
 <ips:template parameters="$collabs, $orientation='vertical'" />
 {{if !empty( $collabs ) }}
-	<h3 class='ipsWidget_title ipsType_reset'>{lang="block_myCollabs"}</h3>
+	<h3 class='ipsWidget_title ipsType_reset'>{lang="block_myCollabs_title" sprintf="\IPS\Member::loggedIn()->language()->addToStack( 'collab_cat__collabs_plural' )"}</h3>
 
 	{{if $orientation == 'vertical'}}
 		<div class='ipsPad_half ipsWidget_inner'>

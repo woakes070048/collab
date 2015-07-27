@@ -33,10 +33,13 @@ $lang = array(
 	// Widgets
 	'block_featuredCollabs'			=> "Featured Collabs",
 	'block_featuredCollabs_desc'		=> "Show collabs that are currently featured",
+	'block_featuredCollabs_title'		=> "Featured %s",
 	'block_latestCollabs'			=> "Latest Collabs",
 	'block_latestCollabs_desc'		=> "Show the most recently started collabs",
+	'block_latestCollabs_title'		=> "Latest %s",
 	'block_myCollabs'			=> "My Collabs",
 	'block_myCollabs_desc'			=> "List of collabs the currently logged in member is an active member of",
+	'block_myCollabs_title'			=> "My %s",
 	
 	// Group Settings
 	'group__collab_groupForm'		=> "Collaboration",
@@ -77,13 +80,17 @@ $lang = array(
 	// Collab Tools
 	'collab_manage_tools'			=> "Collaboration Import Tools",
 	'collab_migrate_missing_data'		=> "Import data unavailable",
-	
-	'collab_cat__collab_singular'		=> "Collab",
-	'collab_cat__collab_plural'		=> "Collabs",
-	
-	// Category Settings Form
+		
+	// Application Settings
 	'collab_app_title'			=> "App Title",
 	'collab_app_title_desc'			=> "You can change the name of the collaboration app to reflect the way you use it.",
+	'collab_app_collab_singular'		=> "Collab Singular",
+	'collab_app_collab_singular_desc'	=> "What are you generally going to call a collaboration on your site (in singular context).",
+	'collab_app_collabs_plural'		=> "Collab Plural",
+	'collab_app_collabs_plural_desc'	=> "What are you generally going to call collaborations on your site (in plural context).",
+	'collab_settings_saved'			=> "Settings Saved!",
+	
+	// Category Settings Form
 	'tab_collab_category_settings'		=> "Category Details",
 	'tab_collab_collabs_settings'		=> "Collab Settings",
 	'collab_category_show_forum_index'	=> "Show On Forum Index",
@@ -146,7 +153,8 @@ $lang = array(
 	'collab_contribution_mode_desc'		=> "Which stat do you want to display for total contributions",
 	'collab_contribution_mode_posts'	=> "Total Posts",
 	'collab_contribution_mode_items'	=> "Items Only",
-
+	'collab_member_default'			=> "Member's Chosen Site Theme",
+	'collab_category_skin_id'		=> "Category Theme",
 	
 	// Category View
 	'no_collabs_in_category'		=> "This category does not contain any %s",

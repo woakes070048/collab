@@ -667,7 +667,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$collab_category->id}", $category[ 'cat_name' ] );
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$collab_category->id}_desc", $category[ 'cat_desc' ] );
 		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$collab_category->id}_collab_singular", \IPS\Lang::load( \IPS\Lang::defaultLanguage() )->get( 'collab_cat__collab_singular' ) );
-		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$collab_category->id}_collabs_plural", \IPS\Lang::load( \IPS\Lang::defaultLanguage() )->get( 'collab_cat__collab_plural' ) );
+		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$collab_category->id}_collabs_plural", \IPS\Lang::load( \IPS\Lang::defaultLanguage() )->get( 'collab_cat__collabs_plural' ) );
 		
 		/**
 		 * Build Sub-categories

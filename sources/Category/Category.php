@@ -556,7 +556,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$member_title_lang 	= "collab_cat_{$this->id}_member_title";
 		$form_id 		= $this->id ? "form_{$this->id}_" : "form_new_";
 		$_singular 		= ucwords( $lang->checkKeyExists( $collab_singular_lang ) ? $lang->get( $collab_singular_lang ) : $lang->get( 'collab_cat__collab_singular' ) );
-		$_plural		= ucwords( $lang->checkKeyExists( $collab_plural_lang ) ? $lang->get( $collab_plural_lang ) : $lang->get( 'collab_cat__collab_plural' ) );
+		$_plural		= ucwords( $lang->checkKeyExists( $collab_plural_lang ) ? $lang->get( $collab_plural_lang ) : $lang->get( 'collab_cat__collabs_plural' ) );
 		$_lc_singular		= mb_strtolower( $_singular );
 		$_lc_plural		= mb_strtolower( $_plural );
 		$iconMap		= \IPS\collab\Application::iconMap();
