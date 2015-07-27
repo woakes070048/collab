@@ -76,6 +76,7 @@ class _categories extends \IPS\Helpers\CoverPhoto\Controller
 	{
 		$where = NULL;
 		$configuration = $category->_configuration;
+		$category->useTheme();
 		
 		if ( $category->privacy_mode == 'private' )
 		{

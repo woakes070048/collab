@@ -314,7 +314,7 @@ class _Application extends \IPS\Application
 	}
 	
 	/**
-	 * Operational Collab
+	 * Get a collab by url parameter
 	 *
 	 * @param	bool		$require		Require
 	 * @param	bool		$throw			Throw exception
@@ -334,7 +334,10 @@ class _Application extends \IPS\Application
 		try
 		{
 			/* Load a collab based on URL parameters */
-			static::$activeCollab = \IPS\collab\Collab::loadAndCheckPerms( \IPS\Request::i()->collab );
+			$collab = static::$activeCollab = \IPS\collab\Collab::loadAndCheckPerms( \IPS\Request::i()->collab );
+			
+			/* Set Theme */
+			$collab->setTheme();
 		}
 		catch ( \OutOfRangeException $e )
 		{
@@ -373,12 +376,17 @@ class _Application extends \IPS\Application
 					/* A collab itself! */
 					if ( $obj instanceof \IPS\collab\Collab )
 					{
-						static::$inferredCollab = $obj;								
+						/* Infer Collab */
+						static::$inferredCollab = $obj;	
+						
+						/* Set Theme */
+						$obj->setTheme();
+						
 						return;				
 					}
 					
 					/* 
-					 * Other content... 
+					 * Other content/nodes... 
 					 */
 					if ( $collab = static::getCollab( $obj ) )
 					{
@@ -387,7 +395,10 @@ class _Application extends \IPS\Application
 							
 						/* Set Breadcrumbs */
 						static::makeBreadcrumbs( $collab );
-																			
+						
+						/* Set Theme */
+						$collab->setTheme();
+						
 						/* Objective Complete. */
 						return;
 					}
@@ -397,6 +408,85 @@ class _Application extends \IPS\Application
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @brief 	Storage for detected collab objects
+	 */
+	public static $collabObjStack = array();
+	
+	/**
+	 * Inspect certain loaded objects to see if they belong to a collab, stack the results
+	 *
+	 * @param	mixed		$obj			The object to inspect
+	 * @return	void
+	 */
+	public static function collabObjStack( $obj )
+	{	
+		if ( $collab = static::getCollab( $obj ) )
+		{
+			static::$collabObjStack[] = array
+			(
+				'obj' 		=> $obj,
+				'collab'	=> $collab,
+			);
+			
+			/* Only do this for the first stacked object, and if a collab has not already been inferred */
+			if ( count( static::$collabObjStack ) == 1 and ! isset( static::$inferredCollab ) )
+			{
+				/* Make Breadcrumbs */
+				static::makeBreadcrumbs( $collab );
+				
+				/* Set Theme */
+				$collab->setTheme();
+			}
+		}
+		
+		return $obj;
+	}
+
+	/**
+	 * @brief  Cache for affective collab
+	 */
+	public static $affectiveCollab = NULL;
+	
+	/**
+	 * Determine which collab we are currently working with
+	 *
+	 * @return	\IPS\collab\Collab|NULL			The affective collab object or NULL if there isn't one
+	 */
+	public static function affectiveCollab()
+	{
+		if ( isset ( static::$affectiveCollab ) )
+		{
+			return static::$affectiveCollab;
+		}
+		
+		/**
+		 *  Option #1: The page specifically belongs to a collab owned object
+		 */
+		if ( isset ( static::$inferredCollab ) )
+		{
+			return static::$affectiveCollab = static::$inferredCollab;
+		}
+		
+		/**
+		 *  Option #2: A collab was specified in the url
+		 */
+		if ( $collab = static::activeCollab( FALSE ) )
+		{
+			return static::$affectiveCollab = $collab;
+		}
+		
+		/**
+		 *  Option #3: At some point, a collab owned object was loaded (by permission check)
+		 */
+		if ( ! empty ( static::$collabObjStack ) )
+		{			
+			return static::$affectiveCollab = static::$collabObjStack[ 0 ][ 'collab' ];
+		}
+		
+		return NULL;
 	}
 	
 	/**
@@ -451,82 +541,6 @@ class _Application extends \IPS\Application
 		}
 	
 		return FALSE;
-	}
-	
-	/**
-	 * @brief 	Storage for detected collab objects
-	 */
-	public static $collabObjStack = array();
-	
-	/**
-	 * Inspect certain loaded objects to see if they belong to a collab, stack the results
-	 *
-	 * @param	mixed		$obj			The object to inspect
-	 * @return	void
-	 */
-	public static function collabObjStack( $obj )
-	{	
-		if ( $collab = static::getCollab( $obj ) )
-		{
-			static::$collabObjStack[] = array(
-				'collab_id' 	=> $collab->collab_id,
-				'obj' 		=> $obj,
-			);
-		}
-		
-		return $obj;
-	}
-
-	/**
-	 * @brief  Cache for affective collab
-	 */
-	public static $affectiveCollab = NULL;
-	
-	/**
-	 * Try to determine what collab this page belongs to
-	 *
-	 * @param	bool		$require		Require
-	 * @param	bool		$throw			Throw exception
-	 * @return	\IPS\collab\Collab|FALSE		The operational collab object or FALSE if there isn't one
-	 */
-	public static function affectiveCollab()
-	{
-		if ( isset ( static::$affectiveCollab ) )
-		{
-			return static::$affectiveCollab;
-		}
-		
-		/**
-		 *  Option #1: The page specifically belongs to a collab owned object
-		 */
-		if ( isset ( static::$inferredCollab ) )
-		{
-			return static::$affectiveCollab = static::$inferredCollab;
-		}
-		
-		/**
-		 *  Option #2: A collab was specified in the url
-		 */
-		if ( $collab = static::activeCollab( FALSE ) )
-		{
-			return static::$affectiveCollab = $collab;
-		}
-		
-		/**
-		 *  Option #3: At some point, a collab owned object was loaded (by permission check)
-		 */
-		if ( ! empty ( static::$collabObjStack ) )
-		{
-			try
-			{
-				$collab = \IPS\collab\Collab::load( static::$collabObjStack[ 0 ][ 'collab_id' ] );
-				static::makeBreadcrumbs( $collab );
-				return static::$affectiveCollab = $collab;
-			}
-			catch ( \OutOfRangeException $e ) {}
-		}
-		
-		return NULL;
 	}
 	
 	/**
@@ -611,7 +625,7 @@ class _Application extends \IPS\Application
 						$collab = \IPS\collab\Collab::load( $container->collab_id );
 						return $collab;
 					}
-					catch ( \OutOfRangeException $e ) {}	
+					catch ( \OutOfRangeException $e ) { }	
 				}
 			}
 		}

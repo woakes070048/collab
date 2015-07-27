@@ -634,11 +634,12 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				'minimize'		=> 'cdesc_placeholder'
 			)
 		) ) );
-		$form->add( new \IPS\Helpers\Form\Node( 'category_parent_id', $this->id ? $this->parent_id : ( \IPS\Request::i()->parent ?: 0 ), FALSE, array(
-			'class'		      => '\IPS\collab\Category',
-			'disabled'	      => false,
-			'zeroVal'         => 'node_no_parent',
-			'permissionCheck' => function( $node )
+		
+		$form->add( new \IPS\Helpers\Form\Node( 'category_parent_id', $this->id ? $this->parent_id : ( \IPS\Request::i()->parent ?: 0 ), TRUE, array
+		(
+			'class'			=> '\IPS\collab\Category',
+			'zeroVal'		=> 'node_no_parent',
+			'permissionCheck'	=> function( $node )
 			{
 				if ( ! isset( \IPS\Request::i()->id ) )
 				{
@@ -649,12 +650,22 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			}
 		) ) );
 		
+		if ( count( \IPS\Theme::themes() ) > 1 )
+		{
+			$form->add( new \IPS\Helpers\Form\Node( 'collab_category_skin_id', $configuration[ 'skin_id' ] ?: 0, TRUE, array
+			(
+				'class' 	=> '\IPS\Theme',
+				'zeroVal'	=> 'collab_member_default',
+			) ) );
+		}		
+		
 		/**
 		 * Collab Settings
 		 */
+		
 		$form->addHeader( 'tab_collab_collabs_settings' );
-		$form->add( new \IPS\Helpers\Form\Translatable( 'collabs_alias_singular', $this->collab_singular, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? $collab_singular_lang : NULL ) ) ) );
-		$form->add( new \IPS\Helpers\Form\Translatable( 'collabs_alias_plural', $this->collab_plural, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? $collab_plural_lang : NULL ) ) ) );
+		$form->add( new \IPS\Helpers\Form\Translatable( 'collabs_alias_singular', NULL, TRUE, array( 'app' => 'collab', 'key' => $collab_singular_lang ) ) );
+		$form->add( new \IPS\Helpers\Form\Translatable( 'collabs_alias_plural', NULL, TRUE, array( 'app' => 'collab', 'key' => $collab_plural_lang ) ) );
 		
 		$form->addHtml( \IPS\Theme::i()->getTemplate( 'forms', 'core', 'front' )->seperator() );
 		
@@ -1029,6 +1040,11 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
 		$configuration[ 'contribution_mode' ] = $values[ 'collab_contribution_mode' ];
 		
+		if ( isset( $values[ 'collab_category_skin_id' ] ) )
+		{
+			$configuration[ 'skin_id' ] = is_object( $values[ 'collab_category_skin_id' ] ) ? $values[ 'collab_category_skin_id' ]->_id : (int) $values[ 'collab_category_skin_id' ];
+		}
+		
 		if ( isset( $values[ 'collab_category_show_forum_index' ] ) )
 		{
 			$configuration[ 'show_forum_index' ] = $values[ 'collab_category_show_forum_index' ];
@@ -1313,6 +1329,21 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		}
 
 		return $this->_url;
+	}
+
+	/**
+	 * Set Configured Theme
+	 *
+	 * @return	void
+	 */
+	public function setTheme()
+	{
+		$configuration = $this->_configuration;
+		
+		if ( $configuration[ 'skin_id' ] )
+		{			
+			\IPS\Theme::switchTheme( $configuration[ 'skin_id' ] );
+		}
 	}
 
 	/**

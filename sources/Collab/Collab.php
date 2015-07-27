@@ -1056,6 +1056,16 @@ class _Collab extends \IPS\Content\Item implements
 	}
 	
 	/**
+	 * Set Configured Theme
+	 *
+	 * @return	void
+	 */
+	public function setTheme()
+	{
+		$this->container()->setTheme();
+	}
+	
+	/**
 	 * Save
 	 *
 	 * @param	bool	$bypassMembership	Bypass the automatic creation of collab owner membership
