@@ -53,27 +53,11 @@
 		</div>
 		{{if !$node->redirect_on}}
 		<div class="ipsDataItem_stats ipsDataItem_statsLarge">
-			{{if $contentClass and method_exists( $contentClass, 'contentCount' ) and $count = $contentClass::contentCount( $node, TRUE )}}
+			{{if ( $count = $node->getContentItemCount() ) !== false}}
 				<dl>
 					<dt class="ipsDataItem_stats_number">{number="$count"}</dt>
 					<dd class="ipsDataItem_stats_type ipsType_light">{lang="collab_items" pluralize="$count"}</dd>
 				</dl>
-			{{else}}
-				{{if $node->_items}}
-				<dl>
-					<dd class='ipsDataItem_stats_type ipsType_light'>{lang="node_content_items" pluralize="$node->_items"}</dd>
-				</dl>
-				{{endif}}
-				{{if $node->_comments}}
-				<dl>
-					<dd class='ipsDataItem_stats_type ipsType_light'>{lang="node_content_comments" pluralize="$node->_comments"}</dd>
-				</dl>
-				{{endif}}
-				{{if $node->_reviews}}
-				<dl>
-					<dd class='ipsDataItem_stats_type ipsType_light'>{lang="node_content_reviews" pluralize="$node->_reviews"}</dd>
-				</dl>
-				{{endif}}
 			{{endif}}
 			{{if get_class( $node ) == 'IPS\forums\Forum' and \IPS\forums\Topic::modPermission( 'unhide', NULL, $node ) AND ( $node->queued_topics OR $node->queued_posts )}}
 				<strong class='ipsType_warning ipsType_medium'>
