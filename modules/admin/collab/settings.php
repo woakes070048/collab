@@ -48,6 +48,13 @@ class _settings extends \IPS\Dispatcher\Controller
 	{
 		\IPS\Dispatcher::i()->checkAcpPermission( 'collab_settings_manage' );
 		
+		\IPS\Output::i()->sidebar[ 'actions' ][ 'flushCounts' ] = array(
+			'icon'	=> 'bar-chart',
+			'link'	=> \IPS\Http\Url::internal( 'app=collab&module=collab&controller=settings&do=flushCounts' )->csrf(),
+			'title'	=> 'collab_flush_counts',
+			'data' => array( 'confirm' => '', 'confirmMessage' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_flush_counts_confirm' ) ),
+		);
+		
 		$form = new \IPS\Helpers\Form;
 
 		$form->addHeader( 'settings' );
@@ -65,6 +72,17 @@ class _settings extends \IPS\Dispatcher\Controller
 		
 		\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack('settings');
 		\IPS\Output::i()->output = $form;
+	}
+	
+	/**
+	 * Flush cached collab count data
+	 */
+	protected function flushCounts()
+	{
+		\IPS\Session::i()->csrfCheck();
+		
+		\IPS\Db::i()->update( 'collab_collabs', array( 'data' => NULL ) );
+		\IPS\Output::i()->redirect( \IPS\Http\Url::internal( 'app=collab&module=collab&controller=settings' ), 'collab_flush_counts_complete' );
 	}
 	
 }

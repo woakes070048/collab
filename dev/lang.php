@@ -26,6 +26,9 @@ $lang = array(
 	'collab_node_copied_to_collab'		=> "Successfully copied to the collab",
 	'collab_node_moved_to_collab'		=> "Successfully moved to the collab",
 	'collab_node_extracted_from_collab'	=> "Successfully extracted to the main site",
+	'collab_flush_counts'			=> "Recount Collab Stats",
+	'collab_flush_counts_confirm'		=> "This will flush cached collab count data and cause items to be recounted",
+	'collab_flush_counts_complete'		=> "Collab items will now be recounted!",
 	
 	// Widgets
 	'block_featuredCollabs'			=> "Featured Collabs",
