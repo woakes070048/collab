@@ -657,13 +657,18 @@ class _Collab extends \IPS\Content\Item implements
 	 */
 	public function getLatestContent( $limit=1 )
 	{
+		$contentItems = array();
+		
 		/* Get types */
 		$types = array();
 		foreach( $this->enabledNodes() as $app => $config )
 		{
 			foreach ( $config[ 'nodes' ] as $node )
 			{
-				$types[] = $node[ 'content' ];
+				if ( $node[ 'content' ] )
+				{
+					$types[] = $node[ 'content' ];
+				}
 			}
 		}
 		
@@ -765,17 +770,18 @@ class _Collab extends \IPS\Content\Item implements
 			$selects[] = $select;
 		}
 		
-		/* Query content */
-		$results = \IPS\Db::i()->union( $selects, 'date DESC', array( 0, $limit ), ( $onlyFollowed ) ? '_app, _follow_area, id' : NULL, FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS, $where );
-
-		$contentItems = array();
-		foreach( $results as $result )
+		if ( ! empty( $selects ) )
 		{
-			try
+			/* Query content */
+			$results = \IPS\Db::i()->union( $selects, 'date DESC', array( 0, $limit ), NULL, FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS, $where );
+			foreach( $results as $result )
 			{
-				$contentItems[] = $result[ 'class' ]::load( $result[ 'id' ] );
+				try
+				{
+					$contentItems[] = $result[ 'class' ]::load( $result[ 'id' ] );
+				}
+				catch( \OutOfRangeException $e ) { }
 			}
-			catch( \OutOfRangeException $e ) { }
 		}
 		
 		return $contentItems;
