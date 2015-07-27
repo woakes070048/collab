@@ -277,6 +277,14 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		}
 		
 	}
+	
+	/**
+	 * Get Collab Count
+	 */
+	public function get_collab_count()
+	{
+		return count( $this->collabs() );
+	}
 
 	/*
 	 *  Custom Getters

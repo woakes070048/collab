@@ -21,7 +21,7 @@ public static function hookData() {
     array (
       'selector' => '#elAccountSettingsLink',
       'type' => 'add_after',
-      'content' => '{{if count( member.collabs() )}}
+      'content' => '{{if member.collab_count}}
 <li class=\'ipsMenu_item\' id=\'elCollabMembershipsLink\'><a href=\'{url="app=collab&module=collab&controller=settings"}\' title=\'{lang="collab_manage_memberships" sprintf="\IPS\Member::loggedIn()->language()->addToStack(\'__app_collab\')"}\'>{lang="collab_manage_memberships" sprintf="\IPS\Member::loggedIn()->language()->addToStack(\'__app_collab\')"}</a></li>
 {{endif}}',
     ),
