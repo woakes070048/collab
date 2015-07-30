@@ -650,6 +650,24 @@ class _Collab extends \IPS\Content\Item implements
 	}
 	
 	/**
+	 * Additional WHERE clauses for New Content view
+	 *
+	 * @param	bool		$joinContainer		If true, will join container data (set to TRUE if your $where clause depends on this data)
+	 * @param	array		$joins				Other joins
+	 * @return	array
+	 */
+	public static function vncWhere( &$joinContainer, &$joins )
+	{
+		/* Omit collabs from mixed content list */
+		if ( ! ( \IPS\Request::i()->type AND \IPS\Request::i()->type !== 'all' ) )
+		{
+			return array_merge( parent::vncWhere( $joinContainer, $joins ), array( 'collab_collabs.collab_id=0' ) );
+		}
+
+		return parent::vncWhere( $joinContainer, $joins );
+	}
+
+	/**
 	 * Get latest collab content with permission
 	 * 
 	 * @param 	int				$limit		The number of items to get
