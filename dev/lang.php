@@ -537,4 +537,6 @@ $lang = array(
 	'collab_Collaboration_actions_set_join_mode_collab'		=> "Associated Collaboration",
 	'collab_rules_set_mode'						=> "Set collaboration join mode to",
 	
+	'collab_rules_select_collab'					=> "Type Collaboration Name",
+	
 );

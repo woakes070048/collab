@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10111">
+ <app key="collab" version="10112">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -453,5 +453,6 @@
   <word key="collab_Collaboration_actions_set_join_mode_mode" js="0">Join Mode to Set</word>
   <word key="collab_Collaboration_actions_set_join_mode_collab" js="0">Associated Collaboration</word>
   <word key="collab_rules_set_mode" js="0">Set collaboration join mode to</word>
+  <word key="collab_rules_select_collab" js="0">Type Collaboration Name</word>
  </app>
 </language>
