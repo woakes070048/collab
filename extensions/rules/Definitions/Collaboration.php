@@ -165,6 +165,7 @@ class _Collaboration
 								'class' => '\IPS\collab\Collab',						
 							),						
 						),
+						'configuration' => \IPS\rules\Application::configPreset( 'item', 'collab_rules_select_collab', TRUE, array( 'class' => '\IPS\collab\Collab' ) ),
 						'required'	=> TRUE,
 					),
 				),
@@ -216,6 +217,7 @@ class _Collaboration
 								'class' => '\IPS\collab\Collab',						
 							),						
 						),
+						'configuration' => \IPS\rules\Application::configPreset( 'item', 'collab_rules_select_collab', TRUE, array( 'class' => '\IPS\collab\Collab' ) ),
 						'required'	=> TRUE,
 					),
 				),
@@ -249,6 +251,7 @@ class _Collaboration
 								'class' => '\IPS\collab\Collab',						
 							),						
 						),
+						'configuration' => \IPS\rules\Application::configPreset( 'item', 'collab_rules_select_collab', TRUE, array( 'class' => '\IPS\collab\Collab' ) ),
 						'required'	=> TRUE,
 					),
 					'member' => array
