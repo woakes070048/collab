@@ -118,7 +118,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		/* Write our count to bypass the magic __set method */
 		$this->_data[ 'member_posts' ] = 0;
 
-		foreach ( \IPS\Content::routedClasses( $this, TRUE, TRUE, FALSE ) as $class )
+		foreach ( \IPS\Content::routedClasses( $this, TRUE, FALSE ) as $class )
 		{
 			if ( $class::memberPostCount( $this ) !== 0 )
 			{
