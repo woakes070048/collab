@@ -74,5 +74,9 @@
     "themeForumsFrontIndex": {
         "type": "S",
         "class": "\\IPS\\Theme\\class_forums_front_index"
+    },
+    "ipsContentComment": {
+        "type": "C",
+        "class": "\\IPS\\Content\\Comment"
     }
 }
