@@ -1204,9 +1204,9 @@ class _Collab extends \IPS\Content\Item implements
 	public function isFull()
 	{
 		$isFull 	= FALSE;
-		$max_members 	= $this->rules_max_collab_members ?: $this->container()->max_collab_members;
+		$max_members 	= $this->r_max_members !== NULL ? $this->r_max_members : $this->container()->max_collab_members;
 		
-		if ( $this->container()->max_collab_members > 0 )
+		if ( $max_members > 0 )
 		{
 			$isFull = ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_memberships', array( 'collab_id=? AND status=?', $this->collab_id, \IPS\collab\COLLAB_MEMBER_ACTIVE ) )->first() >= $this->container()->max_collab_members );
 		}
@@ -1221,7 +1221,7 @@ class _Collab extends \IPS\Content\Item implements
 	 */
 	public function notFull()
 	{
-		return !($this->isFull());
+		return ! ( $this->isFull() );
 	}
 	
 	/**
@@ -1386,13 +1386,14 @@ class _Collab extends \IPS\Content\Item implements
 	 * Get A Collab Membership
 	 *
 	 * @param	\IPS\Member		$member		Member to check collab membership for
+	 * @param	bool			$bypassCache	Bypass cache and recheck for existing membership
 	 * @return	array|FALSE
 	 */
-	public function getMembership( \IPS\Member $member=NULL )
+	public function getMembership( \IPS\Member $member=NULL, $bypassCache=FALSE )
 	{
 		$member = $member ?: \IPS\Member::loggedIn();
 		
-		if ( isset( $this->memberships[ $member->member_id ] ) )
+		if ( isset( $this->memberships[ $member->member_id ] ) and ! $bypassCache )
 		{
 			return $this->memberships[ $member->member_id ];
 		}

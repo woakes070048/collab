@@ -581,7 +581,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		 */
 		$form->addTab( 'tab_collab_category_settings', 'cogs' );
 		$form->add( $collabs_enable = new \IPS\Helpers\Form\YesNo( 'category_collabs_enable', $this->id ? $this->collabs_enable : 0, FALSE, 
-			array( 'togglesOn' => array( 
+			array( 'togglesOn' => array
+			( 
 				$form_id . 'header_tab_collab_collabs_settings',
 				$form_id . 'collab_category_privacy_mode',
 				$form_id . 'collab_category_per_page',
@@ -623,7 +624,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_contribution_mode', $configuration[ 'contribution_mode' ] ?: 'posts', TRUE, array( 'options' => $contribution_modes ) ) );
 		
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_name', NULL, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? "collab_category_{$this->id}" : NULL ) ) ) );
-		$form->add( new \IPS\Helpers\Form\Translatable( 'category_description', NULL, FALSE, array(
+		$form->add( new \IPS\Helpers\Form\Translatable( 'category_description', NULL, FALSE, array
+		(
 			'app'		=> 'collab',
 			'key'		=> ( $this->id ? "collab_category_{$this->id}_desc" : NULL ),
 			'editor'	=> array(
@@ -1461,7 +1463,8 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	
 	protected function langKeys()
 	{
-		return array( 
+		return array
+		( 
 			'description' => "collab_category_{$this->id}_desc", 
 			'rules_title' => "collab_category_{$this->id}_rulestitle", 
 			'rules_text' => "collab_category_{$this->id}_rules", 
