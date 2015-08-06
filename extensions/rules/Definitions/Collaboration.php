@@ -389,7 +389,7 @@ class _Collaboration
 			throw new \InvalidArgumentException( 'Invalid member' );
 		}
 		
-		if ( $membership = $collab->getMembership( $member ) )
+		if ( $membership = $collab->getMembership( $member, TRUE ) )
 		{
 			return in_array( $membership->status, (array) $status );
 		}
@@ -448,7 +448,7 @@ class _Collaboration
 			throw new \InvalidArgumentException( 'Invalid member' );
 		}
 		
-		if ( $membership = $collab->getMembership( $member ) )
+		if ( $membership = $collab->getMembership( $member, TRUE ) )
 		{
 			if ( $membership->status !== $status )
 			{
@@ -506,7 +506,7 @@ class _Collaboration
 			throw new \InvalidArgumentException( 'Invalid member' );
 		}
 		
-		if ( $membership = $collab->getMembership( $member ) )
+		if ( $membership = $collab->getMembership( $member, TRUE ) )
 		{
 			$membership->delete();
 			return "membership deleted";
