@@ -187,6 +187,8 @@ $lang = array(
 	
 	// Collab View
 	'leave_comment'				=> "Leave Comment",
+	'collab_comment'			=> "Comment",
+	'collab_review'				=> "Review",
 	'collab_collab__comment_placeholder'	=> "Type here to leave a comment...",
 	'collab_comment_count'			=> "{# [1:comment][?:comments]} about this %s",
 	'collab_youre_active'			=> "You are an active member.",
@@ -455,10 +457,10 @@ $lang = array(
 	
 	// Uninstall
 	'collab_delete_all'			=> "Delete All Associated Content?",
-	'collab_delete_all_desc'		=> "If checked, all categories and content from collaborations will be deleted from your site. Uncheck for options to keep specific content.",
+	'collab_delete_all_desc'		=> "<strong style='color:red'><i class='fa fa-warn-triangle'></i> Warning:</strong> If checked, all categories and content inside collaborations will be deleted from your site.",
 	'collab_deleting_collabs'		=> "Deleting Collaboration Content",
 	'collab_keep_node'			=> "Keep %s?",
-	'collab_keep_node_desc'			=> "Check this option to keep all %s and %s content associated with collaborations on your site.",
+	'collab_keep_node_desc'			=> "Check this option to keep all %s and %s content inside collaborations on your site.",
 	
 	// Other
 	'collab'				=> "Collab",
