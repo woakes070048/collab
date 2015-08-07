@@ -45,7 +45,7 @@ class _Uninstall
 				$collabOptions	= \IPS\collab\Application::collabOptions();
 				$lang		= \IPS\Member::loggedIn()->language();
 				$form 		= new \IPS\Helpers\Form( $form_id, 'uninstall' );
-				$delete_all	= new \IPS\Helpers\Form\YesNo( 'collab_delete_all', TRUE );
+				$delete_all	= new \IPS\Helpers\Form\YesNo( 'collab_delete_all', FALSE );
 				
 				$form->add( $delete_all );
 				
@@ -60,7 +60,7 @@ class _Uninstall
 						$lang->words[ 'keep_' . $nid . '_desc' ] 	= $lang->addToStack( 'collab_keep_node_desc', FALSE, array( 'sprintf' => array( $node_lang, $lang->addToStack( $node[ 'content' ]::$title ) ) ) );
 						$delete_all->options[ 'togglesOff' ][] 		= $form_id . '_keep_' . $nid;
 						
-						$form->add( new \IPS\Helpers\Form\YesNo( 'keep_' . $nid, FALSE ) );
+						$form->add( new \IPS\Helpers\Form\YesNo( 'keep_' . $nid, TRUE ) );
 					}
 				}
 				
