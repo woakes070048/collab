@@ -531,7 +531,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 * @return	\IPS\Patterns\ActiveRecordIterator
 	 * @throws	\BadMethodCallException
 	 */
-	public function getLatestContentItem()
+	public function getLatestActivityItem()
 	{
 		if ( !isset( static::$contentItemClass ) )
 		{
@@ -542,11 +542,21 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 		$prefix 	= $itemClass::$databasePrefix;
 		$mapped		= $itemClass::$databaseColumnMap;
 		
-		$_where		= array( array( $prefix . $mapped['container'] . '=?', $this->_id ) );
-		$_order 	= $prefix . $mapped[ 'date' ] . ' DESC';	
+		$_select 	= array( $itemClass::$databaseTable . '.*' );
+		$_where		= array( array( $prefix . $mapped[ 'container' ] . '=?', $this->_id ) );
 		$_limit 	= array( 0, 1 );
 		
-		foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', $itemClass::$databaseTable, $_where, $_order, $_limit ), $itemClass ) as $content )
+		if ( $latest = \IPS\collab\Collab::latestContentSQL( $itemClass ) )
+		{
+			$_select[] 	= "{$latest} as latest_activity_date";
+			$_order		= 'latest_activity_date DESC';
+		}
+		else
+		{
+			$_order 	= $prefix . $mapped[ 'date' ] . ' DESC';
+		}		
+		
+		foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( implode( ', ', $_select ), $itemClass::$databaseTable, $_where, $_order, $_limit ), $itemClass ) as $content )
 		{
 			return $content;
 		}

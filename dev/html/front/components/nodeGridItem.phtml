@@ -52,21 +52,26 @@
 		</div>
 		{{endif}}
 		
-
-		{{if !$node->redirect_on}}
-			{{if method_exists( $node, 'lastPost' ) and $lastPost = $node->lastPost()}}
+		{{if ! $node->redirect_on}}
+			{{if $latestContent = $lastPost = $node->getLatestActivityItem()}}
+				{{$itemUrl = $itemDateLink = $latestContent->url();}}
+				{{if isset( $latestContent::$commentClass ) and $_lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+				  {{$lastPost = $_lastPost;}}
+				  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
+				  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
+				{{endif}}
 				<div class='ipsPhotoPanel ipsPhotoPanel_tiny ipsPad'>
 					<hr class='ipsHr'>
-					{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}
+					{template="userPhoto" app="core" group="global" params="$lastPost->author(), 'tiny'"}
 					<div>
 						<ul class='ipsList_reset'>
-							<li><a href="{$lastPost['topic_url']}" class='ipsType_break' title='{$lastPost['topic_title']}'>{truncate="$lastPost['topic_title']" length="30"}</a></li>
-							<li>{lang="byline_nodate" htmlsprintf="$lastPost['author']->link()"}, <span class='ipsType_light'>{datetime="$lastPost['date']"}<span></li>
+							<li><a href="{$itemUrl}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+							<li>{lang="byline_nodate" htmlsprintf="$lastPost->author()->link()"}, <span class='ipsType_light'><a href='{$itemDateLink}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped( 'date' )"}</a><span></li>
 						</ul>
 					</div>
 				</div>
 			{{else}}
-				<p class='ipsPad ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
+				<p class='ipsPad ipsType_light ipsType_reset'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="collab_no_content"}{{endif}}</p>
 			{{endif}}
 		{{endif}}
 		

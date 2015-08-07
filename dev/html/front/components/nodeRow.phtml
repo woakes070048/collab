@@ -51,7 +51,7 @@
 				</div>
 			{{endif}}
 		</div>
-		{{if !$node->redirect_on}}
+		{{if ! $node->redirect_on}}
 		<div class="ipsDataItem_stats ipsDataItem_statsLarge">
 			{{if ( $count = $node->getContentItemCount() ) !== false}}
 				<dl>
@@ -76,29 +76,22 @@
 				</strong>					
 			{{endif}}
 		</div>
-		{{if get_class( $node ) == 'IPS\forums\Forum'}}
 		<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
-			{{if $lastPost = $node->lastPost()}}
-				<li>{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}</li>
-				<li><a href="{$lastPost['topic_url']->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break ipsContained' title='{$lastPost['topic_title']}'>{truncate="$lastPost['topic_title']" length="30"}</a></li>
-				<li>{lang="byline_nodate" htmlsprintf="$lastPost['author']->link()"}</li>
-				<li class="ipsType_light"><a href='{$lastPost['topic_url']->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost['date']"}</a></li>
-			{{else}}
-				<li class='ipsType_light ipsResponsive_showDesktop'>{{if $node->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</li>
-			{{endif}}
-		</ul>
-		{{elseif method_exists( $node, 'getLatestContentItem' )}}
-		<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
-			{{if $lastPost = $node->getLatestContentItem()}}
-				<li>{template="userPhoto" app="core" group="global" params="\IPS\Member::load( $lastPost->mapped('author') ), 'tiny'"}</li>
-				<li><a href="{$lastPost->url()}" class='ipsType_break ipsContained' title='{$lastPost->mapped('title')}'>{truncate="$lastPost->mapped('title')" length="30"}</a></li>
-				<li>{lang="byline_nodate" htmlsprintf="\IPS\Member::load( $lastPost->mapped('author') )->link()"}</li>
-				<li class="ipsType_light"><a href='{$lastPost->url()}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped('date')"}</a></li>
+			{{if $latestContent = $lastPost = $node->getLatestActivityItem()}}
+				{{$itemUrl = $itemDateLink = $latestContent->url();}}
+				{{if isset( $latestContent::$commentClass ) and $_lastPost = $latestContent->comments( 1, NULL, 'date', 'desc' )}}
+				  {{$lastPost = $_lastPost;}}
+				  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
+				  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
+				{{endif}}
+				<li>{template="userPhoto" app="core" group="global" params="$lastPost->author(), 'tiny'"}</li>
+				<li><a href="{$itemUrl}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
+				<li>{lang="byline_nodate" htmlsprintf="$lastPost->author()->link()"}</li>
+				<li class="ipsType_light"><a href='{$itemDateLink}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped( 'date' )"}</a></li>
 			{{else}}
 				<li class='ipsType_light ipsResponsive_showDesktop'>{lang="collab_no_content"}</li>
 			{{endif}}
 		</ul>		
-		{{endif}}
 		{{endif}}
 	</li>
 {{endif}}

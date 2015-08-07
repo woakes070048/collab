@@ -108,7 +108,7 @@
 					  {{$itemUrl = $itemUrl->setQueryString( 'do', 'getNewComment' );}}
 					  {{$itemDateLink = $itemDateLink->setQueryString( 'do', 'getLastComment' );}}
 					{{endif}}
-					<li>{template="userPhoto" app="core" group="global" params="$latestContent->author(), 'tiny'"}</li>
+					<li>{template="userPhoto" app="core" group="global" params="$lastPost->author(), 'tiny'"}</li>
 					<li><a href="{$itemUrl}" class='ipsType_break ipsContained' title="{$latestContent->mapped( 'title' )}">{truncate="$latestContent->mapped( 'title' )" length="30"}</a></li>
 					<li>{lang="byline_nodate" htmlsprintf="$lastPost->author()->link()"}</li>
 					<li class="ipsType_light"><a href='{$itemDateLink}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost->mapped( 'date' )"}</a></li>

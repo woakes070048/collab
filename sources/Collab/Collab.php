@@ -695,7 +695,7 @@ class _Collab extends \IPS\Content\Item implements
 		foreach ( $types as $key => $class )
 		{
 			$containerClass = $class::$containerNodeClass;
-			$dateColumnExpression = $this->_getDateExpression( $class );
+			$dateColumnExpression = $this::latestContentSQL( $class );
 			
 			/* Limit content to this collab */
 			$contentWhere = array( array( $containerClass::$databaseTable . "." . $containerClass::$databasePrefix . 'collab_id=' . $this->collab_id ) );
@@ -806,12 +806,12 @@ class _Collab extends \IPS\Content\Item implements
 	}
 
 	/**
-	 * Get the date Column expression
+	 * Get the latest date column expression
 	 *
-	 * @param	string	$class 		Content class (\IPS\forums\Forum)
+	 * @param	string	$class 		Content class
 	 * @return	string
 	 */
-	protected function _getDateExpression( $class )
+	public static function latestContentSQL( $class )
 	{
 		/* What is the best date column? */
 		$dateColumns = array();
@@ -1670,6 +1670,11 @@ class _Collab extends \IPS\Content\Item implements
 	{
 		$_nodes_to_delete = array();
 		
+		$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
+		
+		/* Set the affective collab so the roots() method produces the correct results */
+		\IPS\collab\Application::$affectiveCollab = $this;
+		
 		foreach ( \IPS\collab\Application::collabOptions() as $app => $nodes )
 		{
 			foreach ( $nodes as $node )
@@ -1681,14 +1686,12 @@ class _Collab extends \IPS\Content\Item implements
 					/* Check if we have an option set to leave this node type alone */
 					if ( ! isset ( $options[ 'keep_nodes' ] ) or ! in_array( $nid, (array) $options[ 'keep_nodes' ] ) )
 					{
-						// Set the affective collab so the roots() method produces the correct results
-						\IPS\collab\Application::$affectiveCollab = $this;
-						$_nodes_to_delete = array_merge( $_nodes_to_delete, $this->nodeFamily( $node['node']::roots( NULL ) ) );
+						$_nodes_to_delete = array_merge( $_nodes_to_delete, $this->nodeFamily( $node[ 'node' ]::roots( NULL ) ) );
 					}
 				}
 			}
 		}
-		\IPS\collab\Application::$affectiveCollab = NULL;
+		\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
 
 		/* Queue the deletion of all nodes (and content) attached to this collab */
 		foreach ( $_nodes_to_delete as $_node )
