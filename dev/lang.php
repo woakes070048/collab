@@ -327,6 +327,7 @@ $lang = array(
 	'collab_menu_title'			=> "Menu Title",
 	'collab_menu_link'			=> "Menu Link",
 	'collab_menu_icon'			=> "Menu Icon",
+	'collab_role_pm_create'			=> "Start Group Conversation",
 	
 	// User Membership Management
 	'collab_membership_collab_id'		=> "Title",

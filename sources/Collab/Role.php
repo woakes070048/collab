@@ -269,6 +269,29 @@ class _Role extends \IPS\Node\Model
 	}
 
 	/**
+	 * [Node] Get buttons to display in tree
+	 * Example code explains return value
+	 *
+	 * @param	string	$url		Base URL
+	 * @param	bool	$subnode	Is this a subnode?
+	 * @return	array
+	 */
+	public function getButtons( $url, $subnode=FALSE )
+	{
+		$buttons = parent::getButtons( $url, $subnode );
+		
+		$buttons[ 'role_pm' ] = array
+		(
+			'icon'	=> 'comments',
+			'title'	=> 'collab_role_pm_create',
+			'link'	=> $url->setQueryString( array( 'do' => 'rolePM', 'id' => $this->_id ) ),
+			'data'  => array( 'ipsDialog' => TRUE, 'ipsDialog-title' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_role_pm_create' ) ),
+		);
+		
+		return $buttons;
+	}
+	
+	/**
 	 * Add Role Permission Fields
 	 *
 	 * @param	\IPS\Helpers\Form	$form		The form to add permission settings to

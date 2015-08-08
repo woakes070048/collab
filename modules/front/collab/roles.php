@@ -117,6 +117,48 @@ class _roles extends \IPS\Node\Controller
 	}
 	
 	/**
+	 * Mass PM
+	 */
+	protected function rolePM()
+	{
+		$collab = \IPS\collab\Application::activeCollab();
+		
+		try
+		{
+			$role = \IPS\collab\Collab\Role::load( \IPS\Request::i()->id );
+			$collab->authObj( $role );
+			
+			/**
+			 * Set up mass pm recipients
+			 */
+			if ( \IPS\Request::i()->messenger_to === NULL )
+			{
+				$extraWhere = $role->member_default ? array( 'collab_memberships.member_id!=?', \IPS\Member::loggedIn()->member_id ) : array( 'collab_roles.id=? and collab_memberships.member_id!=?', $role->id, \IPS\Member::loggedIn()->member_id );
+				$memberships = $collab->memberships( array( 'statuses' => array( \IPS\collab\COLLAB_MEMBER_ACTIVE ) ), $extraWhere );
+				
+				$messenger_to = array();
+				foreach( $memberships as $membership )
+				{
+					$messenger_to[] = $membership->member()->name;
+				}
+			
+				\IPS\Request::i()->messenger_to = implode( ',', $messenger_to );
+			}
+
+			$form = \IPS\core\Messenger\Conversation::create();
+			$form->action = \IPS\Http\Url::internal( "app=core&module=messaging&controller=messenger&do=compose" );
+			$form->class = 'ipsForm_vertical';
+
+			\IPS\Output::i()->title		= \IPS\Member::loggedIn()->language()->addToStack( 'compose_new' );
+			\IPS\Output::i()->output	= $form->customTemplate( array( call_user_func_array( array( \IPS\Theme::i(), 'getTemplate' ), array( 'forms', 'core' ) ), 'popupTemplate' ) );
+		}
+		catch ( \OutOfRangeException $e )
+		{
+			\IPS\Output::i()->error( 'collab_node_unavailable', '2CR60/A', 403 );
+		}
+	}
+	
+	/**
 	 * Execute Controller Methods ( with a "default location" theme hack )
 	 *
 	 * @return	void
