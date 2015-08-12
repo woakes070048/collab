@@ -78,5 +78,9 @@
     "ipsContentComment": {
         "type": "C",
         "class": "\\IPS\\Content\\Comment"
+    },
+    "ipsWidgetPermissionCache": {
+        "type": "C",
+        "class": "\\IPS\\Widget\\PermissionCache"
     }
 }

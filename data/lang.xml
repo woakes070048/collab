@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10113">
+ <app key="collab" version="10200">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -159,6 +159,8 @@
   <word key="collab_member_default_role" js="0">Default Member Role</word>
   <word key="collab_owner_default_role" js="0">Default Owner Role</word>
   <word key="leave_comment" js="0">Leave Comment</word>
+  <word key="collab_comment" js="0">Comment</word>
+  <word key="collab_review" js="0">Review</word>
   <word key="collab_collab__comment_placeholder" js="0">Type here to leave a comment...</word>
   <word key="collab_comment_count" js="0">{# [1:Comment][?:Comments]}</word>
   <word key="collab_youre_active" js="0">You are an active member.</word>
@@ -288,6 +290,7 @@
   <word key="collab_menu_title" js="0">Menu Title</word>
   <word key="collab_menu_link" js="0">Menu Link</word>
   <word key="collab_menu_icon" js="0">Menu Icon</word>
+  <word key="collab_role_pm_create" js="0">Start Group Conversation</word>
   <word key="collab_membership_collab_id" js="0">Title</word>
   <word key="collab_membership_title" js="0">Member Title</word>
   <word key="collab_membership_roles" js="0">Roles</word>
@@ -391,10 +394,10 @@
   <word key="collab_owner_non_removable" js="0">You can't leave when you are the owner!</word>
   <word key="collab_no_transfer_members" js="0">There are no qualified members in your group to transfer to!</word>
   <word key="collab_delete_all" js="0">Delete All Associated Content?</word>
-  <word key="collab_delete_all_desc" js="0">If checked, all categories and content from collaborations will be deleted from your site. Uncheck for options to keep specific content.</word>
+  <word key="collab_delete_all_desc" js="0"><![CDATA[<strong style='color:red'><i class='fa fa-warn-triangle'></i> Warning:</strong> If checked, all categories and content inside collaborations will be deleted from your site.]]></word>
   <word key="collab_deleting_collabs" js="0">Deleting Collaboration Content</word>
   <word key="collab_keep_node" js="0">Keep %s?</word>
-  <word key="collab_keep_node_desc" js="0">Check this option to keep all %s and %s content associated with collaborations on your site.</word>
+  <word key="collab_keep_node_desc" js="0">Check this option to keep all %s and %s content inside collaborations on your site.</word>
   <word key="collab" js="0">Collab</word>
   <word key="remove" js="0">Remove</word>
   <word key="select" js="0">Select</word>
