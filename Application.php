@@ -64,6 +64,24 @@ class _Application extends \IPS\Application
 	}
 
 	/**
+	 * [Node] Custom Badge
+	 *
+	 * @return	NULL|array	Null for no badge, or an array of badge data (0 => CSS class type, 1 => language string, 2 => optional raw HTML to show instead of language string)
+	 */
+	public function get__badge()
+	{
+		if ( \IPS\collab\DEMO )
+		{
+			return array(
+				0	=> 'ipsBadge ipsBadge_warning',
+				1	=> 'Demo',
+			);
+		}
+		
+		return NULL;
+	}	
+	
+	/**
 	 * @brief 	Controller map for app compatibility
 	 * 
 	 * This map is used to help connect dispatcher controller instances to
@@ -771,6 +789,15 @@ class _Application extends \IPS\Application
 		$buttons['delete']['data'] = array( 'delete' => '', 'noajax' => '' );
 		return $buttons;
 	}
+	
+	/**
+	 * Protect
+	 */
+	public function isProtected()
+	{
+		return DEMO;
+	}	
+	
 }
 
 if ( defined( '\IPS\collab\DEMO' ) )
