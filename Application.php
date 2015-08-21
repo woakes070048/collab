@@ -527,46 +527,52 @@ class _Application extends \IPS\Application
 	 */
 	public static function urlMatch( $obj )
 	{
-		if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
+		try
 		{
-			/**
-			 * Work out request parameters
-			 */
-			if ( ! isset ( static::$request ) )
+			if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
 			{
-				try
+				/**
+				 * Work out request parameters
+				 */
+				if ( ! isset ( static::$request ) )
 				{
-					static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
-					static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
+					try
+					{
+						static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
+						static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
+					}
+					catch ( \Exception $e ) { }
+					
+					if ( ! static::$request )
+					{
+						static::$request = \IPS\Request::i();
+					}
 				}
-				catch ( \Exception $e ) { }
 				
-				if ( ! static::$request )
-				{
-					static::$request = \IPS\Request::i();
-				}
-			}
-			
-			/* Filter out any empty parameters */
-			$param = $url->_queryString;
+				/* Filter out any empty parameters */
+				$param = $url->_queryString;
 
-			/**
-			 * Compare the object url to the current url
-			 * and see if the object owns the current page
-			 */
-			foreach ( $param as $k => $v )
-			{
-				
-				if ( $k and static::$request->$k != $v )
+				/**
+				 * Compare the object url to the current url
+				 * and see if the object owns the current page
+				 */
+				foreach ( $param as $k => $v )
 				{
-					// Nope.
-					return FALSE;
+					
+					if ( $k and static::$request->$k != $v )
+					{
+						// Nope.
+						return FALSE;
+					}
 				}
+				
+				/* Yep */
+				return TRUE;
 			}
-			
-			/* Yep */
-			return TRUE;
 		}
+		
+		/* IPS\cms\Records throws LogicException if database is not linked to a page */
+		catch( \LogicException $e ) { }
 	
 		return FALSE;
 	}
