@@ -614,7 +614,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 					}
 				}
 				catch ( \OutOfRangeException $e ) { }
-			}			
+			}
 		}
 
 		return parent::__set( $k, $v );
