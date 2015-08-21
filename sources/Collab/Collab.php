@@ -903,9 +903,10 @@ class _Collab extends \IPS\Content\Item implements
 	 * Count node aggregate totals inside collab
 	 *
 	 * @param 	string		$k		The property to recount ( '_items', '_comments', '_reviews' )
-	 * @return 	array				An array of total count data
+	 * @param	string		$nodeClass	The node class to count or NULL for all
+	 * @return 	mixed				An array of total count data or an integer if counting single node type
 	 */
-	public function countTotals( $k )
+	public function countTotals( $k, $nodeClass=NULL )
 	{
 		$savedAffectiveCollab				= \IPS\collab\Application::$affectiveCollab;
 		\IPS\collab\Application::$affectiveCollab 	= $this;
@@ -929,11 +930,11 @@ class _Collab extends \IPS\Content\Item implements
 			
 			if ( in_array( 'IPS\Content\Hideable', class_implements( $contentItemClass ) ) )
 			{
-				if ( isset( $contentItemClass::$databaseColumnMap['approved'] ) )
+				if ( isset( $contentItemClass::$databaseColumnMap[ 'approved' ] ) )
 				{
 					$contentWhere[] = array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'approved' ] . '=?', 1 );
 				}
-				elseif ( isset( $contentItemClass::$databaseColumnMap['hidden'] ) )
+				elseif ( isset( $contentItemClass::$databaseColumnMap[ 'hidden' ] ) )
 				{
 					$contentWhere[] = array( $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'hidden' ] . '=?', 0 );
 				}
@@ -982,18 +983,35 @@ class _Collab extends \IPS\Content\Item implements
 			return $count;
 		};
 		
-		/* Tally Counts */
-		foreach( $this->enabledNodes() as $app => $config )
+		/* Count all enabled node types */
+		if ( $nodeClass === NULL )
 		{
-			foreach ( $config[ 'nodes' ] as $node )
+			/* Tally Counts */
+			foreach( $this->enabledNodes() as $app => $config )
 			{
-				$node_type_total = 0;
-				foreach ( $node[ 'node' ]::roots( NULL ) as $root )
+				foreach ( $config[ 'nodes' ] as $node )
 				{
-					$node_type_total += $countRecursive( $root );
+					$node_type_total = 0;
+					foreach ( $node[ 'node' ]::roots( NULL ) as $root )
+					{
+						$node_type_total += $countRecursive( $root );
+					}
+					$totals[ 'node_totals' ][ $node[ 'nid' ] ] = $node_type_total;
+					$totals[ 'grand_total' ] += $node_type_total;
 				}
-				$totals[ 'node_totals' ][ $node[ 'nid' ] ] = $node_type_total;
-				$totals[ 'grand_total' ] += $node_type_total;
+			}
+		}
+		
+		/* Count individual node type */
+		else
+		{
+			$totals = 0;
+			if ( $this->enabledNodes( md5( $nodeClass ) ) )
+			{
+				foreach( $nodeClass::roots( NULL ) as $root )
+				{
+					$totals += $countRecursive( $root );
+				}
 			}
 		}
 		
