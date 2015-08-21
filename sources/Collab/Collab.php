@@ -951,6 +951,12 @@ class _Collab extends \IPS\Content\Item implements
 					if ( $contentItemClass::$databaseColumnMap[ 'num_comments' ] )
 					{
 						$count = (int) \IPS\Db::i()->select( 'SUM(' . $contentItemClass::$databasePrefix . $contentItemClass::$databaseColumnMap[ 'num_comments' ] . ')', $contentItemClass::$databaseTable, $contentWhere )->first();
+						
+						/* Subtract first comments if they are required */
+						if ( $contentItemClass::$firstCommentRequired )
+						{
+							$count -= (int) \IPS\Db::i()->select( 'COUNT(*)', $contentItemClass::$databaseTable, $contentWhere )->first();
+						}
 					}
 					break;
 					
@@ -1037,7 +1043,7 @@ class _Collab extends \IPS\Content\Item implements
 			default:
 			case 'posts':
 			
-				return $this->getTotal( '_comments' ) + $this->getTotal( '_reviews' );
+				return $this->getTotal( '_items' ) + $this->getTotal( '_comments' );
 				
 		}
 	}
