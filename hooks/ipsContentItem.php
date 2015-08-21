@@ -58,9 +58,13 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	 * @param	bool		$joinReviews			If true, will join review data (set to TRUE if your $where clause depends on this data)
 	 * @param	bool		$countOnly			If true will return the count
 	 * @param	array|null	$joins				Additional arbitrary joins for the query
+	 * @param	mixed		$skipPermission		If you are getting records from a specific container, pass the container to reduce the number of permission checks necessary or pass TRUE to skip conatiner-based permission. You must still specify this in the $where clause
+	 * @param	bool		$joinTags			If true, will join the tags table
+	 * @param	bool		$joinAuthor			If true, will join the members table for the author
+	 * @param	bool		$joinLastCommenter	If true, will join the members table for the last commenter
 	 * @return	\IPS\Patterns\ActiveRecordIterator|int
 	 */
-	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL, $skipPermission=FALSE )
+	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL, $skipPermission=FALSE, $joinTags=TRUE, $joinAuthor=TRUE, $joinLastCommenter=TRUE )
 	{		
 		if ( isset( static::$containerNodeClass ) )
 		{
@@ -83,7 +87,7 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 			
 		}
 		
-		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins );
+		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins, $skipPermission, $joinTags, $joinAuthor, $joinLastCommenter );
 	}
 	
 	/**
