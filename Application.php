@@ -98,15 +98,25 @@ class _Application extends \IPS\Application
 			/* IPS Downloads */ 
 			
 			// Submit Controller
-			'IPS\downloads\modules\front\downloads\submit' 	=> array(
+			'IPS\downloads\modules\front\downloads\submit' 	=> array
+			(
 				'category' 	=> '\IPS\downloads\Category',
 			),
 			
 			/* IPS Blogs */
 			
 			// Submit Controller
-			'IPS\blog\modules\front\blogs\submit'		=> array(
+			'IPS\blog\modules\front\blogs\submit'		=> array
+			(
 				'id'		=> '\IPS\blog\Blog',
+			),
+			
+			/* IPS Calendar */
+			
+			// Submit Controller
+			'IPS\calendar\modules\front\calendar\submit' 	=> array
+			(
+				'id'		=> '\IPS\calendar\Calendar',
 			),
 			
 		);
