@@ -82,5 +82,9 @@
     "ipsWidgetPermissionCache": {
         "type": "C",
         "class": "\\IPS\\Widget\\PermissionCache"
+    },
+    "modCalendarEvent": {
+        "type": "C",
+        "class": "\\IPS\\calendar\\Event"
     }
 }

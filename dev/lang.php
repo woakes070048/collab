@@ -30,6 +30,10 @@ $lang = array(
 	'collab_flush_counts_confirm'		=> "This will flush cached collab count data and cause items to be recounted",
 	'collab_flush_counts_complete'		=> "Collab items will now be recounted!",
 	
+	'editor__collab_Categories'		=> "Collab Categories",
+	'editor__collab_Collab'			=> "Collaborations",
+	'editor__collab_Generic'		=> "Collab Generic",
+	
 	// Widgets
 	'block_featuredCollabs'			=> "Featured Collabs",
 	'block_featuredCollabs_desc'		=> "Show collabs that are currently featured",

@@ -11,9 +11,13 @@
 					{$category->_title}
 				{{endif}}
 			</h1>
+			<div class='collab-count'>
 			{{if $category->collabs_enable}}
-				<div class='collab-count'>{expression="$category->getCollabCount()"} {$category->collab_plural}</div>
+				{expression="$category->getCollabCount()"} {$category->collab_plural}
+			{{else}}
+				&nbsp;
 			{{endif}}
+			</div>
 			{{if $layout == 'subview'}}
 				<a href='{$category->url()}' class='ipsButton ipsButton_verySmall ipsButton_light'>{lang="browse"}</a>
 			{{else}}
