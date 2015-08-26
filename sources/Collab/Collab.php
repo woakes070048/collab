@@ -1710,11 +1710,12 @@ class _Collab extends \IPS\Content\Item implements
 					/* Check if we have an option set to leave this node type alone */
 					if ( ! isset ( $options[ 'keep_nodes' ] ) or ! in_array( $nid, (array) $options[ 'keep_nodes' ] ) )
 					{
-						$_nodes_to_delete = array_merge( $_nodes_to_delete, $this->nodeFamily( $node[ 'node' ]::roots( NULL ) ) );
+						$_nodes_to_delete = array_merge( $_nodes_to_delete, $this->nodeFamily( $node[ 'node' ]::roots( NULL, NULL, array( 'collab_id=?', $this->collab_id ) ) ) );
 					}
 				}
 			}
 		}
+		
 		\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
 
 		/* Queue the deletion of all nodes (and content) attached to this collab */

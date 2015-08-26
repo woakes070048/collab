@@ -108,7 +108,8 @@ class _Uninstall
 					/* Initialization */
 					if ( empty ( $data ) )
 					{
-						$data = array(
+						$data = array
+						(
 							'starting_total' => \IPS\Db::i()->select( 'COUNT(*)', 'collab_collabs' )->first()
 						);
 						
@@ -118,7 +119,7 @@ class _Uninstall
 						}
 					}
 					
-								
+					
 					/**
 					 * Delete all collab content via delete() method in groups of 100
 					 * this way, attached collab content can be handled properly
