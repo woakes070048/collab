@@ -598,6 +598,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 				$form_id . 'collab_restrict_owner',
 				$form_id . 'collab_category_require_approval',
 				$form_id . 'collab_contribution_mode',
+				$form_id . 'collab_unread_method',
 			) ) 
 		) );
 		
@@ -613,6 +614,12 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			'items' 	=> 'collab_contribution_mode_items',
 		);
 		
+		$unread_method_options = array
+		(
+			'quick' 	=> 'collab_unread_quick',
+			'comprehensive'	=> 'collab_unread_comprehensive',
+		);
+		
 		if ( \IPS\Application::appIsEnabled( 'forums' ) )
 		{
 			$form->add( new \IPS\Helpers\Form\YesNo( 'collab_category_show_forum_index', isset( $configuration[ 'show_forum_index' ] ) ? $configuration[ 'show_forum_index' ] : FALSE, FALSE ) );
@@ -622,6 +629,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_category_privacy_mode', $this->privacy_mode ?: 'public', TRUE, array( 'options' => $privacy_options ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'collab_category_per_page', isset( $configuration[ 'per_page' ] ) ? $configuration[ 'per_page' ] : 25, TRUE, array( 'min' => 1 ) ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_contribution_mode', $configuration[ 'contribution_mode' ] ?: 'posts', TRUE, array( 'options' => $contribution_modes ) ) );
+		$form->add( new \IPS\Helpers\Form\Radio( 'collab_unread_method', $configuration[ 'collab_unread_method' ] ?: 'quick', TRUE, array( 'options' => $unread_method_options ) ) );
 		
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_name', NULL, TRUE, array( 'app' => 'collab', 'key' => ( $this->id ? "collab_category_{$this->id}" : NULL ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Translatable( 'category_description', NULL, FALSE, array

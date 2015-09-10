@@ -618,34 +618,23 @@ class _Collab extends \IPS\Content\Item implements
 	 */
 	public static function containerUnread( \IPS\Node\Model $container, \IPS\Member $member = NULL )
 	{
-		$member = $member ?: \IPS\Member::loggedIn();
-		$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
-
-		/**
-		 * @TODO: This is WAY inefficient. There has got to be a better way to do this.
-		 */
-		foreach( $container->getContentItems( NULL, NULL ) as $collab )
+		$configuration = $container->_configuration;
+		
+		if ( $configuration[ 'collab_unread_method' ] == 'comprehensive' )
 		{
-			\IPS\collab\Application::$affectiveCollab = $collab;
-
-			/* See if any container from any app inside the collab has unread content */
-			foreach( $collab->enabledNodes() as $app => $config )
+			foreach( $container->getContentItems( NULL, NULL ) as $collab )
 			{
-				foreach ( $config[ 'nodes' ] as $node )
-				{				
-					foreach ( $node[ 'node' ]::roots( 'view' ) as $root )
-					{
-						if ( $node[ 'content' ]::containerUnread( $root, $member ) )
-						{
-							\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
-							return TRUE;
-						}
-					}
+				if ( $collab->unread( $member ) )
+				{
+					return TRUE;
 				}
 			}
 		}
-
-		\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+		else
+		{
+			return parent::containerUnread( $container, $member );
+		}
+		
 		return FALSE;
 	}
 	
@@ -850,28 +839,37 @@ class _Collab extends \IPS\Content\Item implements
 			return $this->unread;
 		}
 		
-		$member = $member ?: \IPS\Member::loggedIn();
-		$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
-		\IPS\collab\Application::$affectiveCollab = $this;
-
-		/* See if any container from any app inside the collab has unread content */
-		foreach( $this->enabledNodes() as $app => $config )
+		$configuration = $this->container()->_configuration;
+		
+		if ( $configuration[ 'collab_unread_method' ] == 'comprehensive' )
 		{
-			foreach ( $config[ 'nodes' ] as $node )
-			{				
-				foreach ( $node[ 'node' ]::roots( 'view' ) as $root )
-				{
-					if ( $node[ 'content' ]::containerUnread( $root, $member ) )
+			$member = $member ?: \IPS\Member::loggedIn();
+			$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
+			\IPS\collab\Application::$affectiveCollab = $this;
+
+			/* See if any container from any app inside the collab has unread content */
+			foreach( $this->enabledNodes() as $app => $config )
+			{
+				foreach ( $config[ 'nodes' ] as $node )
+				{				
+					foreach ( $node[ 'node' ]::roots( 'view' ) as $root )
 					{
-						\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
-						return $this->unread = 1;
+						if ( $node[ 'content' ]::containerUnread( $root, $member ) )
+						{
+							\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+							return $this->unread = 1;
+						}
 					}
 				}
 			}
-		}
 
-		\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
-		return $this->unread = 0;
+			\IPS\collab\Application::$affectiveCollab = $savedAffectiveCollab;
+			return $this->unread = 0;
+		}
+		else
+		{
+			return parent::unread();
+		}
 	}
 
 	/**
@@ -1710,7 +1708,7 @@ class _Collab extends \IPS\Content\Item implements
 					/* Check if we have an option set to leave this node type alone */
 					if ( ! isset ( $options[ 'keep_nodes' ] ) or ! in_array( $nid, (array) $options[ 'keep_nodes' ] ) )
 					{
-						$_nodes_to_delete = array_merge( $_nodes_to_delete, $this->nodeFamily( $node[ 'node' ]::roots( NULL, NULL, array( 'collab_id=?', $this->collab_id ) ) ) );
+						$_nodes_to_delete = array_merge( $_nodes_to_delete, $this->nodeFamily( $node[ 'node' ]::roots( NULL, NULL, array( array( $node['node']::$databasePrefix . 'collab_id=?', $this->collab_id ) ) ) ) );
 					}
 				}
 			}
