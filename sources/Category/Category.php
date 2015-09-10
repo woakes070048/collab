@@ -1049,6 +1049,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$configuration[ 'per_page' ] = $values[ 'collab_category_per_page' ];
 		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
 		$configuration[ 'contribution_mode' ] = $values[ 'collab_contribution_mode' ];
+		$configuration[ 'collab_unread_method' ] = $values[ 'collab_unread_method' ];
 		
 		if ( isset( $values[ 'collab_category_skin_id' ] ) )
 		{

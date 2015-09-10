@@ -48,7 +48,8 @@ class _settings extends \IPS\Dispatcher\Controller
 	{
 		\IPS\Dispatcher::i()->checkAcpPermission( 'collab_settings_manage' );
 		
-		\IPS\Output::i()->sidebar[ 'actions' ][ 'flushCounts' ] = array(
+		\IPS\Output::i()->sidebar[ 'actions' ][ 'flushCounts' ] = array
+		(
 			'icon'	=> 'bar-chart',
 			'link'	=> \IPS\Http\Url::internal( 'app=collab&module=collab&controller=settings&do=flushCounts' )->csrf(),
 			'title'	=> 'collab_flush_counts',

@@ -1,1 +1,6 @@
-[]
+[
+    {
+        "key": "collab_unread_depth",
+        "default": ""
+    }
+]

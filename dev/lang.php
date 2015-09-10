@@ -29,6 +29,10 @@ $lang = array(
 	'collab_flush_counts'			=> "Recount Collab Stats",
 	'collab_flush_counts_confirm'		=> "This will flush cached collab count data and cause items to be recounted",
 	'collab_flush_counts_complete'		=> "Collab items will now be recounted!",
+	'collab_unread_method'			=> "Unread Calculation Method",
+	'collab_unread_method_desc'		=> "<div class='ipsMessage ipsMessage_warning'><strong>Quick</strong> will consider a collaboration unread based only on the date/time of the last activity in the collab (irrespective of permissions). <br><strong>Comprehensive</strong> will actually search through every app and every container inside collaborations to see if there is new content that the user can actually view. It can get very resource intensive if there is a lot of content, so use the 'comprehensive' setting with caution.</div>",
+	'collab_unread_quick'			=> "Quick (based on last activity)",
+	'collab_unread_comprehensive'		=> "Comprehensive (based on user permissions)",
 	
 	'editor__collab_Categories'		=> "Collab Categories",
 	'editor__collab_Collab'			=> "Collaborations",
