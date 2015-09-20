@@ -587,9 +587,9 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 						$data = $collab->collab_data;
 						
 						/**
-						 * If no count has been recorded yet to the collab data, count it all
+						 * If no count has been recorded yet to the collab data, or a cached count cannot be retrieved, recount it all
 						 */
-						if ( ! isset( $data[ $k ] ) )
+						if ( ! isset( $data[ $k ] ) or $this->$k === NULL )
 						{
 							$result = parent::__set( $k, $v );
 							$data[ $k ] = $collab->countTotals( $k );
@@ -683,7 +683,19 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 */
 	static public function constructFromData( $data, $updateMultitonStoreIfExists=true )
 	{
-		$obj = call_user_func_array( 'parent::constructFromData', func_get_args() );
+		/** 
+		 * @BUGFIX: Calling $node->children() builds active record objects that are unsavable
+		 * 
+		 * Fix for bug in core caused by calling $node->children() on nodes with permissions
+		 * These permission fields get added to the object _data properties and makes the node
+		 * unsavable
+		 */
+		if ( in_array( 'IPS\Node\Permissions', class_implements( get_called_class() ) ) )
+		{
+			unset( $data[ 'app' ], $data[ 'perm_type' ], $data[ 'perm_type_id' ], $data[ 'owner_only' ], $data[ 'friend_only' ], $data[ 'authorized_users' ] );
+		}
+		
+		$obj = parent::constructFromData( $data, $updateMultitonStoreIfExists );
 		\IPS\collab\Application::inferCollab( $obj );
 		return $obj;
 	}
