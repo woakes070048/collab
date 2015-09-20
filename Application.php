@@ -590,7 +590,14 @@ class _Application extends \IPS\Application
 		$html = (string) $html;
 		if ( $collab = static::affectiveCollab() and ! \IPS\Request::i()->isAjax() )
 		{
-			if ( ! $collab->hidden() or \IPS\collab\Collab::modPermission( 'view_hidden', NULL, $collab->container() ) or \IPS\Member::loggedIn()->member_id === $collab->owner_id )
+			if ( 
+				$collab->canView() and 
+				(
+					! $collab->hidden() or 
+					\IPS\collab\Collab::modPermission( 'view_hidden', NULL, $collab->container() ) or 
+					\IPS\Member::loggedIn()->member_id === $collab->owner_id 
+				)
+			)
 			{
 				$wrapper = 'collabPublicWrapper';
 				if 
