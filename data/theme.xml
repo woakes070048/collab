@@ -48,10 +48,10 @@
 	</dl>
 </div>
 <ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
-{{foreach \IPS\collab\Collab::getItemsWithPermission( array( array( 'category_id=?', $category->_id ) ), 'last_post DESC', 1 ) as $collab}}
-		<li>{template="userPhoto" app="core" group="global" params="$collab->author(), 'tiny'"}	</li>
-		<li><a href="{$collab->url()}" class='ipsType_break ipsContained' title="{$collab->mapped( 'title' )}">{truncate="$collab->mapped( 'title' )" length="30"}</a></li>	
-		<li class="ipsType_light">{datetime="$collab->last_post"}</li>
+{{foreach \IPS\collab\Collab::getItemsWithPermission( array( array( 'collab_collabs.category_id=?', $category->_id ) ), 'last_post DESC', 1 ) as $collab}}
+	<li>{template="userPhoto" app="core" group="global" params="$collab->author(), 'tiny'"}	</li>
+	<li><a href="{$collab->url()}" class='ipsType_break ipsContained' title="{$collab->mapped( 'title' )}">{truncate="$collab->mapped( 'title' )" length="30"}</a></li>	
+	<li class="ipsType_light">{datetime="$collab->last_post"}</li>
 {{endforeach}}
 </ul>
 {{endif}}]]></template>
@@ -634,11 +634,11 @@
 </li>
 ]]></template>
  <template template_group="components" template_name="memberCollabCardList" template_data="$member" template_location="front" template_app="collab"><![CDATA[
-{{if $collabCount = count( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ) )}}
+{{if $collabCount = count( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE, 'view' ) )}}
 	<li>
 		<span class="ipsDataItem_generic ipsDataItem_size3"><strong>{lang="__app_collab"}</strong></span>
 		<span class="ipsDataItem_main">
-		{{foreach array_slice( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE ), 0, 5 ) as $i => $collab}}
+		{{foreach array_slice( $member->collabs( \IPS\collab\COLLAB_MEMBER_ACTIVE, 'view' ), 0, 5 ) as $i => $collab}}
 			<a href="{$collab->url()}">{$collab->title}</a>{{if $i < $collabCount - 1 and $i < 4}}, {{endif}}
 		{{endforeach}}
 		{{if $collabCount - 5 > 0}}
