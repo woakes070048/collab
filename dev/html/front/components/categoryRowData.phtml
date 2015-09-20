@@ -8,10 +8,10 @@
 	</dl>
 </div>
 <ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
-{{foreach \IPS\collab\Collab::getItemsWithPermission( array( array( 'category_id=?', $category->_id ) ), 'last_post DESC', 1 ) as $collab}}
-		<li>{template="userPhoto" app="core" group="global" params="$collab->author(), 'tiny'"}	</li>
-		<li><a href="{$collab->url()}" class='ipsType_break ipsContained' title="{$collab->mapped( 'title' )}">{truncate="$collab->mapped( 'title' )" length="30"}</a></li>	
-		<li class="ipsType_light">{datetime="$collab->last_post"}</li>
+{{foreach \IPS\collab\Collab::getItemsWithPermission( array( array( 'collab_collabs.category_id=?', $category->_id ) ), 'last_post DESC', 1 ) as $collab}}
+	<li>{template="userPhoto" app="core" group="global" params="$collab->author(), 'tiny'"}	</li>
+	<li><a href="{$collab->url()}" class='ipsType_break ipsContained' title="{$collab->mapped( 'title' )}">{truncate="$collab->mapped( 'title' )" length="30"}</a></li>	
+	<li class="ipsType_light">{datetime="$collab->last_post"}</li>
 {{endforeach}}
 </ul>
 {{endif}}

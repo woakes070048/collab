@@ -67,9 +67,19 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 						$_pass = FALSE;
 						foreach ( (array) $perms as $perm )
 						{
-							$_pass = $collab->collabCan( $perm, $this, $params );
+							if ( $perm == 'view' )
+							{
+								$member = $params[ 'member' ] ?: \IPS\Member::loggedIn();
+								$_pass = $collab->canView( $member );
+							}
+							else
+							{
+								$_pass = $collab->collabCan( $perm, $this, $params );
+							}
+							
 							if ( ! $_pass ) break;
 						}
+						
 						if ( ! $_pass ) continue;
 					}
 					$this->collabs[ $cache_key ][] = $collab;		
