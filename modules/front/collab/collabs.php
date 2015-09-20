@@ -37,11 +37,20 @@ class _collabs extends \IPS\Content\Controller
 	 */
 	protected function manage()
 	{
-		$collab = parent::manage();
+		parent::manage();
 		
-		if ( $collab and $collab->hidden() and ! ( \IPS\collab\Collab::modPermission( 'view_hidden', NULL, $collab->container() ) or \IPS\Member::loggedIn()->member_id === $collab->owner_id ) )
+		$class 	= static::$contentModel;
+		$collab = NULL;
+		
+		try
 		{
-			\IPS\Output::i()->error( 'node_error', '2CV01/B', 404, '' );
+			$collab = $class::load( \IPS\Request::i()->id );
+		}
+		catch( \OutOfRangeException $e ) { }
+		
+		if ( $collab and ! $collab->canView() )
+		{
+			\IPS\Output::i()->error( 'node_error_no_perm', '2CV01/B', 404, '' );
 		}
 		
 		$this->viewCollab( $collab );
