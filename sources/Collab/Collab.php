@@ -598,7 +598,7 @@ class _Collab extends \IPS\Content\Item implements
 		 */
 		if ( \IPS\Application::appIsEnabled( 'rules' ) )
 		{
-			foreach ( \IPS\rules\Data::roots( 'view', NULL, array( array( 'data_class=? AND data_use_mode IN ( \'public\' ) AND data_type IN ( \'string\', \'int\', \'float\' )', static::rulesDataClass() ) ) ) as $data_field )
+			foreach ( \IPS\rules\Data::roots( 'view', NULL, array( array( 'data_class=? AND data_display_mode IN ( \'automatic\' ) AND data_type IN ( \'string\', \'int\', \'float\' )', static::rulesDataClass() ) ) ) as $data_field )
 			{
 				$statValue = $this->getRulesData( $data_field->column_name );					
 				if ( $statValue !== NULL )
