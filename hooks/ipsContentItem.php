@@ -160,7 +160,10 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 			}
 		}
 		
-		return array_merge( parent::vncWhere( $joinContainer, $joins ), $where );
+		/* Backwards compatibility with 4.0.x */
+		$parentWhere = is_callable( 'parent::vncWhere' ) ? parent::vncWhere( $joinContainer, $joins ) : array();
+		
+		return array_merge( $parentWhere, $where );
 	}
 	
 	/**
