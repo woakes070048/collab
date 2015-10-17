@@ -118,12 +118,13 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 	protected function socialGroupsImport()
 	{
 		$import_url = \IPS\Http\Url::internal( "app=collab&module=collab&controller=socialgroups&do=socialGroupsImport" );
+		$self = $this;
 		
 		$importer = new \IPS\Helpers\MultipleRedirect( 
 				
 			$import_url,
 			
-			function( $data )
+			function( $data ) use ( $self )
 			{
 				/* Initialization */
 				if ( empty ( $data ) )
@@ -199,7 +200,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 			
 						foreach ( $categories as $category )
 						{
-							$this->_createCategory( $category, $perms );
+							$self->_createCategory( $category, $perms );
 							$data[ 'progress' ]++;
 						}
 						

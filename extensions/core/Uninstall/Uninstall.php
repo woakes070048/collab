@@ -151,6 +151,9 @@ class _Uninstall
 				/* Processing Complete */ 
 				function() use ( &$steps_complete )
 				{
+					$db = \IPS\Db::i();
+					
+					/* Drop collab_id columns for installed apps */
 					foreach ( \IPS\collab\Application::collabOptions() as $app => $nodes )
 					{
 						foreach ( $nodes as $node )
@@ -158,9 +161,34 @@ class _Uninstall
 							$nodeClass = $node[ 'node' ];
 							
 							/* Drop any provisioned collab_id column ( mysql drops the index automatically ) */
-							if ( \IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) )
+							if ( $db->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) )
 							{
-								\IPS\Db::i()->dropColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' );
+								$db->dropColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' );
+							}
+						}
+					}
+					
+					/* Drop imported status columns for social groups */
+					if ( $db->checkForTable( 'social_groups' ) )
+					{
+						$import_tables = array
+						( 
+							'social_groups', 
+							'social_groups_cat', 
+							'social_group_members',
+							'social_groups_invites', 
+							'social_groups_news',
+							'social_groups_pages',
+						);
+						
+						foreach ( $import_tables as $table )
+						{
+							if ( $db->checkForTable( $table ) )
+							{
+								if ( $db->checkForColumn( $table, 'imported_id' ) )
+								{
+									$db->dropColumn( $table, 'imported_id' );
+								}
 							}
 						}
 					}
