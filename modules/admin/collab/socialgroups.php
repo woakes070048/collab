@@ -579,7 +579,7 @@ class _socialgroups extends \IPS\Dispatcher\Controller
 		
 	}
 	
-	protected function _createCategory( $category, $perms, $parent_id=0 )
+	public function _createCategory( $category, $perms, $parent_id=0 )
 	{
 		// Create Category
 		$nid 	 = md5( 'IPS\forums\Forum' );

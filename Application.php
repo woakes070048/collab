@@ -518,6 +518,20 @@ class _Application extends \IPS\Application
 	}
 	
 	/**
+	 * Switch to a new affective collab
+	 *
+	 * @param	\IPS\collab\Collab|NULL			The new affective collab
+	 * @return 	\IPS\collab\Collab|NULL			The previously set affective collab
+	 */
+	public static function switchCollab( $collab )
+	{
+		$affectiveCollab = static::$affectiveCollab;
+		static::$affectiveCollab = $collab;
+		return $affectiveCollab;
+	}
+	 
+	 
+	/**
 	 * @brief	Cache for current url
 	 */
 	public static $request = NULL;

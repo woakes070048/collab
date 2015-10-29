@@ -388,4 +388,14 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		
 		return parent::__set( $key, $value );
 	}
+	
+	/**
+	 * Get Total Site Posts
+	 *
+	 * @return 	int
+	 */
+	public function get_site_posts()
+	{
+		return $this->data[ 'member_posts' ];
+	}
 }

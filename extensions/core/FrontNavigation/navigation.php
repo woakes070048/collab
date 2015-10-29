@@ -2,9 +2,9 @@
 /**
  * @brief		Front Navigation Extension: navigation
  * @author		<a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
- * @copyright	(c) 2001 - SVN_YYYY Invision Power Services, Inc.
+ * @copyright		(c) 2001 - SVN_YYYY Invision Power Services, Inc.
  * @license		http://www.invisionpower.com/legal/standards/
- * @package		IPS Social Suite
+ * @package		IPS Social Suite 
  * @subpackage	
  * @since		14 Dec 2014
  * @version		SVN_VERSION_NUMBER
@@ -22,8 +22,18 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * Front Navigation Extension: navigation
  */
-class _navigation
+class _navigation extends \IPS\collab\Util\FrontNavigationAbstract
 {
+	/**
+	 * Get Type Title which will display in the AdminCP Menu Manager
+	 *
+	 * @return	string
+	 */
+	public static function typeTitle()
+	{
+		return \IPS\Member::loggedIn()->language()->addToStack( '__app_collab' );
+	}
+	
 	/**
 	 * Can access?
 	 *
@@ -31,7 +41,7 @@ class _navigation
 	 */
 	public function canView()
 	{
-		return ! \IPS\Application::load( 'collab' )->hide_tab and \IPS\Member::loggedIn()->canAccessModule( \IPS\Application\Module::get( 'collab', 'collab' ) );
+		return parent::canView() and \IPS\Member::loggedIn()->canAccessModule( \IPS\Application\Module::get( 'collab', 'collab' ) );
 	}
 	
 	/**
@@ -41,7 +51,7 @@ class _navigation
 	 */
 	public function title()
 	{
-		return \IPS\Member::loggedIn()->language()->addToStack('__app_collab');
+		return \IPS\Member::loggedIn()->language()->addToStack( '__app_collab' );
 	}
 	
 	/**
