@@ -222,7 +222,8 @@ class _Application extends \IPS\Application
 						}					
 					
 						$node_id = 'node_' . md5( $nodeClass );
-						$node_data = array(
+						$node_data = array
+						(
 							'app'		=> $app,
 							'node' 		=> $nodeClass,
 							'content' 	=> $contentItemClass,

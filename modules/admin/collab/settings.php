@@ -64,6 +64,10 @@ class _settings extends \IPS\Dispatcher\Controller
 		$form->add( new \IPS\Helpers\Form\Translatable( 'collab_app_collab_singular', NULL, TRUE, array( 'app' => 'collab', 'key' => 'collab_cat__collab_singular', 'placeholder' => \IPS\Member::loggedIn()->language()->get( 'collab_cat__collab_singular' ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Translatable( 'collab_app_collabs_plural', NULL, TRUE, array( 'app' => 'collab', 'key' => 'collab_cat__collabs_plural', 'placeholder' => \IPS\Member::loggedIn()->language()->get( 'collab_cat__collabs_plural' ) ) ) );
 		
+		$form->addHeader( 'config' );
+		
+		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_category_longconfig', \IPS\Settings::i()->collab_category_longconfig, FALSE ) );
+		
 		if ( $values = $form->values() )
 		{			
 			if ( $values[ 'collab_app_title' ] )
@@ -80,6 +84,8 @@ class _settings extends \IPS\Dispatcher\Controller
 			{
 				$this->langSave( array( 'collab_cat__collabs_plural' ), $values[ 'collab_app_collabs_plural' ] );
 			}
+			
+			$form->saveAsSettings( array( 'collab_category_longconfig' => $values[ 'collab_category_longconfig' ] ) );
 			
 			\IPS\Session::i()->log( 'collab_acplog_settings' );
 			\IPS\Output::i()->redirect( $this->url, 'collab_settings_saved' );

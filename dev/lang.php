@@ -34,6 +34,12 @@ $lang = array(
 	'collab_unread_quick'			=> "Quick (based on last activity)",
 	'collab_unread_comprehensive'		=> "Comprehensive (based on user permissions)",
 	
+	'collab_category_longconfig'		=> "Expanded Category Configuration",
+	'collab_category_longconfig_desc'	=> "When enabled, configuration settings for every available content type will be included 'all-in-one' on the collab category configuration form. Disable this option if your server is experiencing problems processing the full form. ( Each content type will still be able to be configured individually. )",
+	'collab_category_updated'		=> "Category Updated!",
+	'collab_config_app'			=> "%s Settings",
+	'collab_category_app_config'		=> "Collab App Configuration",
+	
 	'editor__collab_Categories'		=> "Collab Categories",
 	'editor__collab_Collab'			=> "Collaborations",
 	'editor__collab_Generic'		=> "Collab Generic",

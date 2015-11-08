@@ -712,91 +712,20 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		$lang->words[ 'collab_multiple_models_choice_desc' ] = $lang->addToStack( 'collab_multiple_models_desc', FALSE, array( 'sprintf' => array( $_lc_plural ) ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_multiple_models_choice', $this->id ? ( $this->bitoptions[ 'multiple_model' ] ? 1 : 0 ) : 0, TRUE, array( 'options' => array( 0 => 'single', 1 => 'multiple' ) ) ) );
 
-		/* Application Tabs */
-		foreach ( \IPS\collab\Application::collabOptions() as $app => $nodes )
+		if ( \IPS\Settings::i()->collab_category_longconfig )
 		{
-			$application = \IPS\Application::load( $app );
-			$form->addTab( "__app_{$application->directory}", $iconMap[ $application->directory ] ?: $application->_icon );
-			$collabs_enable->options[ 'togglesOn' ] = array_merge( $collabs_enable->options[ 'togglesOn' ], array( $form_id . 'tab___app_' . $application->directory ) );
-
-			/* Node Options */
-			foreach ( $nodes as $option )
+			/* Application Tabs */
+			foreach ( \IPS\collab\Application::collabOptions() as $app => $nodes )
 			{
-				$nodeClass 	= $option[ 'node' ];
-				$nid 		= md5( $nodeClass );
-				$nodeTitle 	= ucwords( $lang->get( $nodeClass::$nodeTitle ) );
-				$contentClass	= $option[ 'content' ];
-				$contentTitle 	= $contentClass ? ucwords( $lang->get( $contentClass::$title ) ) : NULL;
-				
-				$form->addHeader( $contentTitle . ' ' . $nodeTitle );
-				
-				/**
-				 * Enable Node Type 
-				 */
-				$lang->words[ "options-node_{$nid}-enabled" ] 				= $lang->addToStack( 'collab_allow_node', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
-				$lang->words[ "options-node_{$nid}-enabled_desc" ] 			= $lang->addToStack( $option['content'] ? 'collab_allow_node_content_desc' : 'content_allow_node_desc', FALSE, array( 'sprintf' => array( $lang->addToStack( $collab_plural_lang ), $nodeTitle, $contentTitle ) ) );
-				$form->add( $enable_switch = new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-enabled", isset( $this->_options[ 'node_' . $nid ][ 'enabled' ] ) ? $this->_options[ 'node_' . $nid ][ 'enabled' ] : 0, FALSE, array( 'togglesOn' => array ( 'perms_' . $nid ) ) ) );
-				
-				/**
-				 * Allow Setting Maximum Amount Of Nodes 
-				 */
-				$lang->words[ "options-node_{$nid}-maxnodes" ] 				= $lang->addToStack( 'collab_node_maxnodes', FALSE, array( 'sprintf' => array( $nodeTitle, $lang->addToStack( $collab_singular_lang ) ) ) );
-				$lang->words[ "options-node_{$nid}-maxnodes_desc" ] 			= $lang->addToStack( 'collab_node_maxnodes_desc', FALSE, array( 'sprintf' => array( $nodeTitle, $lang->addToStack( $collab_singular_lang ) ) ) );				
-				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-maxnodes" ) );
-				$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-maxnodes", $this->_options[ 'node_' . $nid ][ 'maxnodes' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'maxnodes' ] : 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
-					
-				/**
-				 * Allow Adding, Editing, Deleting Nodes? 
-				 */
-				foreach ( array( 'enable_add', 'enable_edit', 'enable_delete', 'enable_reorder' ) as $enable_action )
-				{
-					$lang->words[ "options-node_{$nid}-{$enable_action}" ] 		= $lang->addToStack( 'collab_node_' . $enable_action, FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
-					$lang->words[ "options-node_{$nid}-{$enable_action}_desc" ] 	= $lang->addToStack( 'collab_node_' . $enable_action . '_desc', FALSE, array( 'sprintf' => array( $lang->addToStack( $collab_singular_lang ), $nodeTitle, $contentTitle ) ) );
-					$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-{$enable_action}", $this->_options[ 'node_' . $nid ][ $enable_action ] !== NULL ? $this->_options[ 'node_' . $nid ][ $enable_action ] : 1 ) );
-					$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-{$enable_action}" ) );
-				}
-				
-				/* Display Options Header */
-				$lang->words[ 'collab_display_options_' . $nid ] = $lang->addToStack( 'collab_display_options', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
-				$form->addHeader( 'collab_display_options_' . $nid );
-				$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_display_options_' . $nid ) );
-				
-				/**
-				 * Enable Collab Homepage Gridview
-				 */
-				$lang->words[ "options-node_{$nid}-gridview" ] 				= $lang->addToStack( 'collab_node_gridview', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
-				$lang->words[ "options-node_{$nid}-gridview_desc" ] 			= $lang->addToStack( 'collab_node_gridview_desc', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
-				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridview" ) );
-				$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-gridview", $this->_options[ 'node_' . $nid ][ 'gridview' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'gridview' ] : 0, FALSE, array( ) ) );
+				$application = \IPS\Application::load( $app );
+				$form->addTab( "__app_{$application->directory}", $iconMap[ $application->directory ] ?: $application->_icon );
+				$collabs_enable->options[ 'togglesOn' ] = array_merge( $collabs_enable->options[ 'togglesOn' ], array( $form_id . 'tab___app_' . $application->directory ) );
 
-				/**
-				 * Collab Gridview Threshold
-				 */
-				$lang->words[ "options-node_{$nid}-gridthreshold" ] 			= $lang->addToStack( 'collab_node_gridview_threshold', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
-				$lang->words[ "options-node_{$nid}-gridthreshold_desc" ] 		= $lang->addToStack( 'collab_node_gridview_threshold_desc', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );				
-				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridthreshold" ) );
-				$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-gridthreshold", $this->_options[ 'node_' . $nid ][ 'gridthreshold' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'gridthreshold' ] : 3, FALSE, array( 'unlimited' => NULL, 'min' => 0 ) ) );
-
-				if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
+				/* Node Options */
+				foreach ( $nodes as $option )
 				{
-					/* Permissions Matrix */
-					$lang->words[ 'collab_permissions_' . $nid ] = $lang->addToStack( 'collab_permissions', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
-					$form->addHeader( 'collab_permissions_' . $nid );
-					$matrix = $this->nodePermMatrix( $nodeClass );
-					$form->addMatrix( 'perms_' . $nid, $matrix );
-					$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_permissions_' . $nid ) );
+					$this->addNodeOption( $form, $option );
 				}
-				
-				if ( isset ( $modoptions[ $contentClass ] ) )
-				{
-					/* Moderation Options */
-					$s = $modoptions[ $contentClass ];
-					$lang->words[ 'collab_modperms__' . $s[ 'key' ] ] = $lang->addToStack( 'collab_moderation_settings', FALSE, array( 'sprintf' => array( $lang->addToStack( 'modperms__' . $s[ 'key' ] ), $lang->addToStack( $collab_singular_lang ) ) ) );
-					$form->addHeader( 'collab_modperms__' . $s[ 'key' ] );
-					$toggles = $this->addModerationSettings( $form, $s[ 'key' ], $s[ 'ext' ] );
-					$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_modperms__' . $s[ 'key' ] ), $toggles );
-				}
-
 			}
 		}
 		
@@ -804,6 +733,97 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		
 	}
 	
+	/**
+	 * [Form] Collab Node Content Type Configuration
+	 *
+	 * @param	\IPS\Helpers\Form	$form		The form to add node options to
+	 * @param	array			$option		The content type option
+	 */
+	public function addNodeOption( $form, $option )
+	{
+		$lang 			= \IPS\Member::loggedIn()->language();
+		$collab_singular_lang 	= "collab_cat_{$this->id}_collab_singular";
+		$collab_plural_lang 	= "collab_cat_{$this->id}_collabs_plural";
+		$nodeClass 		= $option[ 'node' ];
+		$nid 			= md5( $nodeClass );
+		$nodeTitle 		= ucwords( $lang->get( $nodeClass::$nodeTitle ) );
+		$contentClass		= $option[ 'content' ];
+		$contentTitle 		= $contentClass ? ucwords( $lang->get( $contentClass::$title ) ) : NULL;
+		$modoptions 		= \IPS\collab\Application::modOptions();
+		$configuration 		= $this->_configuration;
+		$form_id 		= $form->id . '_';
+		
+		$form->addHeader( $contentTitle . ' ' . $nodeTitle );
+		
+		/**
+		 * Enable Node Type 
+		 */
+		$lang->words[ "options-node_{$nid}-enabled" ] 				= $lang->addToStack( 'collab_allow_node', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
+		$lang->words[ "options-node_{$nid}-enabled_desc" ] 			= $lang->addToStack( $option['content'] ? 'collab_allow_node_content_desc' : 'content_allow_node_desc', FALSE, array( 'sprintf' => array( $lang->addToStack( $collab_plural_lang ), $nodeTitle, $contentTitle ) ) );
+		$form->add( $enable_switch = new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-enabled", isset( $this->_options[ 'node_' . $nid ][ 'enabled' ] ) ? $this->_options[ 'node_' . $nid ][ 'enabled' ] : 0, FALSE, array( 'togglesOn' => array ( 'perms_' . $nid ) ) ) );
+		
+		/**
+		 * Allow Setting Maximum Amount Of Nodes 
+		 */
+		$lang->words[ "options-node_{$nid}-maxnodes" ] 				= $lang->addToStack( 'collab_node_maxnodes', FALSE, array( 'sprintf' => array( $nodeTitle, $lang->addToStack( $collab_singular_lang ) ) ) );
+		$lang->words[ "options-node_{$nid}-maxnodes_desc" ] 			= $lang->addToStack( 'collab_node_maxnodes_desc', FALSE, array( 'sprintf' => array( $nodeTitle, $lang->addToStack( $collab_singular_lang ) ) ) );				
+		$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-maxnodes" ) );
+		$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-maxnodes", $this->_options[ 'node_' . $nid ][ 'maxnodes' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'maxnodes' ] : 0, FALSE, array( 'unlimited' => 0, 'min' => 1 ) ) );
+			
+		/**
+		 * Allow Adding, Editing, Deleting Nodes? 
+		 */
+		foreach ( array( 'enable_add', 'enable_edit', 'enable_delete', 'enable_reorder' ) as $enable_action )
+		{
+			$lang->words[ "options-node_{$nid}-{$enable_action}" ] 		= $lang->addToStack( 'collab_node_' . $enable_action, FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+			$lang->words[ "options-node_{$nid}-{$enable_action}_desc" ] 	= $lang->addToStack( 'collab_node_' . $enable_action . '_desc', FALSE, array( 'sprintf' => array( $lang->addToStack( $collab_singular_lang ), $nodeTitle, $contentTitle ) ) );
+			$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-{$enable_action}", $this->_options[ 'node_' . $nid ][ $enable_action ] !== NULL ? $this->_options[ 'node_' . $nid ][ $enable_action ] : 1 ) );
+			$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-{$enable_action}" ) );
+		}
+		
+		/* Display Options Header */
+		$lang->words[ 'collab_display_options_' . $nid ] = $lang->addToStack( 'collab_display_options', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
+		$form->addHeader( 'collab_display_options_' . $nid );
+		$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_display_options_' . $nid ) );
+		
+		/**
+		 * Enable Collab Homepage Gridview
+		 */
+		$lang->words[ "options-node_{$nid}-gridview" ] 				= $lang->addToStack( 'collab_node_gridview', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+		$lang->words[ "options-node_{$nid}-gridview_desc" ] 			= $lang->addToStack( 'collab_node_gridview_desc', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+		$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridview" ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( "options-node_{$nid}-gridview", $this->_options[ 'node_' . $nid ][ 'gridview' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'gridview' ] : 0, FALSE, array( ) ) );
+
+		/**
+		 * Collab Gridview Threshold
+		 */
+		$lang->words[ "options-node_{$nid}-gridthreshold" ] 			= $lang->addToStack( 'collab_node_gridview_threshold', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );
+		$lang->words[ "options-node_{$nid}-gridthreshold_desc" ] 		= $lang->addToStack( 'collab_node_gridview_threshold_desc', FALSE, array( 'sprintf' => array( $nodeTitle ) ) );				
+		$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridthreshold" ) );
+		$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-gridthreshold", $this->_options[ 'node_' . $nid ][ 'gridthreshold' ] !== NULL ? $this->_options[ 'node_' . $nid ][ 'gridthreshold' ] : 3, FALSE, array( 'unlimited' => NULL, 'min' => 0 ) ) );
+
+		if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
+		{
+			/* Permissions Matrix */
+			$lang->words[ 'collab_permissions_' . $nid ] = $lang->addToStack( 'collab_permissions', FALSE, array( 'sprintf' => array( $contentTitle, $nodeTitle ) ) );
+			$form->addHeader( 'collab_permissions_' . $nid );
+			$matrix = $this->nodePermMatrix( $nodeClass );
+			$form->addMatrix( 'perms_' . $nid, $matrix );
+			$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_permissions_' . $nid ) );
+		}
+		
+		if ( isset ( $modoptions[ $contentClass ] ) )
+		{
+			/* Moderation Options */
+			$s = $modoptions[ $contentClass ];
+			$lang->words[ 'collab_modperms__' . $s[ 'key' ] ] = $lang->addToStack( 'collab_moderation_settings', FALSE, array( 'sprintf' => array( $lang->addToStack( 'modperms__' . $s[ 'key' ] ), $lang->addToStack( $collab_singular_lang ) ) ) );
+			$form->addHeader( 'collab_modperms__' . $s[ 'key' ] );
+			$toggles = $this->addModerationSettings( $form, $s[ 'key' ], $s[ 'ext' ] );
+			$enable_switch->options[ 'togglesOn' ] = array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . 'header_collab_modperms__' . $s[ 'key' ] ), $toggles );
+		}		
+	
+	}
+	 
 	/**
 	 * Add Moderation Permission Settings
 	 *
@@ -931,11 +951,76 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 			\IPS\File::claimAttachments( 'collab-cat-' . $this->id, $this->id, NULL, 'description', TRUE );
 		}
 		
-		$options 	= $this->_options;
+		/* Update node option settings */
+		$this->updateNodeSettings( $values );
+		
+		/* Parent ID */
+		if ( isset( $values[ 'category_parent_id' ] ) )
+		{
+			$values[ 'category_parent_id' ] = $values[ 'category_parent_id' ] ? intval( $values[ 'category_parent_id' ]->id ) : 0;
+		}
+		
+		$this->bitoptions[ 'allow_comments' ] 		= $values[ 'collab_allow_comments' ];
+		$this->bitoptions[ 'allow_ratings' ] 		= $values[ 'collab_allow_ratings' ];
+		$this->bitoptions[ 'allow_reviews' ] 		= $values[ 'collab_allow_reviews' ];
+		$this->bitoptions[ 'increase_mainposts' ] 	= $values[ 'collab_increase_mainposts' ];
+		$this->bitoptions[ 'enable_model' ]		= $values[ 'collab_enable_model_choice' ];
+		$this->bitoptions[ 'require_model' ] 		= $values[ 'collab_force_model_choice' ];
+		$this->bitoptions[ 'multiple_model' ] 		= $values[ 'collab_multiple_models_choice' ];
+		$this->bitoptions[ 'restrict_owner' ] 		= $values[ 'collab_restrict_owner' ];
+		
+		$this->name_seo	= \IPS\Http\Url::seoTitle( $values[ 'category_name' ][ \IPS\Lang::defaultLanguage() ] );
+		$this->privacy_mode = $values[ 'collab_category_privacy_mode' ];
+		
 		$configuration 	= $this->_configuration;
+		
+		$configuration[ 'per_page' ] = $values[ 'collab_category_per_page' ];
+		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
+		$configuration[ 'contribution_mode' ] = $values[ 'collab_contribution_mode' ];
+		$configuration[ 'collab_unread_method' ] = $values[ 'collab_unread_method' ];
+		
+		if ( isset( $values[ 'collab_category_skin_id' ] ) )
+		{
+			$configuration[ 'skin_id' ] = is_object( $values[ 'collab_category_skin_id' ] ) ? $values[ 'collab_category_skin_id' ]->_id : (int) $values[ 'collab_category_skin_id' ];
+		}
+		
+		if ( isset( $values[ 'collab_category_show_forum_index' ] ) )
+		{
+			$configuration[ 'show_forum_index' ] = $values[ 'collab_category_show_forum_index' ];
+		}
+		
+		$this->_configuration = $configuration;
+		
+		/* Custom language fields */
+		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values[ 'category_name' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_desc", $values[ 'category_description' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collab_singular", $values[ 'collabs_alias_singular' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collabs_plural", $values[ 'collabs_alias_plural' ] );
+
+		$save_values = array();
+		foreach ( $values as $key => $value )
+		{
+			if ( in_array( $key, $save_keys ) )
+			{
+				$save_values[ $key ] = $value;
+			}
+		}
+	
+		/* Send to parent */
+		parent::saveForm( $save_values );
+	}
+	
+	/**
+	 * Save Node Option Settings
+	 *
+	 * @param	array		$values		Values from form submission
+	 */
+	public function updateNodeSettings( $values )
+	{
+		$options 	= $this->_options;
 		$modperms 	= $this->_mod_perms;
 		$t_groups 	= count( \IPS\Member\Group::groups() );
-				
+		
 		foreach ( $values as $key => $val )
 		{
 			// Store Node Options
@@ -1026,60 +1111,7 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 		}
 		
 		$this->_options = $options;
-		$this->_mod_perms = $modperms;
-		
-		/* Parent ID */
-		if ( isset( $values[ 'category_parent_id' ] ) )
-		{
-			$values[ 'category_parent_id' ] = $values[ 'category_parent_id' ] ? intval( $values[ 'category_parent_id' ]->id ) : 0;
-		}
-		
-		$this->bitoptions[ 'allow_comments' ] 		= $values[ 'collab_allow_comments' ];
-		$this->bitoptions[ 'allow_ratings' ] 		= $values[ 'collab_allow_ratings' ];
-		$this->bitoptions[ 'allow_reviews' ] 		= $values[ 'collab_allow_reviews' ];
-		$this->bitoptions[ 'increase_mainposts' ] 	= $values[ 'collab_increase_mainposts' ];
-		$this->bitoptions[ 'enable_model' ]		= $values[ 'collab_enable_model_choice' ];
-		$this->bitoptions[ 'require_model' ] 		= $values[ 'collab_force_model_choice' ];
-		$this->bitoptions[ 'multiple_model' ] 		= $values[ 'collab_multiple_models_choice' ];
-		$this->bitoptions[ 'restrict_owner' ] 		= $values[ 'collab_restrict_owner' ];
-		
-		$this->name_seo	= \IPS\Http\Url::seoTitle( $values[ 'category_name' ][ \IPS\Lang::defaultLanguage() ] );
-		$this->privacy_mode = $values[ 'collab_category_privacy_mode' ];
-		
-		$configuration[ 'per_page' ] = $values[ 'collab_category_per_page' ];
-		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
-		$configuration[ 'contribution_mode' ] = $values[ 'collab_contribution_mode' ];
-		$configuration[ 'collab_unread_method' ] = $values[ 'collab_unread_method' ];
-		
-		if ( isset( $values[ 'collab_category_skin_id' ] ) )
-		{
-			$configuration[ 'skin_id' ] = is_object( $values[ 'collab_category_skin_id' ] ) ? $values[ 'collab_category_skin_id' ]->_id : (int) $values[ 'collab_category_skin_id' ];
-		}
-		
-		if ( isset( $values[ 'collab_category_show_forum_index' ] ) )
-		{
-			$configuration[ 'show_forum_index' ] = $values[ 'collab_category_show_forum_index' ];
-		}
-		
-		$this->_configuration = $configuration;
-		
-		/* Custom language fields */
-		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values[ 'category_name' ] );
-		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_desc", $values[ 'category_description' ] );
-		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collab_singular", $values[ 'collabs_alias_singular' ] );
-		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collabs_plural", $values[ 'collabs_alias_plural' ] );
-
-		$save_values = array();
-		foreach ( $values as $key => $value )
-		{
-			if ( in_array( $key, $save_keys ) )
-			{
-				$save_values[ $key ] = $value;
-			}
-		}
-	
-		/* Send to parent */
-		parent::saveForm( $save_values );
+		$this->_mod_perms = $modperms;	
 	}
 
 	/**
@@ -1207,6 +1239,42 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	}
 
 	/**
+	 * [Node] Get buttons to display in tree
+	 * Example code explains return value
+	 *
+	 * @param	string	$url		Base URL
+	 * @param	bool	$subnode	Is this a subnode?
+	 * @return	array
+	 */
+	public function getButtons( $url, $subnode=FALSE )
+	{
+		$buttons = parent::getButtons( $url, $subnode );
+		
+		if ( $this->collabs_enable )
+		{
+			$_buttons = array();
+			
+			foreach( \IPS\collab\Application::collabOptions() as $app => $nodes )
+			{
+				$application = \IPS\Application::load( $app );
+				
+				$_buttons[ 'config_' . $app ] = array
+				(
+					'icon' => $application->_icon,
+					'title' => \IPS\Member::loggedIn()->language()->addToStack( 'collab_config_app', FALSE, array( 'sprintf' => array( \IPS\Member::loggedIn()->language()->addToStack( '__app_' . $application->directory ) ) ) ),
+					'link' => \IPS\Http\Url::internal( "app=collab&module=collab&controller=categories&do=manageApp" )->setQueryString( array( 'cat' => $this->_id, 'mapp' => $application->directory ) ),
+					'data' => array(),
+				);
+			}
+
+			array_splice( $buttons, 2, 0, $_buttons );
+		}
+		
+		
+		return $buttons;
+	}
+
+	/**
 	 * Can Rate?
 	 *
 	 * @param	\IPS\Member|NULL		$member		The member to check for (NULL for currently logged in member)
@@ -1327,6 +1395,21 @@ class _Category extends \IPS\Node\Model implements \IPS\Node\Permissions, \IPS\C
 	 */
 	protected $_url	= NULL;
 
+	/**
+	 * @brief	URL Base
+	 */
+	public static $urlBase = 'app=collab&module=collab&controller=categories&category=';
+	
+	/**
+	 * @brief	URL Base
+	 */
+	public static $urlTemplate = 'collab_category';
+	
+	/**
+	 * @brief	SEO Title Column
+	 */
+	public static $seoTitleColumn = 'name_seo';
+	
 	/**
 	 * Get URL
 	 *
