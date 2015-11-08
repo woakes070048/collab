@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10206">
+ <app key="collab" version="10302">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -26,6 +26,11 @@
   <word key="collab_unread_method_desc" js="0"><![CDATA[<div class='ipsMessage ipsMessage_warning'><strong>Quick</strong> will consider a collaboration unread based only on the date/time of the last activity in the collab (irrespective of permissions). <br><strong>Comprehensive</strong> will actually search through every app and every container inside collaborations to see if there is new content that the user can actually view. It can get very resource intensive if there is a lot of content, so use the 'comprehensive' setting with caution.</div>]]></word>
   <word key="collab_unread_quick" js="0">Quick (based on last activity)</word>
   <word key="collab_unread_comprehensive" js="0">Comprehensive (based on user permissions)</word>
+  <word key="collab_category_longconfig" js="0">Expanded Category Configuration</word>
+  <word key="collab_category_longconfig_desc" js="0">When enabled, configuration settings for every available content type will be included 'all-in-one' on the collab category configuration form. Disable this option if your server is experiencing problems processing the full form. ( Each content type will still be able to be configured individually. )</word>
+  <word key="collab_category_updated" js="0">Category Updated!</word>
+  <word key="collab_config_app" js="0">%s Settings</word>
+  <word key="collab_category_app_config" js="0">Collab App Configuration</word>
   <word key="editor__collab_Categories" js="0">Collab Categories</word>
   <word key="editor__collab_Collab" js="0">Collaborations</word>
   <word key="editor__collab_Generic" js="0">Collab Generic</word>

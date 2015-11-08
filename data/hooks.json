@@ -90,5 +90,13 @@
     "ipsCmsCategories": {
         "type": "C",
         "class": "\\IPS\\cms\\Categories"
+    },
+    "ipsCoreFrontNavigation": {
+        "type": "C",
+        "class": "\\IPS\\core\\FrontNavigation"
+    },
+    "ipsCoreFrontNavigationAbstract": {
+        "type": "C",
+        "class": "\\IPS\\core\\FrontNavigation\\FrontNavigationAbstract"
     }
 }

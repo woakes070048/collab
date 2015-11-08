@@ -1,6 +1,6 @@
 [
     {
-        "key": "collab_unread_depth",
-        "default": ""
+        "key": "collab_category_longconfig",
+        "default": "1"
     }
 ]
