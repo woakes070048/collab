@@ -17,7 +17,7 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 
 $ips40 = 'namespace IPS\collab\Util; class _FrontNavigationAbstract { public function canView() { return ! \IPS\Application::load( \'collab\' )->hide_tab; } }';
-$ips41 = 'namespace IPS\collab\Util; class _FrontNavigationAbstract extends \IPS\core\FrontNavigation\FrontNavigationAbstract {}';
+$ips41 = 'namespace IPS\collab\Util; abstract class _FrontNavigationAbstract extends \IPS\core\FrontNavigation\FrontNavigationAbstract {}';
 
 if ( class_exists( 'IPS\core\FrontNavigation\FrontNavigationAbstract' ) )
 {

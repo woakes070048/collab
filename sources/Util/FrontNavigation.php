@@ -26,6 +26,11 @@ class _FrontNavigation
 	protected $obj;
 
 	/**
+	 * @brief	Is Subitem of Collab Menu?
+	 */
+	public $isCollabSubitem = FALSE;
+	
+	/**
 	 * Constructor
 	 */
 	public function __construct( $obj )
@@ -44,11 +49,37 @@ class _FrontNavigation
 		 */
 		if ( $method == 'active' )
 		{
-			/* Return TRUE only if this is the navigation item for the collab app */
-			return get_class( $this->obj ) == 'IPS\collab\extensions\core\FrontNavigation\navigation';
+			/* Return TRUE if this is the navigation item for the collab app */
+			$isCollabMenu = get_class( $this->obj ) == 'IPS\collab\extensions\core\FrontNavigation\navigation';
+			
+			/**
+			 * IPS 4.1 menu's can have sub items
+			 */
+			if ( class_exists( 'IPS\core\FrontNavigation' ) )
+			{
+				return $isCollabMenu or ( $this->isCollabSubitem and $this->obj->active() );
+			}
+			
+			return $isCollabMenu;
 		}
 		
 		return call_user_func_array( array( $this->obj, $method ), $args );
+	}
+	
+	/**
+	 * Get Properties
+	 */
+	public function __get( $prop )
+	{
+		return $this->obj->$prop;
+	}
+	
+	/**
+	 * Set Properties
+	 */
+	public function __set( $prop, $val )
+	{
+		return $this->obj->$prop = $val;
 	}
 
 }
