@@ -19,7 +19,7 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  *  Collab collab
  */
-class _Collab extends \IPS\Content\Item implements
+class _Collab extends \IPS\collab\Secure\Collab implements
 	\IPS\Content\Permissions,
 	\IPS\Content\Pinnable, \IPS\Content\Lockable, \IPS\Content\Hideable, \IPS\Content\Featurable,
 	\IPS\Content\Tags,
@@ -1165,18 +1165,6 @@ class _Collab extends \IPS\Content\Item implements
 	{
 		$isNew = $this->_new;
 		
-		/**
-		 * @DEMO: Restrict amount of collabs in demo version
-		 */
-		if ( $isNew and \IPS\collab\DEMO )
-		{
-			if ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_collabs' )->first() >= 10 )
-			{
-				\IPS\Output::i()->error( 'Demo version restricted to a maximum of 10 collaborations.', 'GCDEMO', 200, '' );
-				exit;
-			}
-		}	
-		
 		parent::save();
 		
 		/**
@@ -1191,7 +1179,6 @@ class _Collab extends \IPS\Content\Item implements
 			$membership->joined = time();
 			$membership->save();
 		}
-		
 	}
 	
 	/**

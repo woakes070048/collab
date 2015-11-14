@@ -24,7 +24,7 @@ const COLLAB_JOIN_FREE		= 3;
 /**
  * Group Collaboration Application Class
  */
-class _Application extends \IPS\Application
+class _Application extends \IPS\collab\Secure\Application
 {
 	
 	/**
@@ -70,7 +70,7 @@ class _Application extends \IPS\Application
 	 */
 	public function get__badge()
 	{
-		if ( \IPS\collab\DEMO )
+		if ( $this->isProtected() )
 		{
 			return array(
 				0	=> 'ipsBadge ipsBadge_warning',
@@ -598,61 +598,6 @@ class _Application extends \IPS\Application
 	public static $collabPageTitle = "";
 	
 	/**
-	 *  Wrap output with collab theming
-	 */
-	public static function collabWrapContent( $html )
-	{			
-		$html = (string) $html;
-		if ( $collab = static::affectiveCollab() and ! \IPS\Request::i()->isAjax() )
-		{
-			if ( 
-				$collab->canView() and 
-				(
-					! $collab->hidden() or 
-					\IPS\collab\Collab::modPermission( 'view_hidden', NULL, $collab->container() ) or 
-					\IPS\Member::loggedIn()->member_id === $collab->owner_id 
-				)
-			)
-			{
-				$wrapper = 'collabPublicWrapper';
-				if 
-				( 
-					\IPS\Request::i()->app == 'collab' and 
-					\IPS\Request::i()->module == 'collab' and 
-					\IPS\Request::i()->controller != 'collabs' 
-				)
-				{
-					$wrapper = 'collabAdminWrapper';
-				}
-				
-				$output = \IPS\Theme::i()->getTemplate( 'layouts', 'collab', 'front' )->$wrapper( $collab, $html, static::$collabPageTitle ?: \IPS\Output::i()->title );
-				
-				/**
-				 * @DEMO: Notice
-				 */
-				if ( \IPS\collab\DEMO )
-				{
-					foreach ( range( 0, rand( 0, 2 ) ) as $_ )
-					{
-						$output = "<div style='" . md5( mt_rand() ) . "'>" . $output . "</div>";
-					}
-					
-					$output = "<div style='font-size:22px; text-align:center; margin-bottom: 10px; background: none repeat scroll 0 0 #ede6e0; color: #564a3f; border-radius: 2px; padding: 15px;'><i class='fa fa-warning'></i> Collab Demo Version</div>" . $output;
-					
-					foreach ( range( 0, rand( 0, 2 ) ) as $_ )
-					{
-						$output = "<div style='" . md5( mt_rand() ) . "'>" . $output . "</div>";
-					}
-				}
-				
-				return $output;
-			}
-		}
-		
-		return $html;
-	}
-
-	/**
 	 * Test / Get A Collab From An Object
 	 *
 	 * @param	mixed		$obj			The object to extract a collab from
@@ -827,22 +772,5 @@ class _Application extends \IPS\Application
 		$buttons['delete']['data'] = array( 'delete' => '', 'noajax' => '' );
 		return $buttons;
 	}
-	
-	/**
-	 * Protect
-	 */
-	public function isProtected()
-	{
-		return DEMO;
-	}	
-	
-}
 
-if ( defined( '\IPS\collab\DEMO' ) )
-{
-	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
-	print "Collab demo error.";
-	exit;
 }
-
-const DEMO = FALSE;
