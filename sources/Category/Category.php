@@ -565,18 +565,6 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		$configuration = $this->_configuration;
 		
 		/**
-		 * @DEMO: Restrict amount of categories available in demo version
-		 */
-		if ( \IPS\collab\DEMO and ! $this->id )
-		{
-			if ( \IPS\Db::i()->select( 'COUNT(*)', 'collab_categories' )->first() >= 5 )
-			{
-				\IPS\Output::i()->error( 'Demo version restricted to a maximum of 5 categories.', 'GCDEMO', 200, '' );
-				exit;
-			}
-		}
-		
-		/**
 		 * Category Settings
 		 */
 		$form->addTab( 'tab_collab_category_settings', 'cogs' );
