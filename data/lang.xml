@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10302">
+ <app key="collab" version="10303">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -31,6 +31,7 @@
   <word key="collab_category_updated" js="0">Category Updated!</word>
   <word key="collab_config_app" js="0">%s Settings</word>
   <word key="collab_category_app_config" js="0">Collab App Configuration</word>
+  <word key="collab_configureWizard" js="0">Start Configuration Wizard</word>
   <word key="editor__collab_Categories" js="0">Collab Categories</word>
   <word key="editor__collab_Collab" js="0">Collaborations</word>
   <word key="editor__collab_Generic" js="0">Collab Generic</word>
@@ -422,6 +423,10 @@
   <word key="created_date" js="0">Date Created</word>
   <word key="single" js="0">Only One</word>
   <word key="multiple" js="0">Multiple</word>
+  <word key="config" js="0">Configuration</word>
+  <word key="limits" js="0">Limits</word>
+  <word key="moderation" js="0">Moderation</word>
+  <word key="done" js="0">Done</word>
   <word key="mark_collab_read" js="0">Mark %s Read</word>
   <word key="__global_active_collab" js="0">Page: Associated Collaboration</word>
   <word key="collab_Collaboration_event_member_invited" js="0">Member is invited to collab</word>

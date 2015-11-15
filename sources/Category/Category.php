@@ -808,7 +808,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				$enable_switch->options[ 'togglesOn' ] 					= array_merge( $enable_switch->options[ 'togglesOn' ], array( $form_id . "options-node_{$nid}-gridthreshold" ) );
 				$form->add( new \IPS\Helpers\Form\Number( "options-node_{$nid}-gridthreshold", $self->_options[ 'node_' . $nid ][ 'gridthreshold' ] !== NULL ? $self->_options[ 'node_' . $nid ][ 'gridthreshold' ] : 3, FALSE, array( 'unlimited' => NULL, 'min' => 0 ) ) );
 				
-				if ( $values = $form->values() )
+				if ( is_array( $data ) and $values = $form->values() )
 				{
 					return $values;
 				}
@@ -846,7 +846,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 					}
 				}
 				
-				if ( $values = $form->values() )
+				if ( is_array( $data ) and $values = $form->values() )
 				{
 					return $values;
 				}
@@ -879,7 +879,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 					}
 				}
 				
-				if ( $values = $form->values() )
+				if ( is_array( $data ) and $values = $form->values() )
 				{
 					$data = array_merge( $data, $values );
 					$self->updateNodeSettings( $data );

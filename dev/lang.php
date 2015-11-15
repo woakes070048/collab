@@ -39,6 +39,7 @@ $lang = array(
 	'collab_category_updated'		=> "Category Updated!",
 	'collab_config_app'			=> "%s Settings",
 	'collab_category_app_config'		=> "Collab App Configuration",
+	'collab_configureWizard'		=> "Start Configuration Wizard",
 	
 	'editor__collab_Categories'		=> "Collab Categories",
 	'editor__collab_Collab'			=> "Collaborations",
@@ -490,6 +491,10 @@ $lang = array(
 	'created_date'				=> "Date Created",
 	'single'				=> "Only One",
 	'multiple'				=> "Multiple",
+	'config'				=> "Configuration",
+	'limits'				=> "Limits",
+	'moderation'				=> "Moderation",
+	'done'					=> "Done",
 	
 	'mark_collab_read'			=> "Mark %s Read",
 	
