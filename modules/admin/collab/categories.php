@@ -88,9 +88,10 @@ class _categories extends \IPS\Node\Controller
 							/* Show all-in-one config */
 							$steps = $category->contentConfigSteps( $form, $option );
 							
-							call_user_func( $steps[ 'limits' ] );
-							call_user_func( $steps[ 'permissions' ] );
-							call_user_func( $steps[ 'moderation' ] );
+							foreach( $steps as $step )
+							{
+								call_user_func( $step );
+							}
 						}
 						else
 						{

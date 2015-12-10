@@ -714,9 +714,10 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				{
 					$steps = $this->contentConfigSteps( $form, $option );
 					
-					call_user_func( $steps[ 'limits' ] );
-					call_user_func( $steps[ 'permissions' ] );
-					call_user_func( $steps[ 'moderation' ] );
+					foreach( $steps as $step )
+					{
+						call_user_func( $step );
+					}
 				}
 			}
 		}
@@ -748,7 +749,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		
 		$steps = array
 		(
-			'limits' => function( $data=NULL ) use ( $self, $form, $option, $lang, $collab_singular_lang, $collab_plural_lang, $nodeClass, $nid, $nodeTitle, $contentClass, $contentTitle, $modoptions, $configuration, &$enable_switch )
+			'limits' => function( $data=NULL ) use ( &$steps, $self, $form, $option, $lang, $collab_singular_lang, $collab_plural_lang, $nodeClass, $nid, $nodeTitle, $contentClass, $contentTitle, $modoptions, $configuration, &$enable_switch )
 			{	
 				$form = $form ?: new \IPS\Helpers\Form( 'collab_content_limits', 'next' );
 				$form_id = $form->id . '_';
@@ -756,7 +757,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				
 				if ( is_array( $data ) )
 				{
-					$self->updateNodeSettings( $data );
+					$self->updateNodeSettings( $data, FALSE );
 				}
 				
 				$form->addHeader( $contentTitle . ' ' . $nodeTitle );
@@ -810,13 +811,22 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				
 				if ( is_array( $data ) and $values = $form->values() )
 				{
+					/* Save and exit if there are no more configuration screens */
+					if ( ! isset( $steps[ 'permissions' ] ) and ! isset( $steps[ 'moderation' ] ) )
+					{
+						$data = array_merge( $data, $values );
+						$self->updateNodeSettings( $data );
+						$self->save();
+						\IPS\Output::i()->redirect( \IPS\Http\Url::internal( "app=collab&module=collab&controller=categories&do=manageApp" )->setQueryString( array( 'cat' => \IPS\Request::i()->cat, 'mapp' => \IPS\Request::i()->mapp ) ) );
+					}
+					
 					return $values;
 				}
 
 				return $form;
 			},
 
-			'permissions' => function( $data=NULL ) use ( $self, $form, $option, $lang, $collab_singular_lang, $collab_plural_lang, $nodeClass, $nid, $nodeTitle, $contentClass, $contentTitle, $modoptions, $configuration, &$enable_switch )
+			'permissions' => function( $data=NULL ) use ( &$steps, $self, $form, $option, $lang, $collab_singular_lang, $collab_plural_lang, $nodeClass, $nid, $nodeTitle, $contentClass, $contentTitle, $modoptions, $configuration, &$enable_switch )
 			{
 				$form = $form ?: new \IPS\Helpers\Form( 'collab_content_permissions', 'next' );
 				$form_id = $form->id . '_';
@@ -824,14 +834,16 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				
 				if ( is_array( $data ) )
 				{
-					$self->updateNodeSettings( $data );
+					$self->updateNodeSettings( $data, FALSE );
+					
+					/* Save and exit if this content type has been turned off */
 					if ( ! $data[ 'options-node_' . $nid . '-enabled' ] )
 					{
 						$self->save();
 						\IPS\Output::i()->redirect( \IPS\Http\Url::internal( "app=collab&module=collab&controller=categories&do=manageApp" )->setQueryString( array( 'cat' => \IPS\Request::i()->cat, 'mapp' => \IPS\Request::i()->mapp ) ) );
 					}
 				}
-				
+
 				if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
 				{
 					/* Permissions Matrix */
@@ -848,13 +860,22 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				
 				if ( is_array( $data ) and $values = $form->values() )
 				{
+					/* Save and exit if there are no more configuration screens */
+					if ( ! isset( $steps[ 'moderation' ] ) )
+					{
+						$data = array_merge( $data, $values );
+						$self->updateNodeSettings( $data );
+						$self->save();
+						\IPS\Output::i()->redirect( \IPS\Http\Url::internal( "app=collab&module=collab&controller=categories&do=manageApp" )->setQueryString( array( 'cat' => \IPS\Request::i()->cat, 'mapp' => \IPS\Request::i()->mapp ) ) );
+					}
+					
 					return $values;
 				}
 
 				return $form;
 			},
 
-			'moderation' => function( $data=NULL ) use ( $self, $form, $option, $lang, $collab_singular_lang, $collab_plural_lang, $nodeClass, $nid, $nodeTitle, $contentClass, $contentTitle, $modoptions, $configuration, &$enable_switch )
+			'moderation' => function( $data=NULL ) use ( &$steps, $self, $form, $option, $lang, $collab_singular_lang, $collab_plural_lang, $nodeClass, $nid, $nodeTitle, $contentClass, $contentTitle, $modoptions, $configuration, &$enable_switch )
 			{
 				$form = $form ?: new \IPS\Helpers\Form( 'collab_content_moderation' );
 				$form_id = $form->id . '_';
@@ -862,7 +883,14 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 			
 				if ( is_array( $data ) )
 				{
-					$self->updateNodeSettings( $data );
+					$self->updateNodeSettings( $data, FALSE );
+					
+					/* Save and exit if this content type has been turned off */
+					if ( ! $data[ 'options-node_' . $nid . '-enabled' ] )
+					{
+						$self->save();
+						\IPS\Output::i()->redirect( \IPS\Http\Url::internal( "app=collab&module=collab&controller=categories&do=manageApp" )->setQueryString( array( 'cat' => \IPS\Request::i()->cat, 'mapp' => \IPS\Request::i()->mapp ) ) );
+					}
 				}
 				
 				if ( isset ( $modoptions[ $contentClass ] ) )
@@ -891,9 +919,19 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 			},			
 		);
 		
+		if ( ! in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
+		{
+			unset( $steps[ 'permissions' ] );
+		}
+		
+		if ( ! isset( $modoptions[ $contentClass ] ) )
+		{
+			unset( $steps[ 'moderation' ] );
+		}
+		
 		return $steps;
 	}
-	 
+	
 	/**
 	 * Add Moderation Permission Settings
 	 *
@@ -1081,11 +1119,12 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 	}
 	
 	/**
-	 * Save Node Option Settings
+	 * Update Node Settings
 	 *
-	 * @param	array		$values		Values from form submission
+	 * @param	array		$values			Values from form submission
+	 * @param	bool		$savePermissions	Save any permissions from submitted values
 	 */
-	public function updateNodeSettings( $values )
+	public function updateNodeSettings( $values, $savePermissions=TRUE )
 	{
 		$options 	= $this->_options;
 		$modperms 	= $this->_mod_perms;
@@ -1114,7 +1153,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 			}
 			
 			// Save Node Permissions
-			if ( \substr( $key, 0, \strlen( 'perms_' ) ) === 'perms_' )
+			if ( $savePermissions and \substr( $key, 0, \strlen( 'perms_' ) ) === 'perms_' )
 			{
 				$nid = \substr( $key, \strlen( 'perms_' ) );
 				if ( $nodeSettings = \IPS\collab\Application::collabOptions( $nid ) )
