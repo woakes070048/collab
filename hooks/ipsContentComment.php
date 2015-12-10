@@ -37,7 +37,29 @@ abstract class collab_hook_ipsContentComment extends _HOOK_CLASS_
 				if ( \IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) )
 				{
 					$member = $member ?: \IPS\Member::loggedIn();
+					
 					$joinContainer = TRUE;
+					
+					/**
+					 * @BUGFIX:
+					 * 
+					 * Bug in IPS core causes join clauses using the join container to fail. Need to work around it...
+					 * see: https://community.invisionpower.com/4bugtrack/active-reports/db-query-error-getitemswithpermission-r8889/
+					 */
+					$joinContainer = FALSE;
+					$joins = array_merge
+					( 
+						array
+						( 
+							array
+							(
+								'from'	=> $nodeClass::$databaseTable,
+								'where'	=> array( array( $itemClass::$databaseTable . '.' . $itemClass::$databasePrefix . $itemClass::$databaseColumnMap[ 'container' ] . '=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) )
+							), 
+						), 
+						$joins ?: array() 
+					);
+					/* END BUGFIX */
 					
 					$collabClause = $itemClass::collabPermissionWhere( $member, $nodeClass, $permissionKey );
 					
