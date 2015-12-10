@@ -37,7 +37,6 @@ abstract class collab_hook_ipsContentComment extends _HOOK_CLASS_
 				if ( \IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) )
 				{
 					$member = $member ?: \IPS\Member::loggedIn();
-					
 					$joinContainer = TRUE;
 					
 					/**
@@ -62,7 +61,7 @@ abstract class collab_hook_ipsContentComment extends _HOOK_CLASS_
 					/* END BUGFIX */
 					
 					$collabClause = $itemClass::collabPermissionWhere( $member, $nodeClass, $permissionKey );
-					
+
 					$where = array_merge( $where ?: array(), $collabClause[ 'where' ] );
 					$joins = array_merge( $joins ?: array(), $collabClause[ 'joins' ] );
 				}
