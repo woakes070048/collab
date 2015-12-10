@@ -33,5 +33,46 @@ class collab_hook_modForumsForum extends _HOOK_CLASS_
 		}
 		return $forum;
 	}
+	
+	/**
+	 * Forum Add/Edit Form
+	 */
+	public function form( &$form )
+	{
+		parent::form( $form );
+		
+		/**
+		 * Limit theme selection in collabs to only those which the user can actually use
+		 */
+		if ( \IPS\collab\Application::affectiveCollab() )
+		{
+			foreach( $form->elements[ 'forum_settings' ] as &$formElement )
+			{
+				if ( $formElement->name == 'forum_skin_id' )
+				{
+					$themes = array( 0 => 'forum_skin_id_default' );
+					
+					/* Add visible themes */
+					foreach ( \IPS\Theme::getThemesWithAccessPermission() as $theme )
+					{
+						$themes[ $theme->id ] = $theme->_title;
+					}
+					
+					/* Add current theme if not visible to current user */
+					if ( $this->id and ! isset( $themes[ $this->skin_id ] ) )
+					{
+						try
+						{
+							$currentTheme = \IPS\Theme::load( $this->skin_id );
+							$themes[ $this->skin_id ] = $currentTheme->_title;
+						}
+						catch( \OutOfRangeException $e ) { }
+					}
+
+					$formElement = new \IPS\Helpers\Form\Select( 'forum_skin_id', $this->id ? $this->skin_id : 0, FALSE, array( 'options' => $themes ), NULL, NULL, NULL, 'forum_skin_id' );
+				}
+			}
+		}
+	}
 
 }
