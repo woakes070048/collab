@@ -248,8 +248,11 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		if ( $values = $form->values() )
 		{
 			\IPS\Member::loggedIn()->language()->words[ 'copy' ] = "";
+			\IPS\Member::loggedIn()->language()->words[ 'copy_noun' ] = "";
+			
 			$collab = \IPS\collab\Collab::load( $values[ 'collab_id_select' ] );
 			$collab->addNodeModel( $node, $node::$databaseColumnParentRootValue );
+			
 			\IPS\Output::i()->redirect( $this->url, 'collab_node_copied_to_collab' );
 		}
 		
