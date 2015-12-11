@@ -288,23 +288,38 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	 *
 	 * @param	int|array		$limit	LIMIT clause
 	 * @param	string|NULL		$extra		Additional data
+	 * @param	boolean			$countOnly	Just return the count
 	 * @return \IPS\Db\Select
 	 */
-	public function notificationRecipients( $limit=array( 0, 25 ), $extra=NULL )
+	public function notificationRecipients( $limit=array( 0, 25 ), $extra=NULL, $countOnly=FALSE )
 	{
 		if ( $this->containerWrapper( TRUE ) and $this->container()->collab_id )
 		{
 			try
 			{
 				$collab = \IPS\collab\Collab::load( $this->container()->collab_id );
-				return \IPS\Db::i()->union( 
-					array
-					( 
-						$collab->followers( 3, array( 'immediate' ), time(), NULL, NULL, NULL ), 
-						$this->author()->followers( 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, NULL ),
-						static::containerFollowers( $this->container(), 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, 0 )
-					), 
-				'follow_added', $limit, 'follow_member_id', FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS );
+				$unions = array
+				( 
+					$collab->followers( 3, array( 'immediate' ), time(), NULL, NULL, NULL ), 
+					$this->author()->followers( 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, NULL ),
+					static::containerFollowers( $this->container(), 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, 0 )
+				);
+				
+				if ( $countOnly )
+				{
+					try
+					{
+						return \IPS\Db::i()->union( $unions, 'follow_added', $limit, 'follow_member_id', FALSE, 0, NULL, 'COUNT(DISTINCT(follow_member_id))' )->first();
+					}
+					catch( \UnderflowException $e )
+					{
+						return 0;
+					}
+				}
+				else
+				{
+					return \IPS\Db::i()->union( $unions, 'follow_added', $limit, NULL, FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS )->setKeyField( 'follow_member_id' );
+				}
 			}
 			catch ( \OutOfRangeException $e ) 
 			{
