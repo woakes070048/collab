@@ -667,11 +667,17 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 */
 	public static function loadAndCheckPerms( $id, $perm='view' )
 	{
-		/**
-		 *  If we're loading and checking permission, then this node is pretty important...
-		 *  and if it belongs to a collab, then our object stack is our fallback in case we can't infer
-		 */
-		return \IPS\collab\Application::collabObjStack( call_user_func_array( 'parent::loadAndCheckPerms', func_get_args() ) );
+		/* Load node */
+		$node = call_user_func_array( 'parent::loadAndCheckPerms', func_get_args() );
+		
+		/* Check if this page is excepted from collab ownership */
+		if ( \IPS\collab\Application::controllerExcepted() )
+		{
+			return $node;
+		}
+		
+		/* Check for collab ownership */
+		return \IPS\collab\Application::collabObjStack( $node );
 	}
 
 	/**
