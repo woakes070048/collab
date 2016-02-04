@@ -62,9 +62,10 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 	 * @param	bool		$joinTags			If true, will join the tags table
 	 * @param	bool		$joinAuthor			If true, will join the members table for the author
 	 * @param	bool		$joinLastCommenter	If true, will join the members table for the last commenter
+	 * @param	bool		$showMovedLinks		If true, moved item links are included in the results
 	 * @return	\IPS\Patterns\ActiveRecordIterator|int
 	 */
-	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL, $skipPermission=FALSE, $joinTags=TRUE, $joinAuthor=TRUE, $joinLastCommenter=TRUE )
+	public static function getItemsWithPermission( $where=array(), $order=NULL, $limit=10, $permissionKey='read', $includeHiddenItems=NULL, $queryFlags=0, \IPS\Member $member=NULL, $joinContainer=FALSE, $joinComments=FALSE, $joinReviews=FALSE, $countOnly=FALSE, $joins=NULL, $skipPermission=FALSE, $joinTags=TRUE, $joinAuthor=TRUE, $joinLastCommenter=TRUE, $showMovedLinks=FALSE )
 	{		
 		if ( isset( static::$containerNodeClass ) )
 		{
@@ -236,11 +237,12 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 
 				if( count( $categories ) )
 				{
-					$where[]	= array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . ' IN(' . implode( ',', $categories ) . ')' );
+					
+					$where[] = array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . ' IN(' . implode( ',', $categories ) . ')' );
 				}
 				else
 				{
-					$where[]	= array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . '=0' );
+					$where[] = array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . '=0' );
 				}
 			}
 		}
@@ -248,31 +250,62 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 		{					 
 			if ( ! $member->modPermission( 'can_bypass_collab_permissions' ) )
 			{
-				/**
-				 * Compile a list of all roles for member
-				 */
-				$all_roles = array( 0 );
-				foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ), '\IPS\collab\Collab\Membership' ) as $membership )
+				if ( $member->member_id )
 				{
-					$roles = array_map( function( $role ) { return $role->id; }, $membership->roles() );
-					$all_roles = array_merge( $all_roles, $roles );
-				}
-				
-				$rolesregexp = implode( '|', $all_roles );
-				
-				$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=' . $member_id . ' AND collab_memberships.status=\'' . \IPS\collab\COLLAB_MEMBER_ACTIVE . '\' AND collab_memberships.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
-				
-				if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
-				{
-					$joins[] = array( 'from' => array( 'core_permission_index', 'collab_core_permission_index' ), 'where' => array( "collab_core_permission_index.app='" . $nodeClass::$permApp . "' AND collab_core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND collab_core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );
-					$collabWhere = "collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", collab_core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
+					/* Compile a list of all roles for member */
+					$all_roles = array( 0 );
+					foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ), '\IPS\collab\Collab\Membership' ) as $membership )
+					{
+						$roles = array_map( function( $role ) { return $role->id; }, $membership->roles() );
+						$all_roles = array_merge( $all_roles, $roles );
+					}
+					
+					$rolesregexp = implode( '|', $all_roles );
+					
+					/* Join collab memberships */
+					$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=' . $member_id . ' AND collab_memberships.status=\'' . \IPS\collab\COLLAB_MEMBER_ACTIVE . '\' AND collab_memberships.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
+					
+					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+					{
+						/* Check membership based permissions + guest permission */
+						$joins[] = array( 'from' => array( 'core_permission_index', 'collab_core_permission_index' ), 'where' => array( "collab_core_permission_index.app='" . $nodeClass::$permApp . "' AND collab_core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND collab_core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );				
+						$collabWhere = "collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", collab_core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
+					}
+					else
+					{
+						/* Just require an active membership to see collab database content (because its a whole lot easier than the alternative) */
+						if ( is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+						{
+							$collabWhere = "collab_memberships.id IS NOT NULL";
+						}
+					}
 				}
 				else
 				{
-					$collabWhere = "collab_memberships.id IS NOT NULL";
+					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+					{
+						/* Check for guest permission */
+						$joins[] = array( 'from' => array( 'core_permission_index', 'collab_core_permission_index' ), 'where' => array( "collab_core_permission_index.app='" . $nodeClass::$permApp . "' AND collab_core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND collab_core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );				
+						$collabWhere = "collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR FIND_IN_SET( '-1', collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " )";
+					}
+					else
+					{
+						/* Prevent guests from seeing collab database records */
+						if ( is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+						{
+							$collabWhere = "1=0";
+						}					
+					}
 				}
 				
-				$where[] = array( '( ( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 ) OR ( ' . $collabWhere . ' ) )' );
+				if ( isset( $collabWhere ) )
+				{
+					$where[] = array( '( ( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 ) OR ( ' . $collabWhere . ' ) )' );
+				}
+				else
+				{
+					$where[] = array( '( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 )' );
+				}
 			}
 		}
 		
@@ -301,15 +334,15 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 				$unions = array
 				( 
 					$collab->followers( 3, array( 'immediate' ), time(), NULL, NULL, NULL ), 
-					$this->author()->followers( 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, NULL ),
-					static::containerFollowers( $this->container(), 3, array( 'immediate' ), $this->mapped('date'), NULL, NULL, 0 )
+					$this->author()->followers( 3, array( 'immediate' ), $this->mapped( 'date' ), NULL, NULL, NULL ),
+					static::containerFollowers( $this->container(), 3, array( 'immediate' ), $this->mapped( 'date' ), NULL, NULL, 0 )
 				);
 				
 				if ( $countOnly )
 				{
 					try
 					{
-						return \IPS\Db::i()->union( $unions, 'follow_added', $limit, 'follow_member_id', FALSE, 0, NULL, 'COUNT(DISTINCT(follow_member_id))' )->first();
+						return \IPS\Db::i()->union( $unions, 'follow_added', $limit, NULL, FALSE, 0, NULL, 'COUNT(DISTINCT(follow_member_id))' )->first();
 					}
 					catch( \UnderflowException $e )
 					{
