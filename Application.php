@@ -82,7 +82,7 @@ class _Application extends \IPS\collab\Secure\Application
 	}	
 	
 	/**
-	 * @brief 	Controller map for app compatibility
+	 * Controller map for app compatibility
 	 * 
 	 * This map is used to help connect dispatcher controller instances to
 	 * collabs based on the way they handle node or content objects.
@@ -120,6 +120,26 @@ class _Application extends \IPS\collab\Secure\Application
 			),
 			
 		);
+	}
+	
+	/**
+	 * Controller exceptions for app compatibility
+	 *
+	 * This function is called to check if the current page controller is excepted
+	 * from being owned by a collab.
+	 *
+	 * @return	bool
+	 */
+	public static function controllerExcepted()
+	{
+		$controllerClass = get_class( \IPS\Dispatcher::i()->dispatcherController );
+		
+		return in_array( $controllerClass, array
+		( 
+			'IPS\core\modules\front\members\profile', 
+			'IPS\core\modules\front\search\search',
+			'IPS\core\modules\front\discover\streams',
+		) );
 	}
 	
 	/**
@@ -567,27 +587,31 @@ class _Application extends \IPS\collab\Secure\Application
 				/* Filter out any empty parameters */
 				$param = $url->_queryString;
 
-				/**
-				 * Compare the object url to the current url
-				 * and see if the object owns the current page
-				 */
-				foreach ( $param as $k => $v )
+				if ( ! empty( $param ) )
 				{
-					
-					if ( $k and static::$request->$k != $v )
+					/**
+					 * Compare the object url to the current url
+					 * and see if the object owns the current page
+					 */
+					foreach ( $param as $k => $v )
 					{
-						// Nope.
-						return FALSE;
+						
+						if ( $k and static::$request->$k != $v )
+						{
+							// Nope.
+							return FALSE;
+						}
 					}
+					
+					/* Yep */
+					return TRUE;
 				}
-				
-				/* Yep */
-				return TRUE;
 			}
 		}
 		
-		/* IPS\cms\Records throws LogicException if database is not linked to a page */
-		catch( \LogicException $e ) { }
+		// IPS\cms\Records throws LogicException if database is not linked to a page
+		// IPS\Node\Model throws BadMethodCallException if url is not supported
+		catch( \Exception $e ) { }
 	
 		return FALSE;
 	}
