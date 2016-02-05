@@ -113,6 +113,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 					break;
 			}
 		}
+		
 		return $collabCan or call_user_func_array( 'parent::restrictionCheck', func_get_args() );
 	}
 
