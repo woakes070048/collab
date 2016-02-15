@@ -1,0 +1,102 @@
+{
+    "1": {
+        "method": "addIndex",
+        "params": [
+            "collab_collabs",
+            {
+                "type": "key",
+                "name": "category",
+                "columns": [
+                    "category_id"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        ]
+    },
+    "2": {
+        "method": "addIndex",
+        "params": [
+            "collab_memberships",
+            {
+                "type": "key",
+                "name": "collab",
+                "columns": [
+                    "collab_id"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        ]
+    },
+    "3": {
+        "method": "addIndex",
+        "params": [
+            "collab_memberships",
+            {
+                "type": "key",
+                "name": "member",
+                "columns": [
+                    "member_id"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        ]
+    },
+    "4": {
+        "method": "addIndex",
+        "params": [
+            "collab_memberships",
+            {
+                "type": "key",
+                "name": "status",
+                "columns": [
+                    "status"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        ]
+    },
+    "5": {
+        "method": "addIndex",
+        "params": [
+            "collab_memberships",
+            {
+                "type": "key",
+                "name": "sponsor",
+                "columns": [
+                    "sponsor_id"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        ]
+    },
+    "6": {
+        "method": "addIndex",
+        "params": [
+            "collab_memberships",
+            {
+                "type": "key",
+                "name": "active_member",
+                "columns": [
+                    "collab_id",
+                    "member_id",
+                    "status"
+                ],
+                "length": [
+                    null,
+                    null,
+                    null
+                ]
+            }
+        ]
+    }
+}

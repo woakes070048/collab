@@ -168,6 +168,17 @@ class _Uninstall
 						}
 					}
 					
+					/* Drop collab indexes on core_permissions_index */
+					if ( $db->checkForIndex( 'core_permission_index', 'collab_perm_view' ) )
+					{
+						$db->dropIndex( 'core_permission_index', 'collab_perm_view' );
+					}
+					
+					if ( $db->checkForIndex( 'core_permission_index', 'collab_perm_2' ) )
+					{
+						$db->dropIndex( 'core_permission_index', 'collab_perm_2' );
+					}
+					
 					/* Drop imported status columns for social groups */
 					if ( $db->checkForTable( 'social_groups' ) )
 					{

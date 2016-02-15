@@ -72,8 +72,8 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 			$nodeClass = static::$containerNodeClass;
 
 			/**
-			 * If the container node is provisioned for collabs, then we either want to limit results to the affective collab,
-			 * or limit the results to non-collab content.
+			 * If the container node is enabled for collabs, then we either want to limit results to the affective collab,
+			 * or limit the results to non-collab + permitted collab content.
 			 */
 			if ( \IPS\Db::i()->checkForColumn( $nodeClass::$databaseTable, $nodeClass::$databasePrefix . 'collab_id' ) )
 			{
@@ -85,10 +85,9 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 				$where = array_merge( $where ?: array(), $collabClause[ 'where' ] );
 				$joins = array_merge( $joins ?: array(), $collabClause[ 'joins' ] );
 			}
-			
 		}
 		
-		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins, $skipPermission, $joinTags, $joinAuthor, $joinLastCommenter );
+		return parent::getItemsWithPermission( $where, $order, $limit, $permissionKey, $includeHiddenItems, $queryFlags, $member, $joinContainer, $joinComments, $joinReviews, $countOnly, $joins, $skipPermission, $joinTags, $joinAuthor, $joinLastCommenter, $showMovedLinks );
 	}
 	
 	/**
@@ -187,124 +186,176 @@ abstract class collab_hook_ipsContentItem extends _HOOK_CLASS_
 		
 		$member_id = $member->member_id ?: 0;
 	
+		/* Are we in a collab context? */
 		if ( $collab = \IPS\collab\Application::affectiveCollab() )
 		{
-			$where[] = array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=?', $collab->collab_id );
-			
-			/**
-			 * If the container node class uses permissions, we also need to filter by internal collab role permissions
-			 */
-			if 
-			(
-				! $member->modPermission( 'can_bypass_collab_permissions' ) and 
-				in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) and 
-				$permissionKey !== NULL and 
-				! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) 
-			)
+			/* Check if this content type is enabled for this collab */
+			if ( $collab->enabledNodes( md5( $nodeClass ) ) )
 			{
-				$collabRoles = array();
-				
-				if ( $membership = $collab->getMembership( $member ) )
+				/* Filter to only nodes owned by the collab */
+				$where[] = array( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=?', $collab->collab_id );
+
+				if ( ! $member->modPermission( 'can_bypass_collab_permissions' ) )
 				{
-					/* All Members Role */
-					$collabRoles[] = '0';
-					
-					/* Membership Roles */
-					foreach( $membership->roles() as $role )
+					/* If the node class also uses permissions, we need to filter by internal collab role permissions as well */
+					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) )	)
 					{
-						$collabRoles[] = $role->id;
+						
+						/* Get a list of all the members collab role id's */
+						$collabRoles = array();
+						if ( $membership = $collab->getMembership( $member ) )
+						{
+							/* Membership Roles */
+							foreach( $membership->roles() as $role )
+							{
+								$collabRoles[] = $role->id;
+							}
+						}
+
+						$categories	= array();
+						$lookupKey	= md5( $nodeClass::$permApp . 'collab_' . $nodeClass::$permType . $permissionKey . json_encode( $collabRoles ) );
+
+						/* Lookup collab containers the member has permission for */
+						if( ! isset( static::$permissionSelect[ $lookupKey ] ) )
+						{
+							/* Filter by collab permission */
+							$lookupWhere = 
+								
+								/* Anybody has permission */
+								'core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR " . 
+							
+								( $membership ? 
+							
+									/* Role based permission */
+									'core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . "='0' OR " . 
+									\IPS\Db::i()->findInSet( 'core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ], $collabRoles ) :
+									
+									/* Guest permission */
+									'core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . " LIKE '-1%'"
+								);
+							
+							/* Some CMS Categories are special in that they dont have overridden permissions */
+							if ( is_subclass_of( get_called_class(), 'IPS\cms\Categories' ) )
+							{
+								/* Filter by database */
+								$databaseWhere = $nodeClass::$databaseTable . '.category_database_id=' . $nodeClass::$customDatabaseId;
+								
+								/* Include categories with disabled permission overrides */
+								$lookupWhere = $databaseWhere . " AND ( " . $nodeClass::$databaseTable . ".category_has_perms=0 OR ( {$lookupWhere} ) )";				
+							}						
+							
+							/* Prepend collab filter */
+							$lookupWhere = $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=' . $collab->collab_id . ' AND ' . $lookupWhere;
+							
+							/* Build lookup query */
+							$lookup = \IPS\Db::i()
+								->select( $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId, $nodeClass::$databaseTable, array( $lookupWhere ) )
+								->join( 'core_permission_index', array( 'core_permission_index.perm_type_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId . " AND core_permission_index.app='" . $nodeClass::$permApp . "' AND core_permission_index.perm_type='collab_" . $nodeClass::$permType . "'" ) );
+							
+							/* Cache results */
+							static::$permissionSelect[ $lookupKey ] = iterator_to_array( $lookup );
+						}
+
+						$categories = static::$permissionSelect[ $lookupKey ];
+
+						if( count( $categories ) )
+						{
+							/* Filter by permitted containers */
+							$where[] = array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . ' IN(' . implode( ',', $categories ) . ')' );
+						}
+						else
+						{
+							/* No permitted containers available */
+							$where[] = array( '1=0' );
+						}
 					}
-				}
-				else
-				{
-					/* Guest Role */
-					$collabRoles[] = '-1';
-				}
-
-				$categories	= array();
-				$lookupKey	= md5( $nodeClass::$permApp . 'collab_' . $nodeClass::$permType . $permissionKey . json_encode( $collabRoles ) );
-
-				if( ! isset( static::$permissionSelect[ $lookupKey ] ) )
-				{
-					static::$permissionSelect[ $lookupKey ] = array();
-					foreach( \IPS\Db::i()->select( 'perm_type_id', 'core_permission_index', array( "core_permission_index.app='" . $nodeClass::$permApp . "' AND core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND (" . \IPS\Db::i()->findInSet( 'perm_' . $nodeClass::$permissionMap[ $permissionKey ], $collabRoles ) . ' OR ' . 'perm_' . $nodeClass::$permissionMap[ $permissionKey ] . "='*' )" ) ) as $result )
-					{
-						static::$permissionSelect[ $lookupKey ][] = $result;
-					}
-				}
-
-				$categories = static::$permissionSelect[ $lookupKey ];
-
-				if( count( $categories ) )
-				{
-					
-					$where[] = array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . ' IN(' . implode( ',', $categories ) . ')' );
-				}
-				else
-				{
-					$where[] = array( static::$databaseTable . "." . static::$databasePrefix . static::$databaseColumnMap[ 'container' ] . '=0' );
 				}
 			}
+			else
+			{
+				/* This content type is not enabled for this collab */
+				$where[] = array( '1=0' );
+			}
 		}
+		
+		/* Outside of collab context */
 		else
 		{					 
 			if ( ! $member->modPermission( 'can_bypass_collab_permissions' ) )
 			{
 				if ( $member->member_id )
 				{
-					/* Compile a list of all roles for member */
-					$all_roles = array( 0 );
+					/* Compile a list of all roles for the member */
+					$all_roles = array();
 					foreach ( new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', 'collab_memberships', array( 'status=? AND member_id=?', \IPS\collab\COLLAB_MEMBER_ACTIVE, $member_id ) ), '\IPS\collab\Collab\Membership' ) as $membership )
 					{
 						$roles = array_map( function( $role ) { return $role->id; }, $membership->roles() );
 						$all_roles = array_merge( $all_roles, $roles );
 					}
 					
-					$rolesregexp = implode( '|', $all_roles );
-					
-					/* Join collab memberships */
+					/* Join 'active' collab membership */
 					$joins[] = array( 'from' => 'collab_memberships', 'where' => array( 'collab_memberships.member_id=' . $member_id . ' AND collab_memberships.status=\'' . \IPS\collab\COLLAB_MEMBER_ACTIVE . '\' AND collab_memberships.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) );
 					
-					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
 					{
-						/* Check membership based permissions + guest permission */
+						/* Join collab permissions */
 						$joins[] = array( 'from' => array( 'core_permission_index', 'collab_core_permission_index' ), 'where' => array( "collab_core_permission_index.app='" . $nodeClass::$permApp . "' AND collab_core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND collab_core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );				
-						$collabWhere = "collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR ( ISNULL( collab_memberships.id ) AND FIND_IN_SET( '-1', collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " ) ) OR ( collab_memberships.id IS NOT NULL AND " . 'CONCAT(",", collab_core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ] . ', ",") REGEXP ",(' . $rolesregexp . ')," )';
-					}
-					else
-					{
-						/* Just require an active membership to see collab database content (because its a whole lot easier than the alternative) */
-						if ( is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
-						{
-							$collabWhere = "collab_memberships.id IS NOT NULL";
-						}
+						
+						/* Filter by collab permissions */
+						$collabWhere = 	
+							
+							/* Permission for everybody */
+							"collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR " .
+							
+							/* No active membership with guest permission */
+							"( ISNULL( collab_memberships.id ) AND collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " LIKE '-1%' ) OR " . 
+							
+							/* Active membership with role permission */
+							"(" . 
+								"collab_memberships.id IS NOT NULL AND " . 
+								"(" . 
+									"collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='0' OR " . 
+									\IPS\Db::i()->findInSet( 'collab_core_permission_index.perm_' . $nodeClass::$permissionMap[ $permissionKey ], $all_roles ) .
+								")" .
+							")";
 					}
 				}
 				else
 				{
-					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) AND $permissionKey !== NULL and ! is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+					if ( in_array( 'IPS\Node\Permissions', class_implements( $nodeClass ) ) )
 					{
-						/* Check for guest permission */
+						/* Join collab permissions */
 						$joins[] = array( 'from' => array( 'core_permission_index', 'collab_core_permission_index' ), 'where' => array( "collab_core_permission_index.app='" . $nodeClass::$permApp . "' AND collab_core_permission_index.perm_type='collab_" . $nodeClass::$permType . "' AND collab_core_permission_index.perm_type_id=" . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . $nodeClass::$databaseColumnId ) );				
-						$collabWhere = "collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR FIND_IN_SET( '-1', collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " )";
+						
+						/* Check only for ALL or guest permission */
+						$collabWhere = 
+						
+							/* Permission for everybody */
+							"collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . "='*' OR " . 
+							
+							/* Guest permission */
+							"collab_core_permission_index.perm_" . $nodeClass::$permissionMap[ $permissionKey ] . " LIKE '-1%'";						
 					}
-					else
-					{
-						/* Prevent guests from seeing collab database records */
-						if ( is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
-						{
-							$collabWhere = "1=0";
-						}					
-					}
+				}
+				
+				/* Some CMS Categories are special in that they might not even have permissions overridden */
+				if ( is_subclass_of( $nodeClass, '\IPS\cms\Categories' ) )
+				{
+					/* Filter by database */
+					$databaseWhere = $nodeClass::$databaseTable . '.category_database_id=' . $nodeClass::$customDatabaseId;
+					
+					/* Filter by permissions */
+					$collabWhere = $databaseWhere . " AND ( " . $nodeClass::$databaseTable . ".category_has_perms=0 OR ( {$collabWhere} ) )";				
 				}
 				
 				if ( isset( $collabWhere ) )
 				{
+					/* Filter by non collab or collab permitted content */
 					$where[] = array( '( ( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 ) OR ( ' . $collabWhere . ' ) )' );
 				}
 				else
 				{
-					$where[] = array( '( ' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id=0 )' );
+					// No filter necessary since this content doesn't have collab based restrictions
 				}
 			}
 		}

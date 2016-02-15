@@ -181,7 +181,28 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 			/* Finalize */
 			foreach ( $_perms as $k => $v )
 			{
-				$insert[ "perm_{$k}" ] = is_array( $v ) ? implode( $v, ',' ) : $v;
+				if ( is_array( $v ) )
+				{
+					/* Guest + all members is the same as everybody */
+					if ( in_array( '-1', $v ) and in_array( '0', $v ) )
+					{
+						$insert[ "perm_$k" ] = '*';
+					}
+					/* All members */
+					else if ( in_array( '0', $v ) )
+					{
+						$insert[ "perm_$k" ] = '0';
+					}
+					/* Specific roles */
+					else
+					{
+						$insert[ "perm_$k" ] = implode( ',', $v );
+					}
+				}
+				else
+				{
+					$insert[ "perm_$k" ] = $v;
+				}
 			}
 			
 			/* Set the collab permissions */
