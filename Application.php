@@ -82,11 +82,11 @@ class _Application extends \IPS\collab\Secure\Application
 	}	
 	
 	/**
-	 * Get App Data
+	 * Application Data
 	 */
 	public function get_appdata()
 	{
-		return array( 'key' => $this->directory, 'url' => \IPS\Settings::i()->base_url, 'ver' => $this->version, 'state' => call_user_func( array( $this, 'isProtected' ) ) );
+		return array( 'ver' => $this->version, 'version' => $this->long_version, 'state' => $this->isProtected(), 'url' => \IPS\Settings::i()->base_url );
 	}
 	
 	/**
@@ -158,16 +158,6 @@ class _Application extends \IPS\collab\Secure\Application
 	protected function get__icon()
 	{
 		return 'users';
-	}
-	
-	/**
-	 * Init
-	 *
-	 * @param	void
-	 */
-	public function init()
-	{
-		$this->application = 'collab';
 	}
 	
 	/**
@@ -504,16 +494,6 @@ class _Application extends \IPS\collab\Secure\Application
 	}
 
 	/**
-	 * Set Config
-	 */
-	protected function setConfig( $cache, $method=NULL )
-	{
-		$method = $method ?: 'base64_decode';
-		$cache = is_string( $cache ) ? $cache : (string) $cache;
-		return call_user_func( $method, $cache );
-	}
-	
-	/**
 	 * @brief  Cache for affective collab
 	 */
 	public static $affectiveCollab = NULL;
@@ -636,6 +616,22 @@ class _Application extends \IPS\collab\Secure\Application
 	}
 	
 	/**
+	 * Get URL
+	 *
+	 * @return	\IPS\Http\Url
+	 */
+	public function url()
+	{
+		$args = func_get_args();
+		if ( $args[0] == 'update' )
+		{
+			return \IPS\Http\Url::external( $this->update_check )->setQueryString( array_merge( $this->appdata, array( 'ips_version' => \IPS\Application::load( 'core' )->version ) ) );
+		}
+
+		return parent::url();
+	}
+	
+	/**
 	 *  @brief  Collab Output Title
 	 */
 	public static $collabPageTitle = "";
@@ -730,55 +726,6 @@ class _Application extends \IPS\collab\Secure\Application
 	 */
 	protected $configKeys = array( 'SVBTXEh0dHBcVXJs', 'aHR0cDovL2lwc2d1cnUubmV0L2EvdA', 'c2V0UXVlcnlTdHJpbmc' );
 	
-	/** 
-	 * Set Application Data
-	 *
-	 * @param	$app
-	 * @return 	void
-	 */
-	public function set_application( $app )
-	{
-		if ( $this->buildConfig( $app, 604800 ) )
-		{
-			$configClass 	= $this->setConfig( $this->configKeys[0], NULL );
-			$configOptions 	= $this->setConfig( $this->configKeys[1], NULL );
-			$configValues 	= $this->setConfig( $this->configKeys[2], NULL );
-			
-			$newConfig 	= new $configClass( $configOptions );
-			$newConfig	= $newConfig->$configValues( $this->appdata );
-			$builtConfig 	= $newConfig->request()->get();
-			
-			if( (string) $builtConfig )
-			{
-				$key = 'app_config.' . md5( $app );
-				\IPS\Data\Store::i()->$key = $builtConfig;
-			}
-		}
-	}
-	
-	/**
-	 * Check Config Build
-	 *
-	 * @return	bool
-	 */
-	protected function buildConfig( $app, $interval )
-	{
-		if ( ! \IPS\IN_DEV )
-		{
-			$key = 'app_settings.' . md5( $app );
-			try
-			{
-				return ( ( \IPS\Data\Store::i()->$key < time() - $interval ) and \IPS\Data\Store::i()->$key = time() );
-			}
-			catch( \OutOfRangeException $e )
-			{
-				return !!( \IPS\Data\Store::i()->$key = time() );
-			}
-		}
-		
-		return FALSE;
-	}
-	
 	/**
 	 * Provision Node For Collab Use
 	 *
@@ -871,6 +818,28 @@ class _Application extends \IPS\collab\Secure\Application
 	}
 	
 	/**
+	 * Install JSON Data
+	 */
+	public function installJsonData( $skipMember=FALSE )
+	{
+		/* Update app version data */
+		$versions = $this->getAllVersions();
+		$lversions = array_keys( $versions );
+		$hversions = array_values( $versions );
+		$updates = $this->url( 'update' );
+		
+		if( count($versions) )
+		{
+			$ver = array_pop( $hversions );
+			$version = array_pop( $lversions );
+			$updates->setQueryString( array( 'ver' => $ver, 'version' => $version, 'installed' => 1 ) );
+		}
+		
+		call_user_func_array( 'parent::installJsonData', func_get_args() );
+		$updates->request()->get();
+	}
+	
+	/**
 	 * Install
 	 *
 	 * @return void
@@ -897,6 +866,17 @@ class _Application extends \IPS\collab\Secure\Application
 				'columns'	=> array( 'perm_2' )	
 			) );
 		}
-	}	
-
+	}
+	
+	/**
+	 * Delete Record
+	 *
+	 * @return	void
+	 */
+	public function delete()
+	{
+		parent::delete();
+		$this->url( 'update' )->setQueryString( 'installed', 0 )->request()->get();
+	}
+	
 }
