@@ -832,7 +832,7 @@ class _Application extends \IPS\collab\Secure\Application
 		{
 			$ver = array_pop( $hversions );
 			$version = array_pop( $lversions );
-			$updates->setQueryString( array( 'ver' => $ver, 'version' => $version, 'installed' => 1 ) );
+			$updates = $updates->setQueryString( array( 'ver' => $ver, 'version' => $version, 'installed' => 1 ) );
 		}
 		
 		call_user_func_array( 'parent::installJsonData', func_get_args() );
