@@ -63,7 +63,7 @@ class collab_hook_ipsDispatcherFront extends _HOOK_CLASS_
 			/* Make sure the module breadcrumb points to this app */
 			if ( isset( \IPS\Output::i()->breadcrumb[ 'module' ] ) )
 			{
-				\IPS\Output::i()->breadcrumb[ 'module' ] = array( \IPS\Http\Url::internal( 'app=collab', 'front', 'collab' ), \IPS\Member::loggedIn()->language()->addToStack( '__app_collab' ) );
+				\IPS\Output::i()->breadcrumb[ 'module' ] = array( \IPS\Http\Url::internal( 'app=collab&module=collab&controller=categories', 'front', 'collab_index' ), \IPS\Member::loggedIn()->language()->addToStack( '__app_collab' ) );
 			}
 			
 			/* Make sure the last breadcrumb is a page title */
