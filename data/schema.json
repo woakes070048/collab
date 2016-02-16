@@ -826,6 +826,16 @@
                 "columns": [
                     "collab_id"
                 ]
+            },
+            "category": {
+                "type": "key",
+                "name": "category",
+                "columns": [
+                    "category_id"
+                ],
+                "length": [
+                    null
+                ]
             }
         },
         "collation": "utf8_unicode_ci",
@@ -1243,6 +1253,60 @@
                 ],
                 "columns": [
                     "id"
+                ]
+            },
+            "collab": {
+                "type": "key",
+                "name": "collab",
+                "columns": [
+                    "collab_id"
+                ],
+                "length": [
+                    null
+                ]
+            },
+            "member": {
+                "type": "key",
+                "name": "member",
+                "columns": [
+                    "member_id"
+                ],
+                "length": [
+                    null
+                ]
+            },
+            "status": {
+                "type": "key",
+                "name": "status",
+                "columns": [
+                    "status"
+                ],
+                "length": [
+                    null
+                ]
+            },
+            "sponsor": {
+                "type": "key",
+                "name": "sponsor",
+                "columns": [
+                    "sponsor_id"
+                ],
+                "length": [
+                    null
+                ]
+            },
+            "active_member": {
+                "type": "key",
+                "name": "active_member",
+                "columns": [
+                    "collab_id",
+                    "member_id",
+                    "status"
+                ],
+                "length": [
+                    null,
+                    null,
+                    null
                 ]
             }
         },

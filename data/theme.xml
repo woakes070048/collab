@@ -897,7 +897,7 @@
   {{endforeach}}
 {{else}}
   {{foreach $nodeClass::roots() as $root}}
-    {{if !$root->hasChildren()}}
+    {{if $root->can('view') and !$root->hasChildren()}}
       {{$roots_as_categories = FALSE;}}
     {{endif}}
     {{if $root->can('view')}}
@@ -952,7 +952,7 @@
 					</div>
 				</div>
 			{{else}}
-				<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset" data-role="forums">
+				<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset">
 					{{foreach $nodeClass::roots() as $node}}
 						{{if $node->can('view')}}
 							{template="nodeRow" group="components" app="collab" params="$node"}

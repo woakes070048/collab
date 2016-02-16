@@ -98,5 +98,9 @@
     "ipsCoreFrontNavigationAbstract": {
         "type": "C",
         "class": "\\IPS\\core\\FrontNavigation\\FrontNavigationAbstract"
+    },
+    "ipsApp": {
+        "type": "C",
+        "class": "\\IPS\\core\\tasks\\updatecheck"
     }
 }
