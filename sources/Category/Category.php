@@ -1329,15 +1329,26 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		{
 			unset( $permissions[ 'perm_id' ], $permissions[ 'app' ], $permissions[ 'perm_type' ], $permissions[ 'perm_type_id' ] );
 			
+			/* Filter by collabs in this category */
+			$where = array( 'collab_categories.category_id=?', $this->_id );
+			
+			/* All pages categories are stored in the same table, regardless of database, so we need to filter by database also */
+			if ( is_subclass_of( $nodeClass, 'IPS\cms\Categories' ) )
+			{
+				$where[ 0 ] .= ' AND ' . $nodeClass::$databaseTable . '.category_database_id=?';
+				$where[] = (int) mb_substr( $nodeClass, 18 );
+			}
+			
 			foreach 
 			(  
-				new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( '*', $nodeClass::$databaseTable, array( 'collab_categories.category_id=?', $this->_id ) )
+				new \IPS\Patterns\ActiveRecordIterator( \IPS\Db::i()->select( $nodeClass::$databaseTable . '.*', $nodeClass::$databaseTable, $where )
 					->join( 'collab_collabs', array( 'collab_collabs.collab_id=' . $nodeClass::$databaseTable . '.' . $nodeClass::$databasePrefix . 'collab_id' ) )
 					->join( 'collab_categories', array( 'collab_categories.category_id=collab_collabs.category_id' ) ), $nodeClass ) 
 				as $node 
 			)
 			{
 				$perms = $node->permissions();
+		
 				try
 				{
 					$node->setPermissions( array_merge( array( 'perm_id' => $perms[ 'perm_id' ], 'app' => $nodeClass::$permApp, 'perm_type' => $nodeClass::$permType, 'perm_type_id' => $node->_id ), $permissions ), new \IPS\Helpers\Form\Matrix );
