@@ -566,6 +566,11 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	}
 
 	/**
+	 * Comment Inflation Counter
+	 */
+	public $commentInflation = 0;
+
+	/**
 	 * Cache counts for content items and posts inside collabs
 	 *
 	 * @param	string	$k	Key
@@ -604,10 +609,37 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 						 */
 						else
 						{
-							$existing = (int) $this->$k;
+							$diff = $v - (int) $this->$k;
 							
-							$data[ $k ][ 'node_totals' ][ $nid ] = $data[ $k ][ 'node_totals' ][ $nid ] - $existing + $v;
-							$data[ $k ][ 'grand_total' ] = $data[ $k ][ 'grand_total' ] - $existing + $v;
+							// Do we have to adjust for inflation? This is a workaround so that we dont add inflated comment counts
+							if ( isset( $nodeClass::$contentItemClass ) and $contentItemClass = $nodeClass::$contentItemClass )
+							{
+								if ( isset( $contentItemClass::$firstCommentRequired ) and $contentItemClass::$firstCommentRequired )
+								{
+									if ( $diff < 0 and $k == '_comments' )
+									{
+										$result = parent::__set( $k, $v );
+										$data[ $k ] = $collab->countTotals( $k );
+										$collab->collab_data = $data;
+										$collab->save();
+										return $result;
+									}
+									
+									if ( $k == '_items' )
+									{
+										$this->commentInflation += $diff;
+									}
+								}
+							}
+							
+							if ( $k == '_comments' )
+							{
+								$diff -= $this->commentInflation;
+								$this->commentInflation = 0;
+							}
+							
+							$data[ $k ][ 'node_totals' ][ $nid ] = $data[ $k ][ 'node_totals' ][ $nid ] + $diff;
+							$data[ $k ][ 'grand_total' ] = $data[ $k ][ 'grand_total' ] + $diff;
 							
 							$collab->collab_data = $data;
 							$collab->save();
