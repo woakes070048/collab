@@ -1,0 +1,43 @@
+{
+    "1": {
+        "method": "addColumn",
+        "params": [
+            "collab_collabs",
+            {
+                "name": "logo",
+                "type": "VARCHAR",
+                "length": 2048,
+                "decimals": null,
+                "values": null,
+                "allow_null": true,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        ]
+    },
+    "2": {
+        "method": "changeColumn",
+        "params": [
+            "collab_collabs",
+            "logo",
+            {
+                "name": "logo",
+                "type": "VARCHAR",
+                "length": 255,
+                "decimals": null,
+                "values": null,
+                "allow_null": true,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        ]
+    }
+}

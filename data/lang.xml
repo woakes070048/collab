@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10306">
+ <app key="collab" version="10307">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
@@ -171,6 +171,12 @@
   <word key="collab_no_template" js="0">None</word>
   <word key="collab_member_default_role" js="0">Default Member Role</word>
   <word key="collab_owner_default_role" js="0">Default Owner Role</word>
+  <word key="collab_logo" js="0">Logo</word>
+  <word key="collab_logo_mode" js="0">Collab Logos</word>
+  <word key="collab_logo_none" js="0">Disabled</word>
+  <word key="collab_logo_optional" js="0">Optional</word>
+  <word key="collab_logo_required" js="0">Required</word>
+  <word key="collab_logo_size" js="0">Max Logo Dimensions</word>
   <word key="leave_comment" js="0">Leave Comment</word>
   <word key="collab_comment" js="0">Comment</word>
   <word key="collab_review" js="0">Review</word>
@@ -262,7 +268,7 @@
   <word key="collab_role_edited" js="0">Role has been edited.</word>
   <word key="collab_role_deleted" js="0">Role has been deleted!</word>
   <word key="collab_role_perms" js="0">Permissions</word>
-  <word key="collab_role_guests" js="0">Guests</word>
+  <word key="collab_role_guests" js="0">Non Members</word>
   <word key="collab_role_members" js="0">All Active Members</word>
   <word key="collab_perm_action" js="0">perform that action</word>
   <word key="collab_perm_manageCollab" js="0">Manage Collab</word>

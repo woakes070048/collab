@@ -199,6 +199,12 @@ $lang = array(
 	'collab_no_template'			=> "None",
 	'collab_member_default_role'		=> "Default Member Role",
 	'collab_owner_default_role'		=> "Default Owner Role",
+	'collab_logo'				=> "Logo",
+	'collab_logo_mode'			=> "Collab Logos",
+	'collab_logo_none'			=> "Disabled",
+	'collab_logo_optional'			=> "Optional",
+	'collab_logo_required'			=> "Required",
+	'collab_logo_size'			=> "Max Logo Dimensions",
 	
 	// Collab View
 	'leave_comment'				=> "Leave Comment",
@@ -301,7 +307,7 @@ $lang = array(
 	'collab_role_edited'			=> "Role has been edited.",
 	'collab_role_deleted'			=> "Role has been deleted!",
 	'collab_role_perms'			=> "Permissions",
-	'collab_role_guests'			=> "Guests",
+	'collab_role_guests'			=> "Non Members",
 	'collab_role_members'			=> "All Active Members",
 	'collab_perm_action'			=> "perform that action",
 	'collab_perm_manageCollab'		=> "Manage Collab",
