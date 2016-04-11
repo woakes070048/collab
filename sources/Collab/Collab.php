@@ -412,6 +412,36 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			}
 		}
 		
+		$configuration = $container->_configuration;
+		
+		if ( $configuration[ 'logo_mode' ] and $configuration[ 'logo_mode' ] != 'none' )
+		{
+			$logo_size = NULL;
+			
+			if ( $configuration[ 'logo_size' ] and ( $configuration[ 'logo_size' ][ 0 ] or $configuration[ 'logo_size' ][ 1 ] ) )
+			{
+				$logo_size = array( 'maxWidth' => $configuration[ 'logo_size' ][ 0 ], 'maxHeight' => $configuration[ 'logo_size' ][ 1 ] );
+			}
+			
+			$form['collab_logo'] = new \IPS\Helpers\Form\Upload( 'collab_logo', ( $item and $item->logo ) ? \IPS\File::get( 'collab_Logos', $item->logo ) : NULL, $configuration[ 'logo_mode' ] == 'required', array
+			(
+				'storageExtension'  	=> 'collab_Logos',
+				'multiple'		=> FALSE,
+				'image'			=> $logo_size,
+				'allowedFileTypes'	=> array( 'jpg', 'jpeg', 'png', 'gif' ),
+				'maxFileSize'		=> NULL,
+				'totalMaxSize'		=> NULL,
+				'storageContainer'	=> NULL,
+				'temporary'		=> FALSE,
+				'callback'		=> NULL,
+				'minimize'		=> TRUE,
+				'retainDeleted'		=> FALSE,
+				'template'		=> 'core.attachments.fileItem',
+				'default'		=> NULL,
+				'obscure'		=> TRUE,
+			) );
+		}
+		
 		$form['collab_short_description'] = new \IPS\Helpers\Form\Textarea( 'collab_short_description', $item ? $item->short_description : NULL, FALSE );
 
 		$form['description'] = new \IPS\Helpers\Form\Editor( 'collab_description', $item ? $item->description : NULL, FALSE, array( 
@@ -509,6 +539,11 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			$this->default_member_title = $values[ 'collab_default_title' ];
 		}
 		
+		if ( array_key_exists( 'collab_logo', $values ) )
+		{
+			$this->logo = $values[ 'collab_logo' ];
+		}
+		
 		/* Moderator actions */
 		if ( isset( $values[ 'collab_create_state' ] ) )
 		{
@@ -532,9 +567,6 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 				$this->featured = 1;
 			}
 		}
-		
-		
-
 	}
 	
 	/**

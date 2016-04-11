@@ -587,6 +587,8 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 				$form_id . 'collab_category_require_approval',
 				$form_id . 'collab_contribution_mode',
 				$form_id . 'collab_unread_method',
+				$form_id . 'collab_logo_mode',
+				$form_id . 'collab_logo_size',
 			) ) 
 		) );
 		
@@ -594,6 +596,13 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		(
 			'public' 	=> 'category_privacy_mode_public',
 			'private' 	=> 'category_privacy_mode_private',
+		);
+		
+		$logo_modes = array
+		(
+			'none'		=> 'collab_logo_none',
+			'optional'	=> 'collab_logo_optional',
+			'required'	=> 'collab_logo_required',
 		);
 		
 		$contribution_modes = array
@@ -616,6 +625,8 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		$form->add( new \IPS\Helpers\Form\YesNo( 'collab_category_require_approval', isset( $configuration[ 'require_approval' ] ) ? $configuration[ 'require_approval' ] : FALSE, FALSE ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_category_privacy_mode', $this->privacy_mode ?: 'public', TRUE, array( 'options' => $privacy_options ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'collab_category_per_page', isset( $configuration[ 'per_page' ] ) ? $configuration[ 'per_page' ] : 25, TRUE, array( 'min' => 1 ) ) );
+		$form->add( new \IPS\Helpers\Form\Radio( 'collab_logo_mode', $configuration[ 'logo_mode' ] ?: 'none', TRUE, array( 'options' => $logo_modes ) ) );
+		$form->add( new \IPS\Helpers\Form\WidthHeight( 'collab_logo_size', $configuration[ 'logo_size' ] ?: array( 0, 0 ), TRUE, array( 'unlimited' => array( 0, 0 ) ) ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_contribution_mode', $configuration[ 'contribution_mode' ] ?: 'posts', TRUE, array( 'options' => $contribution_modes ) ) );
 		$form->add( new \IPS\Helpers\Form\Radio( 'collab_unread_method', $configuration[ 'collab_unread_method' ] ?: 'quick', TRUE, array( 'options' => $unread_method_options ) ) );
 		
@@ -1086,6 +1097,8 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		$configuration[ 'require_approval' ] = $values[ 'collab_category_require_approval' ];
 		$configuration[ 'contribution_mode' ] = $values[ 'collab_contribution_mode' ];
 		$configuration[ 'collab_unread_method' ] = $values[ 'collab_unread_method' ];
+		$configuration[ 'logo_mode' ] = $values[ 'collab_logo_mode' ];
+		$configuration[ 'logo_size' ] = $values[ 'collab_logo_size' ];
 		
 		if ( isset( $values[ 'collab_category_skin_id' ] ) )
 		{

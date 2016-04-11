@@ -5,12 +5,21 @@
 	{{$rowIds[] = $row->$idField;}}
 {{endforeach}}
 {{$iposted = ( method_exists( $table, 'container' ) AND $table->container() !== NULL ) ? $table->container()->contentPostedIn( null, $rowIds ) : array();}}
+{{$configuration = $table->container()->_configuration;}}
 {{if count( $rows )}}
 	{{$rowCount=0;}}
 	{{foreach $rows as $row}}
 		{{$rowCount++;}}
 		{{$idField = $row::$databaseColumnId;}}
 		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{else}}ipsDataItem_read{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
+			{{if $configuration[ 'logo_mode' ] and $configuration[ 'logo_mode' ] != 'none'}}
+				<div class="ipsDataItem_generic ipsDataItem_size3" style="padding: 0px 5px 0px 0px;">
+					{{if $row->logo}}
+					{{$logo = \IPS\File::get( 'collab_Logos', $row->logo );}}
+					<img src="{$logo->url}" style="max-height: 75px; max-width:95px; border: 1px solid #ddd; padding: 3px;"/>
+					{{endif}}
+				</div>
+			{{endif}}
 			<div class='ipsDataItem_icon ipsPos_top'>
 				{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
 				{{if $row->unread() and \IPS\Member::loggedIn()->member_id}}<a href="{$row->url()->setQueryString( array( 'do' => 'markRead', 'return' => $row->container()->_id ) )->csrf()}" data-action='markAsRead' title='{lang="mark_collab_read" sprintf="$row->collab_singular"}' data-ipsTooltip>{{endif}}

@@ -1,12 +1,12 @@
 <?php
 /**
- * @brief		File Storage Extension: Collab
+ * @brief		File Storage Extension: Logos
  * @author		<a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
- * @copyright	(c) 2001 - SVN_YYYY Invision Power Services, Inc.
+ * @copyright	(c) 2001 - 2016 Invision Power Services, Inc.
  * @license		http://www.invisionpower.com/legal/standards/
- * @package		IPS Social Suite
- * @subpackage	
- * @since		21 Jan 2015
+ * @package		IPS Community Suite
+ * @subpackage	Collaboration
+ * @since		10 Apr 2016
  * @version		SVN_VERSION_NUMBER
  */
 
@@ -20,9 +20,9 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 
 /**
- * Editor Extension: Collab
+ * File Storage Extension: Logos
  */
-class _Collab
+class _Logos
 {
 	/**
 	 * Count stored files
@@ -31,7 +31,7 @@ class _Collab
 	 */
 	public function count()
 	{
-		return \IPS\Db::i()->select( 'COUNT(*)', 'collab_collabs', 'cover_photo IS NOT NULL' )->first();
+		return \IPS\Db::i()->select( 'COUNT(*)', 'collab_collabs', 'logo IS NOT NULL' )->first();
 	}
 	
 	/**
@@ -40,15 +40,15 @@ class _Collab
 	 * @param	int			$offset					This will be sent starting with 0, increasing to get all files stored by this extension
 	 * @param	int			$storageConfiguration	New storage configuration ID
 	 * @param	int|NULL	$oldConfiguration		Old storage configuration ID
-	 * @throws	\Underflowexception				When file record doesn't exist. Indicating there are no more files to move
-	 * @return	void								FALSE when there are no more files to move
+	 * @throws	\UnderflowException					When file record doesn't exist. Indicating there are no more files to move
+	 * @return	void|int							An offset integer to use on the next cycle, or nothing
 	 */
 	public function move( $offset, $storageConfiguration, $oldConfiguration=NULL )
 	{
-		$record	= \IPS\Db::i()->select( '*', 'collab_collabs', 'cover_photo IS NOT NULL', 'collab_id', array( $offset, 1 ) )->first();
-		$file	= \IPS\File::get( $oldConfiguration ?: 'collab_Collab', $record[ 'cover_photo' ] )->move( $storageConfiguration );
+		$record	= \IPS\Db::i()->select( '*', 'collab_collabs', 'logo IS NOT NULL', 'collab_id', array( $offset, 1 ) )->first();
+		$file	= \IPS\File::get( $oldConfiguration ?: 'collab_Logos', $record[ 'logo' ] )->move( $storageConfiguration );
 		
-		\IPS\Db::i()->update( 'collab_collabs', array( 'cover_photo' => (string) $file ), array( 'collab_id=?', $record[ 'collab_id' ] ) );
+		\IPS\Db::i()->update( 'collab_collabs', array( 'logo' => (string) $file ), array( 'collab_id=?', $record[ 'collab_id' ] ) );
 	}
 
 	/**
@@ -61,7 +61,7 @@ class _Collab
 	{
 		try
 		{
-			$record	= \IPS\Db::i()->select( '*', 'collab_collabs', array( 'cover_photo=?', (string) $file ) )->first();
+			$record	= \IPS\Db::i()->select( '*', 'collab_collabs', array( 'logo=?', (string) $file ) )->first();
 
 			return TRUE;
 		}
@@ -70,7 +70,7 @@ class _Collab
 			return FALSE;
 		}
 	}
-	
+
 	/**
 	 * Delete all stored files
 	 *
@@ -78,14 +78,13 @@ class _Collab
 	 */
 	public function delete()
 	{
-		foreach( \IPS\Db::i()->select( '*', 'collab_collabs', 'cover_photo IS NOT NULL' ) as $collab )
+		foreach( \IPS\Db::i()->select( '*', 'collab_collabs', 'logo IS NOT NULL' ) as $collab )
 		{
 			try
 			{
-				\IPS\File::get( 'collab_Collab', $collab[ 'cover_photo' ] )->delete();
+				\IPS\File::get( 'collab_Logos', $collab[ 'logo' ] )->delete();
 			}
-			catch( \Exception $e ){}
+			catch( \Exception $e ) { }
 		}
-	}	
-	
+	}
 }
