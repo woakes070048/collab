@@ -610,6 +610,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 						else
 						{
 							$diff = $v - (int) $this->$k;
+							$nodeClass = get_called_class();
 							
 							// Do we have to adjust for inflation? This is a workaround so that we dont add inflated comment counts
 							if ( isset( $nodeClass::$contentItemClass ) and $contentItemClass = $nodeClass::$contentItemClass )
