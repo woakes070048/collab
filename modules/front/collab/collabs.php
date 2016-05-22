@@ -119,16 +119,9 @@ class _collabs extends \IPS\Content\Controller
 		}
 		
 		/* Mark read */
-		if( !$collab->isLastPage() )
+		if( ! isset( \IPS\Request::i()->page ) and $last_comment = $collab->comments( 1, 0 ) )
 		{
-			$maxTime	= 0;
-
-			foreach( $comments as $comment )
-			{
-				$maxTime	= ( $comment->mapped('date') > $maxTime ) ? $comment->mapped('date') : $maxTime;
-			}
-
-			$collab->markRead( NULL, $maxTime );
+			$collab->markRead( NULL, $last_comment->mapped( 'date' ) );
 		}
 		
 		/* Online User Location */
@@ -140,7 +133,7 @@ class _collabs extends \IPS\Content\Controller
 			\IPS\forums\Topic::contentTableTemplate();
 		}
 		catch ( \Exception $e) {}
-						
+			
 		\IPS\Output::i()->title = $collab->title;
 		\IPS\Output::i()->output = \IPS\Theme::i()->getTemplate( 'layouts' )->collab( $collab, $activity );		
 	
