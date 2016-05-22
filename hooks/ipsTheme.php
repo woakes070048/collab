@@ -47,7 +47,7 @@ class collab_hook_ipsTheme extends _HOOK_CLASS_
 	protected function getLocation( $location )
 	{
 		if ( $location === NULL and isset( $this->defaultLocation ) )
-        {
+		{
 			$location = $this->defaultLocation;
 		}
 		return $location;

@@ -16,7 +16,7 @@ class collab_hook_ipsSessionFront extends _HOOK_CLASS_
 	 */
 	public function log( $langKey, $params=array(), $noDupes=FALSE )
 	{
-      
-    }
+	
+	}
   
 }
