@@ -853,7 +853,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 	{
 		/* What is the best date column? */
 		$dateColumns = array();
-		foreach ( array( 'updated', 'last_comment', 'last_review' ) as $k )
+		foreach ( array( 'updated', 'last_comment', 'last_review', 'date' ) as $k )
 		{
 			if ( isset( $class::$databaseColumnMap[ $k ] ) )
 			{
@@ -871,7 +871,15 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			}
 		}
 		
-		return count( $dateColumns ) > 1 ? ( 'GREATEST(' . implode( ',', $dateColumns ) . ')' ) : array_pop( $dateColumns );
+		$dateColumn = count( $dateColumns ) > 1 ? ( 'GREATEST(' . implode( ',', $dateColumns ) . ')' ) : array_pop( $dateColumns );
+		
+		/* Fallback to record id */
+		if ( ! $dateColumn )
+		{
+			$dateColumn = $class::$databasePrefix . $class::$databaseColumnId;
+		}
+		
+		return $dateColumn;
 	}
 
 	/**
