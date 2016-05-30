@@ -1,6 +1,6 @@
 <ips:template parameters="$collab" />
 
-<div data-controller='core.front.core.commentFeed' data-commentsType='comments' data-baseURL='{$collab->url()}' {{if $collab->isLastPage()}}data-lastPage{{endif}} data-feedID='file-{$collab->id}'>
+<div data-controller='core.front.core.commentFeed' data-commentsType='comments' data-baseURL='{$collab->url()}' data-feedID='file-{$collab->id}'>
 	<br>
 	{{if $collab->commentPageCount() > 1}}
 		{$collab->commentPagination( array( 'tab' ) )|raw}
