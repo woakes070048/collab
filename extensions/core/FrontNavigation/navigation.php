@@ -79,7 +79,7 @@ class _navigation extends \IPS\collab\Util\FrontNavigationAbstract
 	 *
 	 * @return	array
 	 */
-	public function children()
+	public function children( $noStore=TRUE )
 	{
 		return array();
 	}
