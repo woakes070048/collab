@@ -740,8 +740,8 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 
 			$columns = array
 			(
-				$class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnId				=> 'id',
-				$dateColumnExpression											=> 'date',
+				$class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnId		=> 'id',
+				$dateColumnExpression										=> 'date',
 				$class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap['author']	=> 'author'
 			);
 			
@@ -757,6 +757,11 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 					$columns[ $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap[ 'hidden' ] ] = 'hidden';
 					$contentWhere[] = array( $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap[ 'hidden' ] . '=0' );
 				}
+			}
+			else
+			{
+				/* Placeholder to keep selected columns even. Chose 10 simply to keep column type an integer and to keep array sequence in order. */
+				$columns[ "10" ] = 'hidden';
 			}
 			
 			$select = array( "'".str_replace( '\\', '\\\\' , $class ) ."' AS class" );
