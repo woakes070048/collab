@@ -290,10 +290,21 @@ class _settings extends \IPS\Dispatcher\Controller
 					return "---";
 				}
 			
-				$roles = explode( ',', $val );
-				foreach ( $roles as &$role )
+				$vals = explode( ',', $val );
+				$roles = array();
+				
+				if ( ! empty( $vals ) )
 				{
-					$role = $collab->roles( $role )->name;
+					foreach ( $vals as $val )
+					{
+						if ( $val )
+						{
+							if ( $role = $collab->roles( $val ) )
+							{
+								$roles[] = $role->name;
+							}
+						}
+					}
 				}
 				
 				return implode( ', ', $roles );

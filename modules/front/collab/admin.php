@@ -430,7 +430,7 @@ class _admin extends \IPS\Dispatcher\Controller
 		$table->noSort	= array( 'photo' );
 	
 		/* Default sort options */
-		$table->sortBy = $table->sortBy ?: 'membership.joined';
+		$table->sortBy = $table->sortBy ?: 'collab_joined';
 		$table->sortDirection = $table->sortDirection ?: 'desc';
 		
 		$roles = array( '' => 'any_group' );
@@ -545,7 +545,8 @@ class _admin extends \IPS\Dispatcher\Controller
 		};
 		
 		/* Custom parsers */
-		$table->parsers = array(
+		$table->parsers = array
+		(
 			'photo'	=> function( $val, $row )
 			{
 				return \IPS\Theme::i()->getTemplate( 'global', 'core' )->userPhoto( \IPS\Member::constructFromData( $row ), 'mini' );
@@ -574,7 +575,7 @@ class _admin extends \IPS\Dispatcher\Controller
 				$roles = array();
 				foreach ( explode( ',', $val ) as $id )
 				{
-					if ( $role = $collab->roles( $id ) )
+					if ( $id and $role = $collab->roles( $id ) )
 					{
 						$roles[] = $role->name;
 					}

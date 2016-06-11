@@ -47,6 +47,30 @@ class _Application extends \IPS\collab\Secure\Application
 	);
 	
 	/**
+	 * @brief	Initialization Theme Switch
+	 */
+	static $initSwitchTheme = NULL;
+	
+	/**
+	 * @brief	Initialized Flag
+	 */
+	static $initialized = FALSE;
+	
+	/**
+	 * Init
+	 */
+	public function init()
+	{
+		/* Switch to any queued theme */
+		if ( static::$initSwitchTheme !== NULL )
+		{
+			\IPS\Theme::switchTheme( static::$initSwitchTheme );
+		}
+		
+		static::$initialized = TRUE;
+	}
+	
+	/**
 	 * @brief 	Custom icons for supported apps
 	 */
 	public static function iconMap()
@@ -428,7 +452,7 @@ class _Application extends \IPS\collab\Secure\Application
 						static::$inferredCollab = $obj;	
 						
 						/* Set Theme */
-						$obj->setTheme();
+						//$obj->setTheme();
 						
 						return;				
 					}
@@ -658,7 +682,7 @@ class _Application extends \IPS\collab\Secure\Application
 					}
 				}
 				
-				if ( $container->collab_id )
+				if ( isset( $container ) and $container->collab_id )
 				{
 					try
 					{

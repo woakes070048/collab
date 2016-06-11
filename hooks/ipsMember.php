@@ -301,7 +301,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 	 */
 	public function __get( $key )
 	{
-		if ( $this->member_id )
+		if ( isset( $this->_data[ 'member_id' ] ) and $this->_data[ 'member_id' ] )
 		{
 			switch ( $key )
 			{
@@ -347,7 +347,7 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 	 */
 	public function __set( $key, $value )
 	{
-		if ( $this->member_id )
+		if ( isset( $this->_data[ 'member_id' ] ) and $this->_data[ 'member_id' ] )
 		{
 			if ( in_array( $key, array( 'member_posts', 'member_last_post' ) ) )
 			{

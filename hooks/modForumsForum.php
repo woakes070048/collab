@@ -25,7 +25,7 @@ class collab_hook_modForumsForum extends _HOOK_CLASS_
 			/* Also check if we have any collab categories set up to show on the forum index */
 			foreach( \IPS\collab\Category::roots() as $category )
 			{
-				if ( $category->can( 'view' ) and $configuration = $category->_configuration and $configuration[ 'show_forum_index' ] )
+				if ( $category->can( 'view' ) and $configuration = $category->_configuration and isset( $configuration[ 'show_forum_index' ] ) and $configuration[ 'show_forum_index' ] )
 				{
 					return NULL;
 				}
@@ -48,7 +48,7 @@ class collab_hook_modForumsForum extends _HOOK_CLASS_
 		{
 			foreach( $form->elements[ 'forum_settings' ] as &$formElement )
 			{
-				if ( $formElement->name == 'forum_skin_id' )
+				if ( $formElement instanceof \IPS\Helpers\Form\FormAbstract and $formElement->name == 'forum_skin_id' )
 				{
 					$themes = array( 0 => 'forum_skin_id_default' );
 					

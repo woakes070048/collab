@@ -13,23 +13,23 @@
 		{{$idField = $row::$databaseColumnId;}}
 		{{$member_count = $row->memberships( array ( 'statuses' => \IPS\collab\COLLAB_MEMBER_ACTIVE, 'count' => true ) );}}
 		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{else}}ipsDataItem_read{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}'>
-			{{if $configuration[ 'logo_mode' ] and $configuration[ 'logo_mode' ] != 'none' and $row->logo}}
+			{{if isset( $configuration[ 'logo_mode' ] ) and $configuration[ 'logo_mode' ] != 'none' and $row->logo}}
 				<div class="ipsDataItem_generic ipsResponsive_hidePhone" style="padding: 0px 5px 0px 0px; position: relative; width: 85px; min-width: 85px;">
 					<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_style3 membershipCount" style="position: absolute; top: -2px; right: -2px;" data-ipstooltip title='{lang="collab_active_members_count" pluralize="$member_count"}'>
 						{$member_count}
 					</span>
 					{{if $membership = $row->getMembership()}}
 						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
-							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$row->collab_singular"}'><i class='fa fa-user'></i></span>
 						{{endif}}
 						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING}}
-							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$row->collab_singular"}'><i class='fa fa-user'></i></span>
 						{{endif}}
 						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
-							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$collab->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$row->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
 						{{endif}}
 						{{if $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED}}
-							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_negative membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$collab->collab_singular"}'><i class='fa fa-times-circle'></i></span>
+							<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_negative membershipStatus" style="position: absolute; bottom: 0px; left: -2px;" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$row->collab_singular"}'><i class='fa fa-times-circle'></i></span>
 						{{endif}}
 					{{endif}}
 					{{$logo = \IPS\File::get( 'collab_Logos', $row->logo );}}
@@ -51,16 +51,16 @@
 						</span>
 						{{if $membership = $row->getMembership()}}
 							{{if $membership->status === \IPS\collab\COLLAB_MEMBER_ACTIVE}}
-								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive membershipStatus" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive membershipStatus" data-ipsTooltip title='{lang="collab_youre_active" sprintf="$row->collab_singular"}'><i class='fa fa-user'></i></span>
 							{{endif}}
 							{{if $membership->status === \IPS\collab\COLLAB_MEMBER_PENDING}}
-								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$collab->collab_singular"}'><i class='fa fa-user'></i></span>
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_pending" sprintf="$row->collab_singular"}'><i class='fa fa-user'></i></span>
 							{{endif}}
 							{{if $membership->status === \IPS\collab\COLLAB_MEMBER_INVITED}}
-								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$collab->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_intermediary membershipStatus" data-ipsTooltip title='{lang="collab_youre_invited" sprintf="$row->collab_singular"}'><i class='fa fa-bullhorn'></i></span>
 							{{endif}}
 							{{if $membership->status === \IPS\collab\COLLAB_MEMBER_BANNED}}
-								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_negative membershipStatus" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$collab->collab_singular"}'><i class='fa fa-times-circle'></i></span>
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_negative membershipStatus" data-ipsTooltip title='{lang="collab_youre_banned" sprintf="$row->collab_singular"}'><i class='fa fa-times-circle'></i></span>
 							{{endif}}
 						{{endif}}
 					</span>

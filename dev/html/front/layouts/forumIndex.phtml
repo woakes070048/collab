@@ -3,7 +3,7 @@
 {{$categories = array();}}
 {{foreach \IPS\collab\Category::roots() as $category}}
   {{$configuration = $category->_configuration;}}
-  {{if $category->can( 'view' ) and $configuration[ 'show_forum_index' ] == TRUE}}
+  {{if $category->can( 'view' ) and isset( $configuration[ 'show_forum_index' ] ) and $configuration[ 'show_forum_index' ] == TRUE}}
     {{$categories[] = $category;}}
   {{endif}}
 {{endforeach}}
@@ -30,7 +30,7 @@
 							<ul class="ipsDataItem_subList ipsList_inline">
 								{{foreach $category->children() as $child}}
 									{{$childconfig = $child->_configuration;}}
-									{{if $child->can( 'view' ) and $childconfig[ 'show_forum_index' ]}}
+									{{if $child->can( 'view' ) and isset( $childconfig[ 'show_forum_index' ] ) and $childconfig[ 'show_forum_index' ]}}
 										{{$unread = \IPS\collab\Collab::containerUnread( $child );}}
 										<li class="{{if $unread}}ipsDataItem_unread{{endif}}">
 											<a href="{$child->url()}">{{if $unread}}<span class='ipsItemStatus ipsItemStatus_tiny {{if !$unread}}ipsItemStatus_read{{endif}}'><i class="fa fa-circle"></i></span>&nbsp;{{endif}}{$child->_title}</a>

@@ -1,7 +1,7 @@
 <ips:template parameters="$collab, $page_title" />
 
 <header class="collabHeader">
-	<div class='ipsPageHead_special' id='elCollabHeader' data-controller='core.front.core.coverPhoto' data-url="{$collab->url()->csrf()}" data-coverOffset='{$coverPhoto->offset}'>
+	<div class='ipsPageHead_special' id='elCollabHeader'>
 			<ul class='ipsList_inline' id='elEditCollab' style="right: 10px; top:10px;">
 				{template="menuCollab" app="collab" group="components" params="$collab"}
 			</ul>

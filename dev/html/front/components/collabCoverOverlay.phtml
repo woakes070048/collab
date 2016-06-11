@@ -22,7 +22,7 @@
 <div class='ipsColumns ipsColumns_collapsePhone' data-hideOnCoverEdit>
 	<div class='ipsColumn ipsColumn_fluid'>
 		{{$configuration = $collab->container()->_configuration;}}
-		{{if $collab->logo and $configuration[ 'logo_mode' ] and $configuration[ 'logo_mode' ] != 'none'}}
+		{{if $collab->logo and isset( $configuration[ 'logo_mode' ] ) and $configuration[ 'logo_mode' ] != 'none'}}
 		{{$logo = \IPS\File::get( 'collab_Logos', $collab->logo );}}
 		<div class='ipsPos_left ipsPad ipsResponsive_hidePhone'>
 			<img style="max-width:150px; max-height:150px; padding:2px; border:1px solid #ddd; background-color: #fff;" src="{$logo->url}" />

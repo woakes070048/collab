@@ -240,7 +240,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			foreach ( $configured[ 'nodes' ] as $node )
 			{
 				$nid = md5( $node['node'] );
-				$this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] = array_merge( $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] ?: array(), array(
+				$this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] = array_merge( ( isset( $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] ) ? $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] : array() ), array(
 					"nodeAdd-{$nid}",
 					"nodeEdit-{$nid}",
 					"nodeDelete-{$nid}",
@@ -414,11 +414,11 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 		
 		$configuration = $container->_configuration;
 		
-		if ( $configuration[ 'logo_mode' ] and $configuration[ 'logo_mode' ] != 'none' )
+		if ( isset( $configuration[ 'logo_mode' ] ) and $configuration[ 'logo_mode' ] != 'none' )
 		{
 			$logo_size = NULL;
 			
-			if ( $configuration[ 'logo_size' ] and ( $configuration[ 'logo_size' ][ 0 ] or $configuration[ 'logo_size' ][ 1 ] ) )
+			if ( isset( $configuration[ 'logo_size' ] ) and ( $configuration[ 'logo_size' ][ 0 ] or $configuration[ 'logo_size' ][ 1 ] ) )
 			{
 				$logo_size = array( 'maxWidth' => $configuration[ 'logo_size' ][ 0 ], 'maxHeight' => $configuration[ 'logo_size' ][ 1 ] );
 			}
@@ -669,7 +669,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 	{
 		$configuration = $container->_configuration;
 		
-		if ( $configuration[ 'collab_unread_method' ] == 'comprehensive' )
+		if ( isset( $configuration[ 'collab_unread_method' ] ) and $configuration[ 'collab_unread_method' ] == 'comprehensive' )
 		{
 			foreach( $container->getContentItems( NULL, NULL ) as $collab )
 			{
@@ -747,10 +747,10 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			
 			if ( in_array( 'IPS\Content\Hideable', class_implements( $class ) ) and !\IPS\Member::loggedIn()->modPermission( "can_view_hidden_content" ) )
 			{
-				if ( $class::$databaseColumnMap['approved'] )
+				if ( $class::$databaseColumnMap[ 'approved' ] )
 				{
 					$columns[ $class::$databaseTable . "." .  $class::$databasePrefix.$class::$databaseColumnMap[ 'approved' ] . '-1' ] = 'hidden';
-					$contentWhere[] = array( $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap['approved'] . '-1=0' );
+					$contentWhere[] = array( $class::$databaseTable . "." . $class::$databasePrefix.$class::$databaseColumnMap[ 'approved' ] . '-1=0' );
 				}
 				else
 				{
@@ -834,7 +834,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 		if ( ! empty( $selects ) )
 		{
 			/* Query content */
-			$results = \IPS\Db::i()->union( $selects, 'date DESC', array( 0, $limit ), NULL, FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS, $where );
+			$results = \IPS\Db::i()->union( $selects, 'date DESC', array( 0, $limit ), NULL, FALSE, \IPS\Db::SELECT_SQL_CALC_FOUND_ROWS );
 			foreach( $results as $result )
 			{
 				try
@@ -943,7 +943,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 		
 		$configuration = $this->container()->_configuration;
 		
-		if ( $configuration[ 'collab_unread_method' ] == 'comprehensive' )
+		if ( isset( $configuration[ 'collab_unread_method' ] ) and $configuration[ 'collab_unread_method' ] == 'comprehensive' )
 		{
 			$member = $member ?: \IPS\Member::loggedIn();
 			$savedAffectiveCollab = \IPS\collab\Application::$affectiveCollab;
@@ -1152,7 +1152,9 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 	{
 		$configuration = $this->container()->_configuration;
 		
-		switch( $configuration[ 'contribution_mode' ] )
+		$contribution_mode = isset( $configuration[ 'contribution_mode' ] ) ? $configuration[ 'contribution_mode' ] : 'posts';
+		
+		switch( $contribution_mode )
 		{				
 			case 'items':
 			
@@ -1589,13 +1591,18 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 	/**
 	 * Get Collab Member Roles
 	 *
-	 * @return	\IPS\Db\Select|array
+	 * @return	\IPS\collab\Collab\Role|array
 	 */
 	public function roles( $id=NULL )
 	{
 		if ( isset( $this->roles ) )
 		{
-			return $id ? $this->roles[ $id ] : $this->roles;
+			if ( $id )
+			{
+				return isset( $this->roles[ $id ] ) ? $this->roles[ $id ] : NULL;
+			}
+			
+			return $this->roles;
 		}
 		
 		$roles = array();
@@ -1613,7 +1620,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 		catch ( \UnderflowException $e ) {}
 		
 		$this->roles = $roles;
-		return $id ? $this->roles[ $id ] : $this->roles;
+		return $this->roles( $id );
 	}
 	
 	/**
