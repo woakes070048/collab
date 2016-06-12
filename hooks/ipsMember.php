@@ -351,6 +351,8 @@ class collab_hook_ipsMember extends _HOOK_CLASS_
 		{
 			if ( in_array( $key, array( 'member_posts', 'member_last_post' ) ) )
 			{
+				$account = NULL;
+				
 				if ( $collab = \IPS\collab\Application::affectiveCollab() )
 				{
 					$account = $collab->getMembership( $this ) ?: $collab->guest( $this );

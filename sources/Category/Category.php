@@ -646,7 +646,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		
 		$form->add( new \IPS\Helpers\Form\Node( 'category_parent_id', $this->id ? $this->parent_id : ( \IPS\Request::i()->parent ?: 0 ), TRUE, array
 		(
-			'class'			=> '\IPS\collab\Category',
+			'class'			=> 'IPS\collab\Category',
 			'zeroVal'		=> 'node_no_parent',
 			'permissionCheck'	=> function( $node )
 			{
@@ -661,9 +661,9 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		
 		if ( count( \IPS\Theme::themes() ) > 1 )
 		{
-			$form->add( new \IPS\Helpers\Form\Node( 'collab_category_skin_id', $configuration[ 'skin_id' ] ?: 0, TRUE, array
+			$form->add( new \IPS\Helpers\Form\Node( 'collab_category_skin_id', isset( $configuration[ 'skin_id' ] ) ? (int) $configuration[ 'skin_id' ] : 0, TRUE, array
 			(
-				'class' 	=> '\IPS\Theme',
+				'class' 	=> 'IPS\Theme',
 				'zeroVal'	=> 'collab_member_default',
 			) ) );
 		}		
