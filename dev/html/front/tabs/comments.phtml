@@ -8,7 +8,7 @@
 	{{endif}}
 	<div data-role='commentFeed' data-controller='core.front.core.moderation'>
 		{{if count( $collab->comments() )}}
-			<form action="{$collab->url()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+			<form action="{$collab->url()->setQueryString( 'do', 'multimodComment' )->csrf()}" method="post" data-ipsPageAction data-role='moderationTools'>
 				{{$commentCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
 				{{foreach $collab->comments() as $comment}}
 					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}

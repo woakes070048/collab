@@ -42,7 +42,7 @@
 		</div>
 		
 		<div data-role='commentFeed' data-controller='core.front.core.moderation'>
-			<form action="{$collab->url()->setQueryString( 'do', 'multimodReview' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+			<form action="{$collab->url()->setQueryString( 'do', 'multimodReview' )->csrf()}" method="post" data-ipsPageAction data-role='moderationTools'>
 				{{$reviewCount=0; $timeLastRead = $collab->timeLastRead(); $lined = FALSE;}}
 				{{foreach $collab->reviews() as $review}}
 					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $review->mapped('date')}}

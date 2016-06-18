@@ -73,7 +73,7 @@
 	</div>
 
 	{{if $table->canModerate()}}
-		<form action="{$table->baseUrl}" method="post" data-role='moderationTools' data-ipsPageAction>
+		<form action="{$table->baseUrl->csrf()}" method="post" data-role='moderationTools' data-ipsPageAction>
 	{{endif}}
 		{{if count( $rows )}}
 			<ol class='ipsDataList ipsDataList_zebra ipsClear collabListTable {{foreach $table->classes as $class}}{$class} {{endforeach}}' id='elTable_{$table->uniqueId}' data-role="tableRows" itemscope itemtype="http://schema.org/ItemList">
