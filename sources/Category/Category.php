@@ -752,7 +752,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		$nid 			= md5( $nodeClass );
 		$nodeTitle 		= ucwords( $lang->get( $nodeClass::$nodeTitle ) );
 		$contentClass		= $option[ 'content' ];
-		$contentTitle 		= $contentClass ? ucwords( $lang->get( $contentClass::$title ) ) : NULL;
+		$contentTitle 		= $contentClass ? ( $lang->checkKeyExists( $contentClass::$title ) ? ucwords( $lang->get( $contentClass::$title ) ) : ucwords( $contentClass::$title ) ) : NULL;
 		$modoptions 		= \IPS\collab\Application::modOptions();
 		$configuration 		= $this->_configuration;
 		$self			= $this;
