@@ -16,7 +16,7 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 * @param	mixed				$where				Additional WHERE clause
 	 * @return	array
 	 */
-	static public function roots( $permissionCheck='view', $member=NULL, $where=array() )
+	public static function roots( $permissionCheck='view', $member=NULL, $where=array() )
 	{
 		if ( \IPS\Db::i()->checkForColumn( static::$databaseTable, static::$databasePrefix . 'collab_id' ) )
 		{
@@ -50,9 +50,10 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 	 * @param	string	$key	Restriction key to check
 	 * @return	bool
 	 */
-	static protected function restrictionCheck( $key )
+	protected static function restrictionCheck( $key )
 	{
 		$collabCan = FALSE;
+		
 		if ( $collab = \IPS\collab\Application::activeCollab( false ) )
 		{
 			$nid = md5( get_called_class() );
@@ -96,12 +97,12 @@ abstract class collab_hook_ipsNodeModel extends _HOOK_CLASS_
 					
 				case 'edit':
 				
-					$collabCan = $collab->container()->_options[ 'node_' . $nid ][ 'enable_edit' ] and $collab->collabCan( 'nodeEdit-' . $nid );
+					$collabCan = ( $collab->container()->_options[ 'node_' . $nid ][ 'enable_edit' ] and $collab->collabCan( 'nodeEdit-' . $nid ) );
 					break;
 					
 				case 'delete':
 				
-					$collabCan = $collab->container()->_options[ 'node_' . $nid ][ 'enable_delete' ] and $collab->collabCan( 'nodeDelete-' . $nid );
+					$collabCan = ( $collab->container()->_options[ 'node_' . $nid ][ 'enable_delete' ] and $collab->collabCan( 'nodeDelete-' . $nid ) );
 					break;
 					
 				case 'permissions':

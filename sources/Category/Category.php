@@ -997,7 +997,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 			$options = is_array( $data ) ? $data[1] : array();
 			if ( $type === 'YesNo' )
 			{
-				if ( isset ( $role ) and !( $globalValue) )
+				if ( isset ( $role ) and ! $globalValue )
 				{
 					$options[ 'disabled' ] = TRUE;
 					$currentValue = $globalValue;
