@@ -311,7 +311,7 @@ class _Role extends \IPS\Node\Model
 				$form->add( $switch = new \IPS\Helpers\Form\YesNo( 'perm_' . $k, in_array( $k, $current ) ) );
 				$switch->label = \IPS\Member::loggedIn()->language()->addToStack( 'collab_perm_' . $k );
 				$form->addHtml( "<ul class='role-permissions'>" );
-				$switch->options[ 'togglesOn' ] = $this->_addPermissionSet( $form, $v, $role );
+				$switch->options[ 'togglesOn' ] = $this->_addPermissionSet( $form, $v );
 				$form->addHtml( "</ul>" );
 				$added[] = $form->id . '_perm_' . $k;
 			}
@@ -322,6 +322,7 @@ class _Role extends \IPS\Node\Model
 				$added[] = $form->id . '_perm_' . $v;
 			}
 		}
+		
 		return $added;
 	}
 
@@ -434,6 +435,7 @@ class _Role extends \IPS\Node\Model
 	{
 		if ( $collab = $this->collab() )
 		{
+			
 			if ( array_key_exists( $perm, \IPS\collab\Application::flattenPermissions( $collab->collabPermissions(), explode( ',', $this->perms ) ) ) )
 			{
 				return TRUE;
