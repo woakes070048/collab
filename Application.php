@@ -55,19 +55,17 @@ class _Application extends \IPS\collab\Secure\Application
 	 * @brief	Initialized Flag
 	 */
 	static $initialized = FALSE;
-	
-	/**
+		
+	/** 
 	 * Init
 	 */
 	public function init()
 	{
-		/* Switch to any queued theme */
-		if ( static::$initSwitchTheme !== NULL )
-		{
-			\IPS\Theme::switchTheme( static::$initSwitchTheme );
-		}
-		
-		static::$initialized = TRUE;
+		/**
+		 * Ideally, we would run the code from the constructor here... but IPS doesn't trigger init() for
+		 * apps after they are created. grrrr
+		 * ./system/Application/Application.php  :  \IPS\Application::constructFromData()
+		 */
 	}
 	
 	/**
@@ -452,7 +450,7 @@ class _Application extends \IPS\collab\Secure\Application
 						static::$inferredCollab = $obj;	
 						
 						/* Set Theme */
-						//$obj->setTheme();
+						$obj->setTheme();
 						
 						return;				
 					}
