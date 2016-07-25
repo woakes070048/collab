@@ -48,6 +48,24 @@ class collab_hook_ipsDispatcherFront extends _HOOK_CLASS_
 	}
 	
 	/**
+	 * Init
+	 *
+	 * @return	void
+	 */
+	public function init()
+	{
+		parent::init();
+		
+		/* Switch to any queued theme */
+		if ( \IPS\collab\Application::$initSwitchTheme !== NULL )
+		{
+			\IPS\Theme::switchTheme( \IPS\collab\Application::$initSwitchTheme );
+		}
+		
+		\IPS\collab\Application::$initialized = TRUE;
+	}
+	
+	/**
 	 * Finish
 	 *
 	 * @return	void
