@@ -30,7 +30,7 @@
 			{{if $category->can('view')}}
 				{{if $category->hasChildren()}}
 				<li data-categoryID='{$nid}_{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
-					<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
+					<h2 class="ipsType_sectionTitle ipsType_reset">
 						<a href='{$category->url()}'>{$category->_title}</a>
 					</h2>
 					{{if $options[ 'gridview' ] and $category->childrenCount() >= $options[ 'gridthreshold' ]}}
@@ -55,7 +55,7 @@
 	{{else}}
 		{{if $not_empty}}
 		<li class='ipsBox ipsSpacer_bottom'>
-			<h2 class="ipsType_sectionTitle ipsType_reset ipsType_blendLinks">
+			<h2 class="ipsType_sectionTitle ipsType_reset">
 				{lang="$title_lang"}
 			</h2>
 			{{if $options[ 'gridview' ] and count( $nodeClass::roots() ) >= $options[ 'gridthreshold' ]}}

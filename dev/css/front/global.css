@@ -20,7 +20,13 @@ html[dir="rtl"] #elEditCollab.editable {
 	left: 70px;
 }
 
+.collabHeader .headerContent h1 {
+	font-size: 2em;
+	line-height: 2.2em;
+}
+
 @media ( max-width: 759px ) {
+
   .collabHeader .headerContent {
 	text-align: center;
 	width: 100%;
@@ -28,11 +34,11 @@ html[dir="rtl"] #elEditCollab.editable {
   .collabHeader .headerContent p {
 	margin:0;
   }
-}
-
-.collabHeader .headerContent h1 {
+  .collabHeader .headerContent h1 {
 	font-size: 2em;
-	line-height: 2.2em;
+	line-height: 1.2em;
+  }
+  
 }
 
 .collabHeader .ipsCoverPhoto_button {
@@ -124,4 +130,50 @@ html[dir="rtl"] #elCollabStats > ul:last-child > li {
 
 #elSelect_collab_menu_icon option {
 	padding: 10px 0 10px 10px;
+}
+
+.collabHeader .collabLogoWrap {
+	padding:15px;
+}
+
+.collabHeader #collabLogo {
+	max-width:150px; 
+	max-height:150px; 
+	padding:2px; 
+	border:1px solid #ddd; 
+	background-color: #fff;
+}
+
+/* Minified Header */
+.collabHeadMinified #elCollabStats {
+	font-size:12px;
+	padding: 6px 12px;
+	height: 55px;
+	min-height: 55px;
+}
+
+.collabHeadMinified .minifyHide {
+	display:none;
+}
+
+.collabHeadMinified.collabHeader #collabLogo {
+	max-width:50px;
+	max-height:50px;
+}
+
+.collabHeadMinified.collabHeader .collabLogoWrap {
+	padding:7px;
+}
+
+@media ( min-width: 760px ) {
+  .collabHeadMinified.collabHeader .ipsPageHead_special {
+	height: 85px;
+	min-height: 85px;
+  }
+}
+
+@media ( max-width: 759px ) {
+  #elCollabStats {
+	display: none;
+  }
 }

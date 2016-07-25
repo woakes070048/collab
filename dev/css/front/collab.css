@@ -4,6 +4,10 @@
 	margin:0;
 }
 
+.collabTitleHeight {
+	line-height:1.2em;
+}
+
 /* Admin CSS Transplants */
 
 .ipsToolList_horizontal {
@@ -160,6 +164,34 @@ section.collabCategoryIndex {
 
 .collabCategoryCoverLayout_standard .collabCategoryDescription {
 	max-width: 500px;
+}
+
+/* Collab Row */
+.collabListTable .collabLogoBox {
+	padding: 0px 5px 0px 0px; 
+	position: relative; 
+	width: 85px; 
+	min-width: 85px;
+}
+
+.collabListTable .membershipCount {
+	position: absolute; 
+	top: -2px; 
+	right: -2px;
+}
+
+.collabListTable .membershipStatus {
+	position: absolute; 
+	bottom: 0px; 
+	left: -2px;
+}
+
+.collabListTable .collabLogoImg {
+	max-height: 75px; 
+	max-width:75px;
+	border: 1px solid #ddd; 
+	padding: 3px;
+	border-radius: 50%;
 }
 
 /* DESKTOP */

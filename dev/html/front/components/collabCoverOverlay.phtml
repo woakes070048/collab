@@ -24,8 +24,8 @@
 		{{$configuration = $collab->container()->_configuration;}}
 		{{if $collab->logo and isset( $configuration[ 'logo_mode' ] ) and $configuration[ 'logo_mode' ] != 'none'}}
 		{{$logo = \IPS\File::get( 'collab_Logos', $collab->logo );}}
-		<div class='ipsPos_left ipsPad ipsResponsive_hidePhone'>
-			<img style="max-width:150px; max-height:150px; padding:2px; border:1px solid #ddd; background-color: #fff;" src="{$logo->url}" />
+		<div class='ipsPos_left collabLogoWrap ipsResponsive_hidePhone'>
+			<img id="collabLogo" src="{$logo->url}" />
 		</div>
 		{{endif}}
 		<div class='ipsPos_left ipsPad headerContent' style='padding-top:0'>
@@ -83,6 +83,6 @@
 		</div>
 	</div>
 </div>
-<div id="collabModOptions">
+<div id="collabModOptions" class="minifyHide">
 	{template="menuModerators" app="collab" group="components" params="$collab"}
 </div>

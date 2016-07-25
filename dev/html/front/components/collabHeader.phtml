@@ -1,5 +1,5 @@
 <ips:template parameters="$collab" />
-<header class="collabHeader">
+<header class="collabHeader{{if ! \IPS\collab\Application::urlMatch( $collab )}} collabHeadMinified{{endif}}">
 	{$collab->coverPhoto()|raw}
 	{template="collabStatBar" app="collab" group="components" params="$collab"}
 </header>
