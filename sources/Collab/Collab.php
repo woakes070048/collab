@@ -234,17 +234,38 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			),
 		) );
 		
+		$categoryOptions = $this->container()->_options;
+		
 		foreach ( $this->enabledNodes() as $app => $configured )
 		{
 			$lang->words[ 'collab_perm_appManage-' . $app ] = $lang->addToStack( 'collab_perm_nodeManage', FALSE, array( 'sprintf' => array( $lang->addToStack( '__app_' . $app ) ) ) );			
 			foreach ( $configured[ 'nodes' ] as $node )
 			{
 				$nid = md5( $node['node'] );
-				$this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] = array_merge( ( isset( $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] ) ? $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] : array() ), array(
-					"nodeAdd-{$nid}",
-					"nodeEdit-{$nid}",
-					"nodeDelete-{$nid}",
-				) );
+				
+				$existingPerms = isset( $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] ) ? $this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] : array();
+				$nodePerms = array();
+				
+				/* Add Enabled? */
+				if ( isset( $categoryOptions[ 'node_' . $nid ][ 'enable_add' ] ) and $categoryOptions[ 'node_' . $nid ][ 'enable_add' ] )
+				{
+					$nodePerms[] = 'nodeAdd-' . $nid;
+				}
+				
+				/* Edit Enabled? */
+				if ( isset( $categoryOptions[ 'node_' . $nid ][ 'enable_edit' ] ) and $categoryOptions[ 'node_' . $nid ][ 'enable_edit' ] )
+				{
+					$nodePerms[] = 'nodeEdit-' . $nid;
+				}
+				
+				/* Delete Enabled? */
+				if ( isset( $categoryOptions[ 'node_' . $nid ][ 'enable_delete' ] ) and $categoryOptions[ 'node_' . $nid ][ 'enable_delete' ] )
+				{
+					$nodePerms[] = 'nodeDelete-' . $nid;
+				}
+				
+				$this->permissions[ 'manageCollab' ][ "appManage-{$app}" ] = array_merge( $existingPerms, $nodePerms );
+				
 				$lang->words[ 'collab_perm_nodeAdd-' . $nid ] = $lang->addToStack( 'collab_perm_nodeAdd', FALSE, array( 'sprintf' => array( $lang->addToStack( $node['node']::$nodeTitle ) ) ) );
 				$lang->words[ 'collab_perm_nodeEdit-' . $nid ] = $lang->addToStack( 'collab_perm_nodeEdit', FALSE, array( 'sprintf' => array( $lang->addToStack( $node['node']::$nodeTitle ) ) ) );
 				$lang->words[ 'collab_perm_nodeDelete-' . $nid ] = $lang->addToStack( 'collab_perm_nodeDelete', FALSE, array( 'sprintf' => array( $lang->addToStack( $node['node']::$nodeTitle ) ) ) );
@@ -1389,13 +1410,13 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 			 */
 			if ( \IPS\Application::appIsEnabled( 'rules' ) )
 			{
-				\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_invited' )->trigger( $member, $sponsor, $collab, $membership );
+				\IPS\rules\Event::load( 'collab', 'Collaboration', 'member_invited' )->trigger( $member, $sponsor, $membership->collab(), $membership );
 			}
 			
 			if ( ! $skipNotification )
 			{
 				// Send "Invited" Notification
-				$notification = new \IPS\Notification( \IPS\Application::load( 'collab' ), 'collab_invitation_received', $membership, array( $membership->sponsor(), $collab, $membership ) );
+				$notification = new \IPS\Notification( \IPS\Application::load( 'collab' ), 'collab_invitation_received', $membership, array( $membership->sponsor(), $membership->collab(), $membership ) );
 				$notification->recipients->attach( $membership->member() );
 				$notification->send();
 			}
@@ -1405,11 +1426,7 @@ class _Collab extends \IPS\collab\Secure\Collab implements
 		
 		return NULL;
 	}
-	
-	/**
-	 * Approve Member to Collab
-	 */
-	
+		
 	/**
 	 * Collab member permission check
 	 *
