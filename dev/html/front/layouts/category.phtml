@@ -1,4 +1,4 @@
-<ips:template parameters="$category, $table" />
+<ips:template parameters="$category, $content" />
 
 <div class="collabLayout">
 	<header class="collabCategoryHeader">
@@ -18,7 +18,11 @@
 		{{endif}}
 	</header>
 
-	{{if $category->collabs_enable}}
-		{$table|raw}
+	{{if $category->can( 'view' )}}
+		{{if $category->collabs_enable}}
+			{$content|raw}
+		{{endif}}
+	{{else}}
+		{$content|raw}
 	{{endif}}
 </div>

@@ -36,7 +36,21 @@ class _categories extends \IPS\Helpers\CoverPhoto\Controller
 		{
 			try
 			{
-				$this->_category( \IPS\collab\Category::loadAndCheckPerms( \IPS\Request::i()->category ) );
+				$category = \IPS\collab\Category::load( \IPS\Request::i()->category );
+				
+				if ( ! $category->can( 'view' ) )
+				{
+					if ( strip_tags( $category->denied_message ) == "" )
+					{
+						\IPS\Output::i()->error( 'collab_category_denied', '2CCV1/B', 404, '' );
+					}
+					
+					\IPS\Output::i()->title = \IPS\Member::loggedIn()->language()->addToStack( $category->_title );
+					\IPS\Output::i()->output = \IPS\Theme::i()->getTemplate( 'layouts' )->category( $category, $category->denied_message );
+					return;
+				}
+				
+				$this->_category( $category );
 			}
 			catch ( \OutOfRangeException $e )
 			{

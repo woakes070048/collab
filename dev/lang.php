@@ -159,6 +159,7 @@ $lang = array(
 	'collab_force_model_desc'		=> "If you enable this option, users will be forced to select a %s model when they create a new %s. If only one model is available, it will be used automatically.",
 	'collab_multiple_models'		=> "Model Choices",
 	'collab_multiple_models_desc'		=> "If you allow multiple choices, newly created %s can have a configuration that combines all the models selected by the user.",
+	'category_denied'			=> "Custom 'Permission Denied' Content",
 	
 	'collab_category_privacy_mode'		=> "Listing Mode",
 	'collab_category_privacy_mode_desc'	=> "In public listing mode, collabs are always visibly listed for any member with permissions to view this category. In private listing mode, collabs are only visibly listed when their join mode is open to all, or if a member is already an active member of that collab.",
@@ -173,6 +174,7 @@ $lang = array(
 	
 	// Category View
 	'no_collabs_in_category'		=> "This category does not contain any %s",
+	'collab_category_denied'		=> "You do not have permission to view this category.",
 	
 	// Collab Create / Edit Form
 	'collab_collab_tags'			=> "Tags",

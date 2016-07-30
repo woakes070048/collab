@@ -177,6 +177,16 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 	}
 
 	/**
+	 * Get denied message
+	 *
+	 * @return	string
+	 */
+	protected function get_denied_message()
+	{
+		return \IPS\Member::loggedIn()->language()->checkKeyExists( "collab_category_{$this->id}_denied" ) ? \IPS\Member::loggedIn()->language()->get( "collab_category_{$this->id}_denied" ) : '';
+	}
+	
+	/**
 	 * Get SEO name
 	 *
 	 * @return	string
@@ -644,6 +654,19 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 			)
 		) ) );
 		
+		$form->add( new \IPS\Helpers\Form\Translatable( 'category_denied', NULL, FALSE, array
+		(
+			'app'		=> 'collab',
+			'key'		=> ( $this->id ? "collab_category_{$this->id}_denied" : NULL ),
+			'editor'	=> array(
+				'app'			=> 'collab',
+				'key'			=> 'Categories',
+				'autoSaveKey'		=> ( $this->id ? "collab-cat-{$this->id}-denied" : "collab-new-cat-denied" ),
+				'attachIds'		=> $this->id ? array( $this->id, NULL, 'category_denied' ) : NULL, 
+				'minimize'		=> 'cdesc_placeholder'
+			)
+		) ) );
+		
 		$form->add( new \IPS\Helpers\Form\Node( 'category_parent_id', $this->id ? $this->parent_id : ( \IPS\Request::i()->parent ?: 0 ), TRUE, array
 		(
 			'class'			=> 'IPS\collab\Category',
@@ -1064,10 +1087,12 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 			$this->_options = array();
 			$this->save();
 			\IPS\File::claimAttachments( 'collab-new-cat', $this->id, NULL, 'description', TRUE );
+			\IPS\File::claimAttachments( 'collab-new-cat-denied', $this->id, NULL, 'denied', TRUE );
 		}
 		else
 		{
 			\IPS\File::claimAttachments( 'collab-cat-' . $this->id, $this->id, NULL, 'description', TRUE );
+			\IPS\File::claimAttachments( 'collab-cat-' . $this->id . '-denied', $this->id, NULL, 'denied', TRUE );
 		}
 		
 		/* Update node option settings */
@@ -1115,6 +1140,7 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 		/* Custom language fields */
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}", $values[ 'category_name' ] );
 		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_desc", $values[ 'category_description' ] );
+		\IPS\Lang::saveCustom( 'collab', "collab_category_{$this->id}_denied", $values[ 'category_denied' ] );
 		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collab_singular", $values[ 'collabs_alias_singular' ] );
 		\IPS\Lang::saveCustom( 'collab', "collab_cat_{$this->id}_collabs_plural", $values[ 'collabs_alias_plural' ] );
 
