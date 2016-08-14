@@ -69,7 +69,62 @@ abstract class collab_hook_ipsContent extends _HOOK_CLASS_
 			catch ( \OutOfRangeException $e ) { }
 		}
 
-		return $modCan or call_user_func_array( 'parent::modPermission', func_get_args() );
+		return ( $modCan or call_user_func_array( 'parent::modPermission', func_get_args() ) );
+	}
+	
+	/**
+	 * Send Unapproved Notification
+	 *
+	 * @return	void
+	 */
+	public function sendUnapprovedNotification()
+	{
+		if ( $collab = \IPS\collab\Application::getCollab( $this ) )
+		{
+			$moderators = array();
+			$container = NULL;
+			
+			if ( $this instanceof \IPS\Content\Comment )
+			{
+				$container = $this->item()->containerWrapper();
+			}
+			
+			if ( $this instanceof \IPS\Content\Item )
+			{
+				$container = $this->containerWrapper();
+			}
+			
+			foreach( $collab->memberships( array( 'permissions' => array( 'moderateContent' ) ) ) as $membership )
+			{
+				$member = $membership->member();
+				if ( static::modPermission( 'view_hidden', $member, $container ) and static::modPermission( 'unhide', $member, $container ) )
+				{
+					$moderators[ $member->member_id ] = $member;
+				}
+			}
+			
+			/* If there are no moderators, then send notification to the collab owner */
+			if ( empty( $moderators ) )
+			{
+				$moderators[ $collab->author()->member_id ] = $collab->author();
+			}
+			
+			/* Send notification to collab moderators */
+			$notification = new \IPS\Notification( \IPS\Application::load('core'), 'unapproved_content', $this, array( $this, $this->author() ) );
+			foreach ( $moderators as $member )
+			{
+				if( $this->author()->member_id != $member->member_id )
+				{
+					$notification->recipients->attach( $member );
+				}
+			}
+			
+			$notification->send();
+		}
+		else
+		{
+			return parent::sendUnapprovedNotification();
+		}
 	}
 	
 	/**
