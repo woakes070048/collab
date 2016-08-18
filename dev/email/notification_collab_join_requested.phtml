@@ -1,3 +1,10 @@
 <ips:template parameters="$member, $collab, $membership, $email" />
 
-{$member->name} has requested to join "{$collab->title}".
+<p>
+  <a href="{$member->url()}">{$member->name}</a> has requested to join the {expression="mb_strtolower($collab->collab_singular)"} "<a href="{$collab->url()}>">{$collab->title}</a>".
+</p>
+
+{$membership->member_notes|raw}
+
+<br>
+<a href="{url='app=collab&module=collab&controller=collabs&id={$collab->collab_id}&do=joinRequest'}" style="color: #ffffff; font-family: 'Helvetica Neue', helvetica, sans-serif; text-decoration: none; font-size: 14px; background: {setting="email_color"}; line-height: 32px; padding: 0 10px; display: inline-block; border-radius: 3px;">Send Reply</a>
