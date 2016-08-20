@@ -102,5 +102,9 @@
     "ipsApp": {
         "type": "C",
         "class": "\\IPS\\core\\tasks\\updatecheck"
+    },
+    "extCoreNotificationsContent": {
+        "type": "C",
+        "class": "\\IPS\\core\\extensions\\core\\Notifications\\Content"
     }
 }

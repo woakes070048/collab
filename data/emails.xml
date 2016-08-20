@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <emails><template><template_app>collab</template_app><template_name>notification_collab_join_accepted</template_name><template_content_html><![CDATA[
-Congratulations! {$sponsor->name} has accepted your request to join "{$collab->title}".]]></template_content_html><template_data>$sponsor, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+<p>
+  Congratulations! <a href="{$sponsor->url()}">{$sponsor->name}</a> has accepted your request to join the {expression="mb_strtolower($collab->collab_singular)"} "<a href="{$collab->url()}>">{$collab->title}</a>".
+</p>
+
+{$membership->collab_notes|raw}]]></template_content_html><template_data>$sponsor, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
 Congratulations! {$sponsor->name} has accepted your request to join "{$collab->title}".]]></template_content_plaintext></template><template><template_app>collab</template_app><template_name>notification_collab_invitation_accepted</template_name><template_content_html><![CDATA[
-{$member->name} has accepted your invitation to "{$collab->title}".]]></template_content_html><template_data>$member, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+<p>
+  <a href="{$member->url()}">{$member->name}</a> has accepted your invitation to join the {expression="mb_strtolower($collab->collab_singular)"} "<a href="{$collab->url()}>">{$collab->title}</a>".
+</p>
+
+{$membership->member_notes|raw}]]></template_content_html><template_data>$member, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
 {$member->name} has accepted your invitation to "{$collab->title}".]]></template_content_plaintext></template><template><template_app>collab</template_app><template_name>notification_collab_join_requested</template_name><template_content_html><![CDATA[
-{$member->name} has requested to join "{$collab->title}".]]></template_content_html><template_data>$member, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+<p>
+  <a href="{$member->url()}">{$member->name}</a> has requested to join the {expression="mb_strtolower($collab->collab_singular)"} "<a href="{$collab->url()}>">{$collab->title}</a>".
+</p>
+
+{$membership->member_notes|raw}
+
+<br>
+<a href="{url='app=collab&module=collab&controller=collabs&id={$collab->collab_id}&do=joinRequest'}" style="color: #ffffff; font-family: 'Helvetica Neue', helvetica, sans-serif; text-decoration: none; font-size: 14px; background: {setting="email_color"}; line-height: 32px; padding: 0 10px; display: inline-block; border-radius: 3px;">Send Reply</a>]]></template_content_html><template_data>$member, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
 {$member->name} has requested to join "{$collab->title}".]]></template_content_plaintext></template><template><template_app>collab</template_app><template_name>notification_collab_invitation_received</template_name><template_content_html><![CDATA[
-{$sponsor->name} has invited you to join "{$collab->title}".]]></template_content_html><template_data>$sponsor, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
+<p>
+  <a href="{$sponsor->url()}">{$sponsor->name}</a> has invited you to join the {expression="mb_strtolower($collab->collab_singular)"} "<a href="{$collab->url()}>">{$collab->title}</a>".
+</p>
+
+{$membership->collab_notes|raw}
+
+<br>
+<a href="{url='app=collab&module=collab&controller=collabs&id={$collab->collab_id}&do=joinRequest'}" style="color: #ffffff; font-family: 'Helvetica Neue', helvetica, sans-serif; text-decoration: none; font-size: 14px; background: {setting="email_color"}; line-height: 32px; padding: 0 10px; display: inline-block; border-radius: 3px;">Send Reply</a>]]></template_content_html><template_data>$sponsor, $collab, $membership, $email</template_data><template_content_plaintext><![CDATA[
 {$sponsor->name} has invited you to join "{$collab->title}".]]></template_content_plaintext></template></emails>

@@ -605,8 +605,15 @@ class _Application extends \IPS\collab\Secure\Application
 					}
 				}
 				
-				/* Filter out any empty parameters */
-				$param = $url->_queryString;
+				/* IPS 4.1.14+ */
+				if ( class_exists( 'IPS\Http\Url\Friendly' ) )
+				{
+					$param = $url->hiddenQueryString;
+				}
+				else
+				{
+					$param = $url->_queryString;
+				}
 
 				if ( ! empty( $param ) )
 				{

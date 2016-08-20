@@ -1654,7 +1654,16 @@ class _Category extends \IPS\collab\Secure\Category implements \IPS\Node\Permiss
 	 */
 	public static function loadFromUrl( \IPS\Http\Url $url )
 	{
-		$qs = array_merge( $url->queryString, $url->getFriendlyUrlData() );
+		if ( class_exists( 'IPS\Http\Url\Friendly' ) )
+		{
+			/* IPS 4.1.14+ */
+			$qs = array_merge( $url->queryString, $url->hiddenQueryString );
+		}
+		else
+		{
+			/* IPS 4.1.13 and below */
+			$qs = array_merge( $url->queryString, $url->getFriendlyUrlData() );
+		}
 		
 		if ( isset( $qs['category'] ) )
 		{

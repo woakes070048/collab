@@ -15,7 +15,7 @@ class collab_hook_ipsHttpUrl extends _HOOK_CLASS_
 	 * @return	void
 	 * @throws	\InvalidArgumentException
 	 */
-	public function __construct( $url, $internal=NULL )
+	public function __construct( $url=NULL )
 	{
 		call_user_func_array( 'parent::__construct', func_get_args() );
 		$this->_queryString = $this->queryString;
