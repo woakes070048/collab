@@ -583,64 +583,77 @@ class _Application extends \IPS\collab\Secure\Application
 	 */
 	public static function urlMatch( $obj )
 	{
-		try
+		/* Wait for \IPS\Dispatcher to be initialized so that all url functions work correctly */
+		if ( \IPS\collab\Application::$initialized )
 		{
-			if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
+			try
 			{
-				/**
-				 * Work out request parameters
-				 */
-				if ( ! isset ( static::$request ) )
+				if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
 				{
-					try
+					/* IPS 4.1.14+ */
+					if ( class_exists( 'IPS\Http\Url\Friendly' ) )
 					{
-						static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
-						static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
-					}
-					catch ( \Exception $e ) { }
-					
-					if ( ! static::$request )
-					{
-						static::$request = \IPS\Request::i();
-					}
-				}
-				
-				/* IPS 4.1.14+ */
-				if ( class_exists( 'IPS\Http\Url\Friendly' ) )
-				{
-					$param = $url->hiddenQueryString;
-				}
-				else
-				{
-					$param = $url->_queryString;
-				}
-
-				if ( ! empty( $param ) )
-				{
-					/**
-					 * Compare the object url to the current url
-					 * and see if the object owns the current page
-					 */
-					foreach ( $param as $k => $v )
-					{
-						
-						if ( $k and static::$request->$k != $v )
+						/**
+						 * Work out request parameters
+						 */
+						if ( ! isset ( static::$request ) )
 						{
-							// Nope.
-							return FALSE;
+							$u = \IPS\Request::i()->url();
+							static::$request = (object) array_merge( $u->queryString, $u->hiddenQueryString );
+						}						
+						
+						$param = array_merge( $url->queryString, $url->hiddenQueryString );
+					}
+					else
+					{
+						/**
+						 * Work out request parameters
+						 */
+						if ( ! isset ( static::$request ) )
+						{
+							try
+							{
+								static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
+								static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
+							}
+							catch ( \Exception $e ) { }
+							
+							if ( ! static::$request )
+							{
+								static::$request = \IPS\Request::i();
+							}
 						}
+						
+						$param = $url->_queryString;
 					}
 					
-					/* Yep */
-					return TRUE;
+					if ( ! empty( $param ) )
+					{
+						/**
+						 * Compare the object url to the current url
+						 * and see if the object owns the current page
+						 */
+						foreach ( $param as $k => $v )
+						{
+							
+							if ( $k and static::$request->$k != $v )
+							{
+								// Nope.
+								return FALSE;
+							}
+						}
+						
+						/* Yep */
+						return TRUE;
+					}
 				}
 			}
+			
+			// IPS\cms\Records throws LogicException if database is not linked to a page
+			// IPS\Node\Model throws BadMethodCallException if url is not supported
+			catch( \Exception $e ) { }
 		}
 		
-		// IPS\cms\Records throws LogicException if database is not linked to a page
-		// IPS\Node\Model throws BadMethodCallException if url is not supported
-		catch( \Exception $e ) { }
-	
 		return FALSE;
 	}
 	
