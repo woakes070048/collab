@@ -7,6 +7,8 @@ $lang = array(
 	'module__collab_collab'			=> "Collaboration",
 	'__indefart_collab' 			=> "a collab",
 	'__indefart_collab_comment'		=> "a post in a collab",
+	'__defart_collab'			=> "the collab",
+	'__defart_collab_comment'		=> "a post in the collab",
 	
 	// Administration Restrictions
 	'r__collab_categories_manage'		=> "Manage Categories",
