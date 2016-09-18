@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="collab" version="10313">
+ <app key="collab" version="10314">
   <word key="__app_collab" js="0">Collaboration</word>
   <word key="module__collab_collab" js="0">Collaboration</word>
   <word key="__indefart_collab" js="0">a collab</word>
   <word key="__indefart_collab_comment" js="0">a post in a collab</word>
+  <word key="__defart_collab" js="0">the collab</word>
+  <word key="__defart_collab_comment" js="0">a post in the collab</word>
   <word key="r__collab_categories_manage" js="0">Manage Categories</word>
   <word key="r__collab_settings_manage" js="0">Manage Settings</word>
   <word key="menu__collab_collab" js="0">Collaboration</word>
