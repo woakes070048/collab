@@ -583,76 +583,85 @@ class _Application extends \IPS\collab\Secure\Application
 	 */
 	public static function urlMatch( $obj )
 	{
-		/* Wait for \IPS\Dispatcher to be initialized so that all url functions work correctly */
-		if ( \IPS\collab\Application::$initialized )
+		/* 
+		 * Prevent matching on Pages nodes. They cannot belong to a collab anyway.
+		 * 
+		 * Reason: Pages will load a page node during its friendly url creation,
+		 * and if the request url is a pages friendly url, then this method will
+		 * cache the \IPS\Request::i()->url() before pages has a chance to set its
+		 * friendly url parameters (because of a recursive call). No good.
+		 */
+		if ( $obj instanceof \IPS\cms\Pages\Page )
 		{
-			try
+			return FALSE;
+		}
+		
+		try
+		{
+			if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
 			{
-				if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
+				/* IPS 4.1.14+ */
+				if ( class_exists( 'IPS\Http\Url\Friendly' ) )
 				{
-					/* IPS 4.1.14+ */
-					if ( class_exists( 'IPS\Http\Url\Friendly' ) )
+					/**
+					 * Work out request parameters
+					 */
+					if ( ! isset ( static::$request ) )
 					{
-						/**
-						 * Work out request parameters
-						 */
-						if ( ! isset ( static::$request ) )
-						{
-							$u = \IPS\Request::i()->url();
-							static::$request = (object) array_merge( $u->queryString, $u->hiddenQueryString );
-						}						
-						
-						$param = array_merge( $url->queryString, $url->hiddenQueryString );
-					}
-					else
+						$u = \IPS\Request::i()->url();
+						static::$request = (object) array_merge( $u->queryString, $u->hiddenQueryString );
+					}						
+					
+					$param = array_merge( $url->queryString, $url->hiddenQueryString );
+				}
+				else
+				{
+					/**
+					 * Work out request parameters
+					 */
+					if ( ! isset ( static::$request ) )
 					{
-						/**
-						 * Work out request parameters
-						 */
-						if ( ! isset ( static::$request ) )
+						try
 						{
-							try
-							{
-								static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
-								static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
-							}
-							catch ( \Exception $e ) { }
-							
-							if ( ! static::$request )
-							{
-								static::$request = \IPS\Request::i();
-							}
+							static::$request = \IPS\Request::i()->url()->getFriendlyUrlData();
+							static::$request = ! empty ( static::$request ) ? (object) static::$request : NULL;
 						}
+						catch ( \Exception $e ) { }
 						
-						$param = $url->_queryString;
+						if ( ! static::$request )
+						{
+							static::$request = \IPS\Request::i();
+						}
 					}
 					
-					if ( ! empty( $param ) )
+					$param = $url->_queryString;
+				}
+				
+				if ( ! empty( $param ) )
+				{
+					/**
+					 * Compare the object url to the current url
+					 * and see if the object owns the current page
+					 */
+					foreach ( $param as $k => $v )
 					{
-						/**
-						 * Compare the object url to the current url
-						 * and see if the object owns the current page
-						 */
-						foreach ( $param as $k => $v )
-						{
-							
-							if ( $k and static::$request->$k != $v )
-							{
-								// Nope.
-								return FALSE;
-							}
-						}
 						
-						/* Yep */
-						return TRUE;
+						if ( $k and static::$request->$k != $v )
+						{
+							// Nope.
+							return FALSE;
+						}
 					}
+					
+					/* Yep */
+					return TRUE;
 				}
 			}
-			
-			// IPS\cms\Records throws LogicException if database is not linked to a page
-			// IPS\Node\Model throws BadMethodCallException if url is not supported
-			catch( \Exception $e ) { }
 		}
+		
+		// IPS\cms\Records throws LogicException if database is not linked to a page
+		// IPS\Node\Model throws BadMethodCallException if url is not supported
+		catch( \Exception $e ) { }
 		
 		return FALSE;
 	}
