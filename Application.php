@@ -599,7 +599,7 @@ class _Application extends \IPS\collab\Secure\Application
 		try
 		{
 			if ( method_exists( $obj, 'url' ) and $url = $obj->url() )
-			{
+			{			
 				/* IPS 4.1.14+ */
 				if ( class_exists( 'IPS\Http\Url\Friendly' ) )
 				{
@@ -609,10 +609,10 @@ class _Application extends \IPS\collab\Secure\Application
 					if ( ! isset ( static::$request ) )
 					{
 						$u = \IPS\Request::i()->url();
-						static::$request = (object) array_merge( $u->queryString, $u->hiddenQueryString );
+						static::$request = (object) array_merge( (array) $u->queryString, (array) $u->hiddenQueryString );
 					}						
 					
-					$param = array_merge( $url->queryString, $url->hiddenQueryString );
+					$param = array_merge( (array) $url->queryString, (array) $url->hiddenQueryString );
 				}
 				else
 				{
