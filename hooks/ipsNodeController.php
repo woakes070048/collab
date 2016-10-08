@@ -428,4 +428,35 @@ class collab_hook_ipsNodeController extends _HOOK_CLASS_
 		\IPS\Output::i()->redirect( $this->url, 'collab_node_extracted_from_collab' );		
 	}
 	
+	/**
+	 * Get form
+	 *
+	 * @param	\IPS\Node\Model
+	 * @return	\IPS\Helpers\Form
+	 */
+	protected function _addEditForm( \IPS\Node\Model $node )
+	{
+		$form = parent::_addEditForm( $node );
+		
+		/* Special cases */
+
+		/* Forums in collab context... allow them to be saved without a category as a parent */
+		if ( $node instanceof \IPS\forums\Forum and \IPS\collab\Application::activeCollab() )
+		{
+			if ( isset( $form->elements[ 'forum_settings' ][ 'forum_type' ] ) and isset( $form->elements[ 'forum_settings' ][ 'forum_parent_id' ] ) )
+			{
+				$forum_type = $form->elements[ 'forum_settings' ][ 'forum_type' ];
+				$forum_parent = $form->elements[ 'forum_settings' ][ 'forum_parent_id' ];
+				
+				/* Clear any potential "category required" error */
+				if ( $forum_type->value == 'normal' and $forum_parent->value == 0 )
+				{
+					$forum_parent->error = NULL;
+				}
+			}
+		}
+		
+		return $form;
+	}	
+	
 }
